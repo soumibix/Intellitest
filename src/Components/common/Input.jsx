@@ -12,6 +12,10 @@ const Input = ({
   error = '',
   disabled = false,
   className = '',
+  showRememberMe = false,
+  rememberMeChecked = false,
+  onRememberMeChange,
+  rememberMeLabel = 'Remember me',
   ...props
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +27,7 @@ const Input = ({
     lg: 'px-5 py-3 text-lg',
   };
 
-  const baseInputClasses = `w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+  const baseInputClasses = `w-full rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#631891] focus:border-transparent transition-all ${
     sizeClasses[size]
   } ${disabled ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white'} ${
     error ? 'border-red-500 focus:ring-red-500' : ''
@@ -125,27 +129,32 @@ const Input = ({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
           {label}
         </label>
       )}
       {renderInput()}
-      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-sm text-red-600 text-left">{error}</p>}
+      
+      {showRememberMe && (
+        <div className="mt-3 flex items-center">
+          <input
+            type="checkbox"
+            id={`remember-${label || 'checkbox'}`}
+            checked={rememberMeChecked}
+            onChange={(e) => onRememberMeChange && onRememberMeChange(e.target.checked)}
+            className="w-4 h-4 text-[#631891] bg-white border-gray-300 rounded cursor-pointer"
+          />
+          <label
+            htmlFor={`remember-${label || 'checkbox'}`}
+            className="ml-2 text-sm font-medium text-[#2B2B2B] cursor-pointer"
+          >
+            {rememberMeLabel}
+          </label>
+        </div>
+      )}
     </div>
   );
 };
-
-// Input.propTypes = {
-//   type: PropTypes.string,
-//   placeholder: PropTypes.string,
-//   value: PropTypes.string,
-//   onChange: PropTypes.func,
-//   options: PropTypes.array,
-//   size: PropTypes.oneOf(['sm', 'md', 'lg']),
-//   label: PropTypes.string,
-//   error: PropTypes.string,
-//   disabled: PropTypes.bool,
-//   className: PropTypes.string,
-// };
 
 export default Input;

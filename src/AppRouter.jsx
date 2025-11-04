@@ -2,12 +2,14 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import UserDashboard from "./Pages/User/UserDashboard";
 import UserSignIn from "./Pages/User/UserSignIn";
+import AdminLayout from "./Layout/Admin/Layout";
+import AdminDashboard from "./Pages/Admin/AdminDashboard";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
 
 // *** EXISTING COMPONENTS (from your original code) ***
-const AdminDashboard = () => <h2>Admin Dashboard</h2>;
+// const AdminDashboard = () => <h2>Admin Dashboard</h2>;
 const AdminLogin = () => <h2>Admin Login</h2>;
 // const UserDashboard = () => <h2>User Dshboard</h2>;
 const NotFound = () => <h2>404 - Page Not Found</h2>;
@@ -266,11 +268,15 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
+          
+          {/* FIXED: AdminLayout wraps the content inside the element prop */}
           <Route
             path="/admin/dashboard"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboard />
+                <AdminLayout>
+                  <AdminDashboard />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
