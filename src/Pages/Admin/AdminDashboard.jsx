@@ -1,30 +1,31 @@
-import React, { useState } from 'react'
-import Input from '../../Components/common/Input'
+import React, { useState } from "react";
+import Input from "../../Components/common/Input";
+import Button from "../../Components/common/Button";
+import { ArrowRight, Plus } from "lucide-react";
 
 const AdminDashboard = () => {
   const [formData, setFormData] = useState({
-      text: '',
-      email: '',
-      password: '',
-      number: '',
-      tel: '',
-      date: '',
-      dropdown: '',
-    });
-      const [rememberMe, setRememberMe] = useState(false);
-    const [rememberEmail, setRememberEmail] = useState(false);
-  
-  
-    const handleChange = (field) => (e) => {
-      setFormData({ ...formData, [field]: e.target.value });
-    };
-  
-    const dropdownOptions = [
-      { label: 'Select an option', value: '' },
-      { label: 'Option 1', value: 'option1' },
-      { label: 'Option 2', value: 'option2' },
-      { label: 'Option 3', value: 'option3' },
-    ];
+    text: "",
+    email: "",
+    password: "",
+    number: "",
+    tel: "",
+    date: "",
+    dropdown: "",
+  });
+  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(false);
+
+  const handleChange = (field) => (e) => {
+    setFormData({ ...formData, [field]: e.target.value });
+  };
+
+  const dropdownOptions = [
+    { label: "Select an option", value: "" },
+    { label: "Option 1", value: "option1" },
+    { label: "Option 2", value: "option2" },
+    { label: "Option 3", value: "option3" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
@@ -40,19 +41,19 @@ const AdminDashboard = () => {
           <Input
             type="text"
             label="Text Input (Medium)"
-            className='bg-black'
+            className="bg-black"
             placeholder="Enter text here"
             value={formData.text}
-            onChange={handleChange('text')}
+            onChange={handleChange("text")}
             size="md"
           />
 
-         <Input
+          <Input
             type="email"
             label="Email Input with Remember Me"
             placeholder="your@email.com"
             value={formData.email}
-            onChange={handleChange('email')}
+            onChange={handleChange("email")}
             size="md"
             showRememberMe={true}
             rememberMeChecked={rememberEmail}
@@ -65,7 +66,7 @@ const AdminDashboard = () => {
             label="Password Input with Eye Icon"
             placeholder="Enter your password"
             value={formData.password}
-            onChange={handleChange('password')}
+            onChange={handleChange("password")}
             size="md"
           />
 
@@ -74,7 +75,7 @@ const AdminDashboard = () => {
             label="Number Input (Small)"
             placeholder="Enter a number"
             value={formData.number}
-            onChange={handleChange('number')}
+            onChange={handleChange("number")}
             size="sm"
           />
 
@@ -83,7 +84,7 @@ const AdminDashboard = () => {
             label="Phone Number"
             placeholder="+1 (555) 000-0000"
             value={formData.tel}
-            onChange={handleChange('tel')}
+            onChange={handleChange("tel")}
             size="md"
           />
 
@@ -91,7 +92,7 @@ const AdminDashboard = () => {
             type="date"
             label="Date Input"
             value={formData.date}
-            onChange={handleChange('date')}
+            onChange={handleChange("date")}
             size="md"
           />
 
@@ -100,7 +101,7 @@ const AdminDashboard = () => {
             label="Dropdown Select"
             placeholder="Choose an option"
             value={formData.dropdown}
-            onChange={handleChange('dropdown')}
+            onChange={handleChange("dropdown")}
             options={dropdownOptions}
             size="md"
           />
@@ -119,9 +120,31 @@ const AdminDashboard = () => {
             label="Input with Error"
             placeholder="This field has an error"
             value={formData.text}
-            onChange={handleChange('text')}
+            onChange={handleChange("text")}
             error="This field is required"
             size="md"
+          />
+          <Button text="Submit" color="blue" onClick={() => alert("Clicked")} />
+          <Button
+            text="Edit"
+            color="green"
+            variant="outline"
+            padding="px-8 py-3"
+            width="w-40"
+          />
+          <Button
+            text="Add User"
+            color="#000"
+            padding="px-6 py-3"
+            width="w-48"
+            icon={<Plus size={18} />}
+            iconPosition="left"
+          />
+          <Button
+            text="Next"
+            color="[#631891]"
+            icon={<ArrowRight size={18} />}
+            iconPosition="right"
           />
         </div>
 
@@ -133,7 +156,7 @@ const AdminDashboard = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;
