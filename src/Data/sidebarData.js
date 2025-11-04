@@ -1,11 +1,10 @@
-// src/Data/sidebarData.js
-import { Clock, FileText, GraduationCap, Settings } from "lucide-react";
+import { ChartPie, FileText, GraduationCap, Settings } from "lucide-react";
 
 export const portalNavItems = [
   {
     id: "dashboard",
     label: "Dashboard",
-    icon: Clock,
+    icon: ChartPie,
     hasDropdown: false,
     route: "/dashboard",
   },
