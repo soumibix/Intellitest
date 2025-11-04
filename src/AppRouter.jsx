@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import UserDashboard from "./Pages/User/UserDashboard";
+import UserSignIn from "./Pages/User/UserSignIn";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -9,7 +10,6 @@ const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, whe
 const AdminDashboard = () => <h2>Admin Dashboard</h2>;
 const AdminLogin = () => <h2>Admin Login</h2>;
 // const UserDashboard = () => <h2>User Dshboard</h2>;
-const UserLogin = () => <h2>User Login</h2>;
 const NotFound = () => <h2>404 - Page Not Found</h2>;
 
 // *** REDIRECT COMPONENTS FOR ROLE-BASED DASHBOARDS ***
@@ -228,7 +228,7 @@ const AppRouter = () => {
             path="/login"
             element={
               <GuestOnlyRoute>
-                <UserLogin />
+                <UserSignIn />
               </GuestOnlyRoute>
             }
           />
