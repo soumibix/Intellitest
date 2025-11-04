@@ -23,7 +23,7 @@ function Toast() {
 
         <button
           onClick={() => setIsVisible(false)}
-          className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors ml-4"
+          className="text-gray-400 hover:text-gray-600 transition-colors ml-4"
           aria-label="Close notification"
         >
           <CircleX  className="w-5 h-5 text-purple-600 cursor-pointer" />
