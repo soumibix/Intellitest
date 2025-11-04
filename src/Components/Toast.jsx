@@ -7,10 +7,10 @@ function Toast() {
   if (!isVisible) return null
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
-      <div className="bg-purple-50 rounded-lg p-4 flex items-center justify-between shadow-sm border border-purple-100">
+    <div className="w-full p-4">
+      <div className="bg-purple-50 rounded-lg p-4 flex items-center justify-between border border-purple-100">
         <div className="flex items-center gap-3">
-          <div className=" rounded-lg p-2 flex-shrink-0">
+          <div className=" rounded-lg p-2">
             <IdCard className="w-6 h-6 text-purple-600" />
           </div>
           
