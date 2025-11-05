@@ -39,11 +39,11 @@ const UserDashboard = () => {
     }
   };
 
-  const institutionOptions = [
-    { value: "", label: "College Name" },
-    { value: "college1", label: "MIT College" },
-    { value: "college2", label: "Stanford University" },
-    { value: "college3", label: "Harvard University" },
+  const institutionOptions =  [
+    { value: "", label: "College Campus" },
+    { value: "college1", label: "IEM, Salt Lake" },
+    { value: "college2", label: "IEM, Newtown" },
+    { value: "college3", label: "IEM, Jaipur" },
   ];
 
   const departmentOptions = [

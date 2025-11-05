@@ -10,7 +10,10 @@ const AdminDashboard = () => {
     mobile: "",
     institution: "",
     department: "",
-    designation: "",
+    batch: "",
+    enrollmentNumber: "",
+    section: "",
+    rollNumber: "",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
@@ -36,20 +39,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const institutionOptions = [
+  const institutionOptions =  [
     { value: "", label: "College Campus" },
     { value: "college1", label: "IEM, Salt Lake" },
     { value: "college2", label: "IEM, Newtown" },
     { value: "college3", label: "IEM, Jaipur" },
   ];
 
-  const departmentOptions = [
-    { value: "", label: "Civil Engineering" },
-    { value: "civil", label: "Civil Engineering" },
-    { value: "mechanical", label: "Mechanical Engineering" },
-    { value: "electrical", label: "Electrical Engineering" },
-    { value: "computer", label: "Computer Science" },
-  ];
 
   const designationOptions = [
     { value: "", label: "Your Designation" },
@@ -58,6 +54,14 @@ const AdminDashboard = () => {
     { value: "assistantProfessor", label: "Assistant Professor" },
     { value: "lecturer", label: "Lecturer" },
     { value: "instructor", label: "Instructor" }
+  ];
+
+  const batchOptions = [
+    { value: "", label: "Your Designation" },
+    { value: "2021", label: "2021-2025" },
+    { value: "2022", label: "2022-2026" },
+    { value: "2023", label: "2023-2027" },
+    { value: "2024", label: "2024-2028" },
   ];
 
   const sectionOptions = [
@@ -69,25 +73,25 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative h-full">
       <div className="mx-4 sm:mx-6 lg:mx-8">
         {/* Student Details Card */}
         <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
-            <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#631891]" />
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-              Faculty Details
+              Student Details
             </h2>
           </div>
 
           {/* Form Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-20">
             {/* Row 1 */}
             <Input
               type="text"
               label="Name"
-              placeholder="Firstname Lastname"
+              placeholder="Abhirup Ghosh"
               value={formData.name}
               onChange={handleChange("name")}
               size="md"
@@ -95,7 +99,7 @@ const AdminDashboard = () => {
             <Input
               type="email"
               label="Email Address"
-              placeholder="xyz@gmail.com"
+              placeholder="abhirupghosh@gmail.com"
               value={formData.email}
               onChange={handleChange("email")}
               size="md"
@@ -103,7 +107,7 @@ const AdminDashboard = () => {
             <Input
               type="tel"
               label="Mobile Number"
-              placeholder="9874563219"
+              placeholder="+91"
               value={formData.mobile}
               onChange={handleChange("mobile")}
               size="md"
@@ -112,7 +116,7 @@ const AdminDashboard = () => {
             {/* Row 2 */}
             <Input
               type="dropdown"
-              label="Institution Campus Name"
+              label="Institution Name"
               placeholder="College Name"
               value={formData.institution}
               onChange={handleChange("institution")}
@@ -125,18 +129,45 @@ const AdminDashboard = () => {
               placeholder="Civil Engineering"
               value={formData.department}
               onChange={handleChange("department")}
-              options={departmentOptions}
+              options={designationOptions}
               size="md"
             />
             <Input
               type="dropdown"
-              label="Designation"
+              label="Batch"
               placeholder="Your Designation"
-              value={formData.designation}
-              onChange={handleChange("designation")}
-              options={designationOptions}
+              value={formData.batch}
+              onChange={handleChange("batch")}
+              options={batchOptions}
               size="md"
             />
+
+            {/* Row 3 */}
+            {/* <Input
+              type="text"
+              label="Enrollment Number"
+              placeholder="ABC123456789"
+              value={formData.enrollmentNumber}
+              onChange={handleChange("enrollmentNumber")}
+              size="md"
+            />
+            <Input
+              type="dropdown"
+              label="Section"
+              placeholder="Section A"
+              value={formData.section}
+              onChange={handleChange("section")}
+              options={sectionOptions}
+              size="md"
+            />
+            <Input
+              type="text"
+              label="Roll Number"
+              placeholder="12345"
+              value={formData.rollNumber}
+              onChange={handleChange("rollNumber")}
+              size="md"
+            /> */}
           </div>
 
           {/* Submit Button */}
@@ -144,11 +175,11 @@ const AdminDashboard = () => {
             <Button
               text="Submit"
               color="[#631891]"
-              padding="md:py-3 md:px-8 py-4"
+              padding="py-3 sm:py-4"
+              width="w-32 sm:w-40"
               icon={<ArrowRight size={18} />}
               iconPosition="right"
               onClick={handleSubmit}
-              textSize="lg"
             />
           </div>
         </div>
@@ -157,7 +188,7 @@ const AdminDashboard = () => {
         {!isProfileComplete && (
           <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-8 sm:mt-10 lg:mt-12 px-12 bottom-0">
             <div
-              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl h-full"
+              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl "
               style={{
                 background: "linear-gradient(to bottom, #631891, #1D072B)",
               }}
@@ -183,7 +214,7 @@ const AdminDashboard = () => {
               </div>
 
               {/* Foreground content */}
-              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-20 justify-center z-10">
+              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-5 lg:top-20 md:top-10  justify-center z-10">
                 <p className="text-[#DEA7FF] text-base sm:text-xl lg:text-2xl font-semibold mb-2">
                   Complete Your Profile to
                 </p>
@@ -193,8 +224,8 @@ const AdminDashboard = () => {
               </div>
 
               {/* Lock Icon */}
-              <div className="absolute -top-6 sm:-top-8 lg:-top-10 left-1/2 transform -translate-x-1/2 flex justify-center z-10">
-                <div className="bg-white backdrop-blur-sm rounded-full p-4 sm:p-5 lg:p-6 inline-block border-2 border-[#631891]">
+              <div className="absolute -top-10 lg:-top-10 md:-top-9 left-1/2 transform -translate-x-1/2 flex justify-center z-10">
+                <div className="bg-white rounded-full p-4 sm:p-5 lg:p-6 inline-block border-2 border-[#631891]">
                   <LockKeyhole className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#631891]" />
                 </div>
               </div>
