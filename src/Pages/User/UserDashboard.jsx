@@ -184,38 +184,35 @@ const UserDashboard = () => {
 
         {/* Unlock Tests Card */}
         {!isProfileComplete && (
-          <div className="absolute flex-1 w-[96%] ">
+          <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-8 sm:mt-10 lg:mt-12 px-12 bottom-0">
             <div
-              className="relative p-6 sm:p-8 lg:p-12 text-center w-full min-h-[300px] sm:min-h-[400px] mt-6 sm:mt-8 lg:mt-10 rounded-t-3xl sm:rounded-t-4xl rounded-xl"
+              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl h-full"
               style={{
                 background: "linear-gradient(to bottom, #631891, #1D072B)",
               }}
             >
               {/* IntelliTest background text */}
-              <div
-                className="absolute -bottom-30 inset-0 flex items-center justify-center z-0 overflow-hidden"
-              >
+              <div className="relative flex items-center justify-center z-0 overflow-hidden">
                 <span
-                  className="font-extrabold text-transparent bg-clip-text select-none"
+                  className="font-extrabold text-transparent bg-clip-text select-none translate-y-0"
                   style={{
                     fontSize: "15vw", // scales with screen width
                     lineHeight: 1,
                     backgroundImage: "linear-gradient(to bottom, #59158100, #6D209A)",
-                    // backgroundSize: "cover",
-                    // backgroundPosition: "top", // gradient starts at top
+                    backgroundSize: "100% 100%",
+                    backgroundPosition: "bottom",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
-                    // opacity: 0.15, // faint overlay look
-                    // whiteSpace: "nowrap",
+                    whiteSpace: "nowrap",
+                    
                   }}
                 >
                   IntelliTest
                 </span>
-
               </div>
 
               {/* Foreground content */}
-              <div className="relative z-10 flex flex-col h-full">
+              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-20 justify-center z-10">
                 <p className="text-[#DEA7FF] text-base sm:text-xl lg:text-2xl font-semibold mb-2">
                   Complete Your Profile to
                 </p>

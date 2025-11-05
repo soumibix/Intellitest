@@ -91,7 +91,7 @@ function UserTests() {
                             className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                     </div>
-                    <Button text="Submit" color="blue" onClick={() => alert("Clicked")} />
+                    <Button text="Submit" color="#160024" padding='px-12' />
                 </div>
 
                 {/* Test Cards Grid */}
