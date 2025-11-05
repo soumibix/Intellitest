@@ -16,9 +16,6 @@ import AdminTestDetails from "./Pages/Admin/TestDetails";
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
 
 // *** EXISTING COMPONENTS (from your original code) ***
-// const AdminDashboard = () => <h2>Admin Dashboard</h2>;
-// const AdminLogin = () => <h2>Admin Login</h2>;
-// const UserDashboard = () => <h2>User Dshboard</h2>;
 const NotFound = () => <h2>404 - Page Not Found</h2>;
 
 // *** REDIRECT COMPONENTS FOR ROLE-BASED DASHBOARDS ***
@@ -283,13 +280,12 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
+          {/* UPDATED: Changed from /user/test to /user/test/:id */}
           <Route
-            path="/user/test"
+            path="/user/test/:id"
             element={
               <ProtectedRoute allowedRoles={["user"]}>
-                {/* <UserLayout> */}
-                  <UserIndividualTest />
-                {/* </UserLayout> */}
+                <UserIndividualTest />
               </ProtectedRoute>
             }
           />
@@ -335,6 +331,19 @@ const AppRouter = () => {
             }
           />
           
+          {/* NEW: View Report Route for Admin */}
+          <Route
+            path="/admin/viewreport"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout>
+                  {/* Replace with your actual ViewReport component */}
+                  <div>View Report Component Here</div>
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          
           {/* ---------- FACULTY ROUTES ---------- */}
           <Route
             path="/faculty/signin"
@@ -353,7 +362,6 @@ const AppRouter = () => {
             }
           />
           
-          {/* FIXED: AdminLayout wraps the content inside the element prop */}
           <Route
             path="/faculty/dashboard"
             element={

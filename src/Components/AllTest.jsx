@@ -3,76 +3,106 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import TestCard from '../Components/TestCard';
 
 function AllTest() {
-  const [activeFilter, setActiveFilter] = useState('ongoing');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('All');
+  const [userType] = useState('user'); // Change to 'admin' to test admin view
 
   // Mock test data
   const allTests = [
     {
       id: 1,
-      date: '58:07 mins',
-      time: '',
       status: 'ongoing',
-      title: 'Machine Learning Mid-Sem Test',
-      questionCount: 30,
-      marks: 60,
-      duration: '1 hour',
-      department: 'CST',
-      semester: '05',
-      creatorName: 'Saurabh Kumbhar',
-      creatorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Saurabh',
-      createdDate: 'Sept 5 04:25',
+      testData: {
+        timeRemaining: '58:07 mins remaining',
+        title: 'Machine Learning Mid-Sem Test',
+        questions: 30,
+        marks: 60,
+        duration: '1 hour',
+        department: 'CST',
+        semester: '05',
+        createdBy: 'Saurabh Kumbhar',
+        createdDate: 'Sept 5 04:25',
+        avatarSeed: 'Saurabh'
+      },
       month: 'September'
     },
     {
       id: 2,
-      date: 'Nov 15',
-      time: '2:00 PM',
       status: 'upcoming',
-      title: 'Data Structures Final Exam',
-      questionCount: 50,
-      marks: 100,
-      duration: '2 hours',
-      department: 'CST',
-      semester: '03',
-      creatorName: 'Priya Sharma',
-      creatorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya',
-      createdDate: 'Oct 20 10:15',
+      testData: {
+        dateTime: 'Nov 15 • 2:00 PM',
+        title: 'Data Structures Final Exam',
+        questions: 50,
+        marks: 100,
+        duration: '2 hours',
+        department: 'CST',
+        semester: '03',
+        createdBy: 'Priya Sharma',
+        createdDate: 'Oct 20 10:15',
+        avatarSeed: 'Priya'
+      },
       month: 'November'
     },
     {
       id: 3,
-      date: 'Oct 10',
-      time: '10:00 AM',
       status: 'completed',
-      title: 'Database Management Systems Quiz',
-      questionCount: 20,
-      marks: 40,
-      duration: '45 mins',
-      department: 'CST',
-      semester: '04',
-      creatorName: 'Rahul Verma',
-      creatorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul',
-      createdDate: 'Sept 30 14:20',
+      testData: {
+        dateTime: 'Oct 10 • 10:00 AM',
+        title: 'Database Management Systems Quiz',
+        questions: 20,
+        marks: 40,
+        duration: '45 mins',
+        department: 'CST',
+        semester: '04',
+        createdBy: 'Rahul Verma',
+        createdDate: 'Sept 30 14:20',
+        avatarSeed: 'Rahul',
+        marksObtained: 52,
+        totalMarks: 60,
+        timeTaken: '54 minutes',
+        accuracy: '87%'
+      },
       month: 'October'
     },
     {
       id: 4,
-      date: 'Nov 20',
-      time: '11:00 AM',
       status: 'upcoming',
-      title: 'Computer Networks Test',
-      questionCount: 40,
-      marks: 80,
-      duration: '1.5 hours',
-      department: 'CST',
-      semester: '05',
-      creatorName: 'Anjali Singh',
-      creatorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anjali',
-      createdDate: 'Nov 1 09:00',
+      testData: {
+        dateTime: 'Nov 20 • 11:00 AM',
+        title: 'Computer Networks Test',
+        questions: 40,
+        marks: 80,
+        duration: '1.5 hours',
+        department: 'CST',
+        semester: '05',
+        createdBy: 'Anjali Singh',
+        createdDate: 'Nov 1 09:00',
+        avatarSeed: 'Anjali'
+      },
       month: 'November'
+    },
+    {
+      id: 5,
+      status: 'completed',
+      testData: {
+        dateTime: 'Oct 25 • 3:00 PM',
+        title: 'Operating Systems Mid-Term',
+        questions: 35,
+        marks: 70,
+        duration: '1.5 hours',
+        department: 'CST',
+        semester: '05',
+        createdBy: 'Saurabh Kumbhar',
+        createdDate: 'Oct 15 11:30',
+        avatarSeed: 'Saurabh',
+        marksObtained: 45,
+        totalMarks: 70,
+        timeTaken: '1 hour 20 mins',
+        accuracy: '64%'
+      },
+      month: 'October'
     }
   ];
 
@@ -81,7 +111,7 @@ function AllTest() {
   // Filter tests based on active filter
   const filteredTests = allTests.filter(test => {
     const matchesStatus = activeFilter === 'all' || test.status === activeFilter;
-    const matchesSearch = test.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = test.testData.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMonth = selectedMonth === 'All' || test.month === selectedMonth;
     return matchesStatus && matchesSearch && matchesMonth;
   });
@@ -89,13 +119,29 @@ function AllTest() {
   // Get suggestions for search
   const suggestions = searchQuery.length > 0 
     ? allTests
-        .filter(test => test.title.toLowerCase().includes(searchQuery.toLowerCase()))
-        .map(test => test.title)
+        .filter(test => test.testData.title.toLowerCase().includes(searchQuery.toLowerCase()))
+        .map(test => test.testData.title)
         .slice(0, 5)
     : [];
 
+  // Handler functions
+  const handleStartTest = (testId) => {
+    console.log('Starting test:', testId);
+    // Add your start test logic here
+  };
+
+  const handleViewReport = (testId) => {
+    console.log('Viewing report for test:', testId);
+    // Add your view report logic here
+  };
+
+  const handleEditTest = (testId) => {
+    console.log('Editing test:', testId);
+    // Add your edit test logic here
+  };
+
   return (
-    <div className=" bg-white p-4 sm:p-6 lg:p-8 rounded-4xl">
+    <div className="p-4 sm:p-6 lg:p-8">
       <div className="w-full mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
@@ -212,10 +258,19 @@ function AllTest() {
         </div>
 
         {/* Tests Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {filteredTests.length > 0 ? (
             filteredTests.map((test) => (
-              <TestCard key={test.id} {...test} />
+              <TestCard 
+                key={test.id}
+                data={test}
+                userType={userType}
+                status={test.status}
+                testData={test.testData}
+                onStartTest={() => handleStartTest(test.id)}
+                onViewReport={() => handleViewReport(test.id)}
+                onEdit={() => handleEditTest(test.id)}
+              />
             ))
           ) : (
             <div className="col-span-full text-center py-12 text-gray-500">
