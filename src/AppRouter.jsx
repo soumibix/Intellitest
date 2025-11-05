@@ -3,7 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import UserDashboard from "./Pages/User/UserDashboard";
 import UserSignIn from "./Pages/User/UserSignIn";
 import AdminLayout from "./Layout/Admin/Layout";
+import UserLayout from "./Layout/User/UserLayout";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
+import UserTests from "./Pages/User/UserTests";
 import { AdminSignIn } from "./Pages/Admin/AdminSignIn";
 import { UserSignUp } from "./Pages/User/UserSignUp";
 import { FacultySignIn } from "./Pages/Faculty/FacultySignIn";
@@ -253,7 +255,9 @@ const AppRouter = () => {
             path="/user"
             element={
               <ProtectedRoute allowedRoles={["user"]}>
-                <UserDashboardRedirect />
+                <UserLayout>
+                  <UserDashboardRedirect />
+                </UserLayout>
               </ProtectedRoute>
             }
           />
@@ -261,7 +265,19 @@ const AppRouter = () => {
             path="/user/dashboard"
             element={
               <ProtectedRoute allowedRoles={["user"]}>
-                <UserDashboard />
+                <UserLayout>
+                  <UserDashboard />
+                </UserLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/tests"
+            element={
+              <ProtectedRoute allowedRoles={["user"]}>
+                <UserLayout>
+                  <UserTests />
+                </UserLayout>
               </ProtectedRoute>
             }
           />
@@ -279,12 +295,12 @@ const AppRouter = () => {
             path="/admin"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboardRedirect />
+                <AdminLayout>
+                  <AdminDashboardRedirect />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
-          
-          {/* FIXED: AdminLayout wraps the content inside the element prop */}
           <Route
             path="/admin/dashboard"
             element={
