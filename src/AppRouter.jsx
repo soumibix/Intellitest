@@ -10,6 +10,7 @@ import { AdminSignIn } from "./Pages/Admin/AdminSignIn";
 import { UserSignUp } from "./Pages/User/UserSignUp";
 import { FacultySignIn } from "./Pages/Faculty/FacultySignIn";
 import UserIndividualTest from "./Pages/User/UserIndividualTest";
+import AdminTestDetails from "./Pages/Admin/TestDetails";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -318,6 +319,17 @@ const AppRouter = () => {
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminLayout>
                   <AdminDashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/test-details"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout>
+                  <AdminTestDetails />
                 </AdminLayout>
               </ProtectedRoute>
             }
