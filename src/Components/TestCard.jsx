@@ -1,15 +1,18 @@
 import React from 'react';
 import { SquarePen, LockKeyhole } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function TestCard({
   userType = 'admin', // 'user' or 'admin'
   status = 'upcoming', // 'ongoing', 'upcoming', or 'completed'
   testData = {},
-  onViewReport,
   onEdit,
-  onStartTest
+  data
 }) {
+  const navigate = useNavigate();
+  
   const {
+    id = null,
     dateTime = 'Nov 10 • 10:00 AM',
     title = 'Machine Learning Mid-Sem Test',
     questions = 30,
@@ -123,7 +126,7 @@ function TestCard({
       {/* Footer - Creator Info and Action Buttons */}
       <div className="w-full flex justify-between items-center gap-4">
         {/* Check if any button will be shown */}
-        {((userType === 'user' && (status === 'ongoing' || status === 'upcoming')) || status === 'completed') ? (
+        {((userType === 'user' && (status === 'ongoing' || status === 'upcoming')) || (userType === 'admin' && status === 'completed')) ? (
           <>
             {/* When buttons are present - show name and date in flex-col */}
             <div className="flex items-center gap-3">
@@ -143,33 +146,38 @@ function TestCard({
             <div className="flex items-center gap-2">
               {/* Start Test Button - For user on ongoing tests (enabled) */}
               {userType === 'user' && status === 'ongoing' && (
-                <button
-                  onClick={onStartTest}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl font-medium transition-colors"
+                <div
+                  onClick={() => {
+                    const testId = data.id || 'default-test-id';
+                    console.log('Navigating to test:', testId);
+                    navigate(`/user/test/${testId}`);
+                  }}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl font-medium transition-colors cursor-pointer select-none"
                 >
                   Start Test
-                </button>
+                </div>
               )}
 
               {/* Start Test Button - For user on upcoming tests (locked/disabled) */}
               {userType === 'user' && status === 'upcoming' && (
-                <button
-                  disabled
-                  className="bg-gray-300 text-gray-500 px-6 py-2 rounded-xl font-medium cursor-not-allowed flex items-center gap-2"
-                >
+                <div className="bg-gray-300 text-gray-500 px-6 py-2 rounded-xl font-medium cursor-not-allowed flex items-center gap-2">
                   <LockKeyhole className="w-4 h-4" />
                   Start Test
-                </button>
+                </div>
               )}
               
-              {/* View Report Button - For user on completed tests OR admin on completed tests */}
-              {status === 'completed' && (
-                <button
-                  onClick={onViewReport}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl font-medium transition-colors"
+              {/* View Report Button - Only for admin on completed tests */}
+              {userType === 'admin' && status === 'completed' && (
+                <div
+                  onClick={() => {
+                    const testId = data.id || 'default-test-id';
+                    console.log('Navigating to view report:', testId);
+                    navigate(`/admin/viewreport?testId=${testId}`);
+                  }}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl font-medium transition-colors cursor-pointer select-none"
                 >
                   View Report
-                </button>
+                </div>
               )}
             </div>
           </>
@@ -194,6 +202,5 @@ function TestCard({
     </div>
   );
 }
-
 
 export default TestCard;

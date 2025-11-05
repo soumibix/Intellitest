@@ -263,6 +263,7 @@ function AllTest() {
             filteredTests.map((test) => (
               <TestCard 
                 key={test.id}
+                data={test}
                 userType={userType}
                 status={test.status}
                 testData={test.testData}
