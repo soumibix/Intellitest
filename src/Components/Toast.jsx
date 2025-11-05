@@ -8,7 +8,7 @@ function Toast() {
 
   return (
     <div className="w-full p-4">
-      <div className="bg-purple-50 rounded-lg p-4 flex items-center justify-between border border-purple-100">
+      <div className="bg-[#F7E9FF] rounded-lg px-4 py-2 flex items-center justify-between border border-purple-100">
         <div className="flex items-center gap-3">
           <div className=" rounded-lg p-2">
             <IdCard className="w-6 h-6 text-purple-600" />

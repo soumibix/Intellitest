@@ -3,15 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import UserDashboard from "./Pages/User/UserDashboard";
 import UserSignIn from "./Pages/User/UserSignIn";
 import AdminLayout from "./Layout/Admin/Layout";
+import UserLayout from "./Layout/User/UserLayout";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
 
 // *** EXISTING COMPONENTS (from your original code) ***
-// const AdminDashboard = () => <h2>Admin Dashboard</h2>;
 const AdminLogin = () => <h2>Admin Login</h2>;
-// const UserDashboard = () => <h2>User Dshboard</h2>;
 const NotFound = () => <h2>404 - Page Not Found</h2>;
 
 // *** REDIRECT COMPONENTS FOR ROLE-BASED DASHBOARDS ***
@@ -238,7 +237,9 @@ const AppRouter = () => {
             path="/user"
             element={
               <ProtectedRoute allowedRoles={["user"]}>
-                <UserDashboardRedirect />
+                <UserLayout>
+                  <UserDashboardRedirect />
+                </UserLayout>
               </ProtectedRoute>
             }
           />
@@ -246,7 +247,9 @@ const AppRouter = () => {
             path="/user/dashboard"
             element={
               <ProtectedRoute allowedRoles={["user"]}>
-                <UserDashboard />
+                <UserLayout>
+                  <UserDashboard />
+                </UserLayout>
               </ProtectedRoute>
             }
           />
@@ -264,12 +267,12 @@ const AppRouter = () => {
             path="/admin"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminDashboardRedirect />
+                <AdminLayout>
+                  <AdminDashboardRedirect />
+                </AdminLayout>
               </ProtectedRoute>
             }
           />
-          
-          {/* FIXED: AdminLayout wraps the content inside the element prop */}
           <Route
             path="/admin/dashboard"
             element={
