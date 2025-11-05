@@ -212,7 +212,7 @@ function AllTest() {
         </div>
 
         {/* Tests Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {filteredTests.length > 0 ? (
             filteredTests.map((test) => (
               <TestCard key={test.id} {...test} />
