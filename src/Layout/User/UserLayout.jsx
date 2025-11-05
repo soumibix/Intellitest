@@ -44,7 +44,7 @@ function UserLayout({ children }) {
 
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar onMenuClick={handleMenuClick} />
-        <main className="flex-1 overflow-auto p-4">{children}</main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { SquarePen } from 'lucide-react';
 
 function TestCard() {
   return (
-    <div className="w-full max-w-xl bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
+    <div className="w-full max-w-lg bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
       {/* Header Section */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">

@@ -20,10 +20,10 @@ export function UserSidebar({
       route: "/user/dashboard",
     },
     {
-      id: "my-tests",
+      id: "tests",
       label: "My Tests",
       icon: FileText,
-      route: "/user/my-tests",
+      route: "/user/tests",
     },
     {
       id: "test-reports",

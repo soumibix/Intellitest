@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, Lock, ArrowRight } from "lucide-react";
+import { User, Lock, ArrowRight, LockKeyhole } from "lucide-react";
 import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
 
@@ -30,7 +30,7 @@ const UserDashboard = () => {
     const allFieldsFilled = Object.values(formData).every(
       (value) => value.trim() !== ""
     );
-    
+
     if (allFieldsFilled) {
       setIsProfileComplete(true);
       alert("Profile submitted successfully!");
@@ -71,20 +71,20 @@ const UserDashboard = () => {
   ];
 
   return (
-    <div className="h-full overflow-hidden">
-      <div className="">
+    <div className="relative">
+      <div className="mx-4 sm:mx-6 lg:mx-8">
         {/* Student Details Card */}
-        <div className=" p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
-          <div className="flex items-center gap-2 mb-6">
-            <User className="w-5 h-5 text-purple-600" />
-            <h2 className="text-xl font-semibold text-gray-800">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
               Student Details
             </h2>
           </div>
 
           {/* Form Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Row 1 */}
             <Input
               type="text"
@@ -169,12 +169,12 @@ const UserDashboard = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-6 sm:mt-8">
             <Button
               text="Submit"
-              color="[#7C3AED]"
-              padding="px-8 py-3"
-              width="w-40"
+              color="[#631891]"
+              padding="py-3 sm:py-4"
+              width="w-32 sm:w-40"
               icon={<ArrowRight size={18} />}
               iconPosition="right"
               onClick={handleSubmit}
@@ -184,38 +184,66 @@ const UserDashboard = () => {
 
         {/* Unlock Tests Card */}
         {!isProfileComplete && (
-          <div className="relative bg-gradient-to-br from-[#57157F] to-[#3A0E54] rounded-lg shadow-lg p-12 text-center h-screen">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-10 left-10 w-32 h-32 border-4 border-white rounded-full"></div>
-              <div className="absolute bottom-10 right-10 w-40 h-40 border-4 border-white rounded-full"></div>
-              <div className="absolute top-1/2 left-1/4 w-24 h-24 border-4 border-white rounded-full"></div>
-            </div>
+          <div className="absolute flex-1 w-[96%] ">
+            <div
+              className="relative p-6 sm:p-8 lg:p-12 text-center w-full min-h-[300px] sm:min-h-[400px] mt-6 sm:mt-8 lg:mt-10 rounded-t-3xl sm:rounded-t-4xl rounded-xl"
+              style={{
+                background: "linear-gradient(to bottom, #631891, #1D072B)",
+              }}
+            >
+              {/* IntelliTest background text */}
+              <div
+                className="absolute -bottom-30 inset-0 flex items-center justify-center z-0 overflow-hidden"
+              >
+                <span
+                  className="font-extrabold text-transparent bg-clip-text select-none"
+                  style={{
+                    fontSize: "15vw", // scales with screen width
+                    lineHeight: 1,
+                    backgroundImage: "linear-gradient(to bottom, #59158100, #6D209A)",
+                    // backgroundSize: "cover",
+                    // backgroundPosition: "top", // gradient starts at top
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    // opacity: 0.15, // faint overlay look
+                    // whiteSpace: "nowrap",
+                  }}
+                >
+                  IntelliTest
+                </span>
 
-            {/* Lock Icon */}
-            <div className="absolute -top-10 right-[48%] z-10 mb-6 flex justify-center">
-              <div className="bg-white backdrop-blur-sm rounded-full p-4 inline-block border-2 border-purple-300">
-                <Lock className="w-8 h-8 text-black" />
               </div>
-            </div>
 
-            {/* Text Content */}
-            <div className="relative z-10">
-              <p className="text-white/90 text-lg mb-2">
-                Complete Your Profile to
-              </p>
-              <h3 className="text-white text-2xl font-bold">Unlock Tests</h3>
+              {/* Foreground content */}
+              <div className="relative z-10 flex flex-col h-full">
+                <p className="text-[#DEA7FF] text-base sm:text-xl lg:text-2xl font-semibold mb-2">
+                  Complete Your Profile to
+                </p>
+                <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">
+                  Unlock Tests
+                </h3>
+              </div>
+
+              {/* Lock Icon */}
+              <div className="absolute -top-6 sm:-top-8 lg:-top-10 left-1/2 transform -translate-x-1/2 flex justify-center z-10">
+                <div className="bg-white backdrop-blur-sm rounded-full p-4 sm:p-5 lg:p-6 inline-block border-2 border-[#631891]">
+                  <LockKeyhole className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#631891]" />
+                </div>
+              </div>
             </div>
           </div>
         )}
 
+
+
+
         {/* Success Message */}
         {isProfileComplete && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6 text-center mt-6 sm:mt-8">
             <div className="flex justify-center mb-3">
-              <div className="bg-green-100 rounded-full p-3">
+              <div className="bg-green-100 rounded-full p-2 sm:p-3">
                 <svg
-                  className="w-8 h-8 text-green-600"
+                  className="w-6 h-6 sm:w-8 sm:h-8 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -229,10 +257,10 @@ const UserDashboard = () => {
                 </svg>
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-green-800 mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-green-800 mb-2">
               Profile Complete!
             </h3>
-            <p className="text-green-700">
+            <p className="text-sm sm:text-base text-green-700">
               You can now access all available tests
             </p>
           </div>
