@@ -7,7 +7,7 @@ function AllTest() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('All');
-  const [userType] = useState('admin'); // Change to 'admin' to test admin view
+  const [userType] = useState('user'); // Change to 'admin' to test admin view
 
   // Mock test data
   const allTests = [
