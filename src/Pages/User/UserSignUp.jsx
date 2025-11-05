@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
-import SignInImg from "../../assets/AdminSignIn.jpg";
 import { useNavigate } from "react-router-dom";
 
-const UserSignIn = () => {
+export const UserSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const nagigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = (formData) => {
     setIsLoading(true);
@@ -14,18 +13,24 @@ const UserSignIn = () => {
     
     // Simulate API call
     setTimeout(() => {
-      console.log('Sign In Data:', formData);
+      console.log('Sign Up Data:', formData);
       setIsLoading(false);
-      // Add your authentication logic here
+      // Add your registration logic here
     }, 2000);
   };
 
   const fields = [
     {
+      name: 'fullName',
+      type: 'text',
+      label: 'Full Name',
+      placeholder: 'Enter your full name',
+    },
+    {
       name: 'email',
       type: 'text',
       label: 'Email Address',
-      placeholder: 'Enter your email',
+      placeholder: 'xyz@gmail.com',
     },
     {
       name: 'enrollmentNumber',
@@ -37,46 +42,38 @@ const UserSignIn = () => {
       name: 'password',
       type: 'password',
       label: 'Password',
-      placeholder: 'Enter your password',
-      showRememberMe: true,
-      rememberMeName: 'rememberMe',
-      rememberMeLabel: 'Remember me',
+      placeholder: '$056978@Abc',
+    },
+    {
+      name: 'confirmPassword',
+      type: 'password',
+      label: 'Confirm Password',
+      placeholder: '$056978@Abc',
     },
   ];
 
-  const additionalElements = (
-    <div className="text-right">
-      <button
-        type="button"
-        className="text-sm font-medium text-[#2B2B2B] cursor-pointer"
-        onClick={() => alert('Forgot password clicked')}
-      >
-        Forgot password?
-      </button>
-    </div>
-  );
 
   return (
     <AuthenticationComp
-      image={SignInImg}
-      leftTitle="IntelliTest Students"
-      leftDescription="Comprehensive assessment and evaluation platform for modern education"
-      heading="Welcome"
-      colorHeading="Back"
+      image="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop"
+      leftTitle="Join thousands of educators and students"
+      leftDescription="Create your account and start your IntelliTest experience"
+      heading="Create"
+      colorHeading="Account"
       fields={fields}
       initialFormData={{
+        fullName: '',
         email: '',
         password: '',
-        rememberMe: false,
+        confirmPassword: '',
       }}
       onSubmit={handleSubmit}
       submitButtonText="Sign Up"
       isLoading={isLoading}
-      additionalElements={additionalElements}
       bottomLinks={[
         {
-          text: "Don't have an account? Sign Up",
-          action: () => nagigate('/signup'),
+          text: 'Already have an account? Sign In',
+          action: () => navigate('/signin'),
           className: 'text-gray-700 hover:text-[#631891] font-semibold cursor-pointer',
         },
       ]}
@@ -84,4 +81,3 @@ const UserSignIn = () => {
     />
   );
 };
-export default UserSignIn;
