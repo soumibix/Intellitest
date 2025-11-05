@@ -3,7 +3,7 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import TestCard from '../Components/TestCard';
 
 function AllTest() {
-  const [activeFilter, setActiveFilter] = useState('ongoing');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('All');
