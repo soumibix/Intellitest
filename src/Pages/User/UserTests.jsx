@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import TestCard from '../../Components/TestCard';
 import Button from '../../Components/common/Button';
+import AllTest from '../../Components/AllTest';
 
 function UserTests() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -77,38 +78,40 @@ function UserTests() {
     );
 
     return (
-        <div className="p-6">
-            <div className=" mx-auto">
-                {/* Search Bar */}
-                <div className="mb-6 flex gap-4">
-                    <div className="relative w-[100%]">
-                        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                        <input
-                            type="text"
-                            placeholder="Search from completed, ongoing..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        />
-                    </div>
-                    <Button text="Submit" color="#160024" padding='px-12' />
-                </div>
+        // <div className="p-6">
+        //     <div className=" mx-auto">
+        //         {/* Search Bar */}
+        //         <div className="mb-6 flex gap-4">
+        //             <div className="relative w-[100%]">
+        //                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        //                 <input
+        //                     type="text"
+        //                     placeholder="Search from completed, ongoing..."
+        //                     value={searchQuery}
+        //                     onChange={(e) => setSearchQuery(e.target.value)}
+        //                     className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        //                 />
+        //             </div>
+        //             <Button text="Submit" color="#160024" padding='px-12' />
+        //         </div>
 
-                {/* Test Cards Grid */}
-                <div className="flex flex-wrap gap-6">
-                    {filteredTests.map(test => (
-                        <TestCard key={test.id} test={test} />
-                    ))}
+        //         {/* Test Cards Grid */}
+        //         <div className="flex flex-wrap gap-6">
+        //             {filteredTests.map(test => (
+        //                 <TestCard key={test.id} test={test} />
+        //             ))}
 
-                </div>
+        //         </div>
 
-                {filteredTests.length === 0 && (
-                    <div className="text-center py-12">
-                        <p className="text-gray-500">No tests found matching your search.</p>
-                    </div>
-                )}
-            </div>
-        </div>
+        //         {filteredTests.length === 0 && (
+        //             <div className="text-center py-12">
+        //                 <p className="text-gray-500">No tests found matching your search.</p>
+        //             </div>
+        //         )}
+        //     </div>
+        // </div>
+        
+        <AllTest/>
     );
 }
 
