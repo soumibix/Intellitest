@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/AdminSignIn.jpg";
 import { useNavigate } from "react-router-dom";
+import Button from "../../Components/common/Button";
 
-const UserSignIn = () => {
+export const FacultySignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const nagigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = (formData) => {
     setIsLoading(true);
@@ -26,12 +27,6 @@ const UserSignIn = () => {
       type: 'text',
       label: 'Email Address',
       placeholder: 'Enter your email',
-    },
-    {
-      name: 'enrollmentNumber',
-      type: 'number',
-      label: 'Enrollment Number',
-      placeholder: 'Enter your enrollment number',
     },
     {
       name: 'password',
@@ -59,7 +54,7 @@ const UserSignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest Students"
+      leftTitle="IntelliTest Faculty"
       leftDescription="Comprehensive assessment and evaluation platform for modern education"
       heading="Welcome"
       colorHeading="Back"
@@ -70,18 +65,17 @@ const UserSignIn = () => {
         rememberMe: false,
       }}
       onSubmit={handleSubmit}
-      submitButtonText="Sign Up"
+      submitButtonText="Sign In"
       isLoading={isLoading}
       additionalElements={additionalElements}
       bottomLinks={[
         {
           text: "Don't have an account? Sign Up",
-          action: () => nagigate('/signup'),
-          className: 'text-gray-700 hover:text-[#631891] font-semibold cursor-pointer',
+          action: () => navigate('/admin/signup'),
+          className: 'text-gray-700 hover:text-purple-600 font-semibold',
         },
       ]}
       errors={errors}
     />
   );
 };
-export default UserSignIn;

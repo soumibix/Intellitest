@@ -6,13 +6,18 @@ import AdminLayout from "./Layout/Admin/Layout";
 import UserLayout from "./Layout/User/UserLayout";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import UserTests from "./Pages/User/UserTests";
+import { AdminSignIn } from "./Pages/Admin/AdminSignIn";
+import { UserSignUp } from "./Pages/User/UserSignUp";
+import { FacultySignIn } from "./Pages/Faculty/FacultySignIn";
 import UserIndividualTest from "./Pages/User/UserIndividualTest";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
 
 // *** EXISTING COMPONENTS (from your original code) ***
-const AdminLogin = () => <h2>Admin Login</h2>;
+// const AdminDashboard = () => <h2>Admin Dashboard</h2>;
+// const AdminLogin = () => <h2>Admin Login</h2>;
+// const UserDashboard = () => <h2>User Dshboard</h2>;
 const NotFound = () => <h2>404 - Page Not Found</h2>;
 
 // *** REDIRECT COMPONENTS FOR ROLE-BASED DASHBOARDS ***
@@ -153,13 +158,13 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
   if (!isAuthenticated) {
     // Redirect to appropriate login based on required role
-    const loginPath = allowedRoles?.includes("admin") ? "/admin/login" : "/login";
+    const loginPath = allowedRoles?.includes("admin") ? "/admin/signin" : "/signin";
     return <Navigate to={loginPath} replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(role)) {
     // Redirect to their appropriate dashboard
-    const redirectPath = role === "admin" ? "/admin/dashboard" : "/user/dashboard";
+    const redirectPath = role === "admin" ? "/admin/dashboard" : role === "faculty" ? "/faculty/dashboard" : "/user/dashboard";
     return <Navigate to={redirectPath} replace />;
   }
 
@@ -184,6 +189,8 @@ const GuestOnlyRoute = ({ children }) => {
   if (isAuthenticated && role) {
     if (role === "admin") {
       return <Navigate to="/admin/dashboard" replace />;
+    } else if (role === "faculty") {
+      return <Navigate to="/faculty/dashboard" replace />;
     } else if (role === "user") {
       return <Navigate to="/user/dashboard" replace />;
     }
@@ -204,20 +211,22 @@ const SmartRedirect = () => {
 
   // If protection is disabled, redirect to login pages (user login by default)
   if (!ENFORCE_ROUTE_PROTECTION) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/signin" replace />;
   }
 
   // If user is authenticated, redirect based on role
   if (isAuthenticated && role) {
     if (role === "admin") {
       return <Navigate to="/admin/dashboard" replace />;
+    } else if (role === "faculty") {
+      return <Navigate to="/faculty/dashboard" replace />;
     } else if (role === "user") {
       return <Navigate to="/user/dashboard" replace />;
     }
   }
 
   // Not authenticated - redirect to user login
-  return <Navigate to="/login" replace />;
+  return <Navigate to="/signin" replace />;
 };
 
 // *** MAIN APP ROUTER ***
@@ -228,7 +237,15 @@ const AppRouter = () => {
         <Routes>
           {/* ---------- USER ROUTES ---------- */}
           <Route
-            path="/login"
+            path="/signup"
+            element={
+              <GuestOnlyRoute>
+                <UserSignUp />
+              </GuestOnlyRoute>
+            }
+          />
+          <Route
+            path="/signin"
             element={
               <GuestOnlyRoute>
                 <UserSignIn />
@@ -278,10 +295,10 @@ const AppRouter = () => {
 
           {/* ---------- ADMIN ROUTES ---------- */}
           <Route
-            path="/admin/login"
+            path="/admin/signin"
             element={
               <GuestOnlyRoute>
-                <AdminLogin />
+                <AdminSignIn />
               </GuestOnlyRoute>
             }
           />
@@ -299,6 +316,36 @@ const AppRouter = () => {
             path="/admin/dashboard"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout>
+                  <AdminDashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* ---------- FACULTY ROUTES ---------- */}
+          <Route
+            path="/faculty/signin"
+            element={
+              <GuestOnlyRoute>
+                <FacultySignIn />
+              </GuestOnlyRoute>
+            }
+          />
+          <Route
+            path="/faculty"
+            element={
+              <ProtectedRoute allowedRoles={["faculty"]}>
+                <AdminDashboardRedirect />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* FIXED: AdminLayout wraps the content inside the element prop */}
+          <Route
+            path="/faculty/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["faculty"]}>
                 <AdminLayout>
                   <AdminDashboard />
                 </AdminLayout>

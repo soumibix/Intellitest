@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Eye, EyeOff, ChevronDown, Loader2 } from 'lucide-react';
 
+// Input Component
 const Input = ({
   type = 'text',
   placeholder = '',
@@ -71,8 +72,8 @@ const Input = ({
                   <div
                     key={index}
                     onClick={() => handleDropdownSelect(option)}
-                    className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-                      option.value === value ? 'bg-blue-100 text-blue-700' : 'text-gray-900'
+                    className={`px-4 py-2 cursor-pointer hover:bg-purple-50 transition-colors ${
+                      option.value === value ? 'bg-purple-100 text-purple-700' : 'text-gray-900'
                     }`}
                   >
                     {option.label}
@@ -156,5 +157,4 @@ const Input = ({
     </div>
   );
 };
-
 export default Input;
