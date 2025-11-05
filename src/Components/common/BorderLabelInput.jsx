@@ -1,124 +1,39 @@
 import React from 'react';
 
-function BorderLabelInput({ 
-  label, 
-  placeholder = "", 
-  type = "text", 
-  required = false, 
-  value = "", 
-  onChange, 
-  name,
-  id,
-  className = "",
-  disabled = false,
-  variant = "default",
-  options = null
-}) {
-  const [isFocused, setIsFocused] = React.useState(false);
-  
-  // Simple, safe value handling
-  const inputValue = String(value || '');
-  const hasValue = inputValue.length > 0;
-  const isActive = isFocused || hasValue;
-
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => setIsFocused(false);
-  
-  const handleChange = (e) => {
-    //console.log(`BorderLabelInput change: ${name} = ${e.target.value}`);
-    if (onChange) {
-      onChange(e);
-    }
-  };
-
-  const variants = {
-    default: {
-      border: 'border-gray-300',
-      focusBorder: 'border-[#B52B6E]',
-      label: 'text-gray-600',
-      labelBg: 'bg-white'
-    }
-  };
-
-  const currentVariant = variants[variant] || variants.default;
-
-  if (type === 'select' && options) {
-    return (
-      <div className={`relative ${className}`}>
+const BorderLabelInput = ({ label, name, type, required, value, onChange, options, placeholder }) => {
+  return (
+    <div className="relative">
+      <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-700">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      {type === 'select' ? (
         <select
-          id={id || name}
           name={name}
-          value={inputValue}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+          value={value}
+          onChange={onChange}
           required={required}
-          disabled={disabled}
-          className={`
-            w-full px-4 py-3 text-gray-900 bg-white border-2 rounded-lg appearance-none
-            ${isFocused ? currentVariant.focusBorder : currentVariant.border}
-            focus:outline-none transition-colors duration-200
-          `}
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors"
         >
-          <option value="">{placeholder}</option>
-          {options.map((option, index) => (
-            <option key={index} value={option.value}>
-              {option.label}
+          <option value="">Select {label}</option>
+          {options?.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
             </option>
           ))}
         </select>
-        
-        <label
-          className={`
-            absolute left-3 px-1 transition-all duration-200 pointer-events-none select-none z-10
-            ${currentVariant.labelBg} ${currentVariant.label}
-            ${isActive ? '-top-2 text-xs font-medium' : 'top-3 text-base'}
-          `}
-        >
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </label>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`relative ${className}`}>
-      <input
-        type={type}
-        id={id || name}
-        name={name}
-        value={inputValue}
-        onChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        required={required}
-        disabled={disabled}
-        className={`
-          w-full px-4 py-3 text-gray-900 bg-white border-2 rounded-lg
-          ${isFocused ? currentVariant.focusBorder : currentVariant.border}
-          focus:outline-none transition-colors duration-200
-        `}
-      />
-      
-      <label
-        className={`
-          absolute left-3 px-1 transition-all duration-200 pointer-events-none select-none z-10
-          ${currentVariant.labelBg} ${currentVariant.label}
-          ${isActive ? '-top-2 text-xs font-medium' : 'top-3 text-base'}
-        `}
-      >
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-      
-      {isFocused && !hasValue && placeholder && (
-        <div className="absolute left-4 top-3 text-gray-400 pointer-events-none">
-          {placeholder}
-        </div>
+      ) : (
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none transition-colors"
+        />
       )}
     </div>
   );
-}
+};
 
 export default BorderLabelInput;

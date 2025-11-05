@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { CheckCircle, FileText, Upload, Calendar, Send } from 'lucide-react';
-
+import React from 'react';
+import { CheckCircle, FileText, Upload, Calendar, Send, Plus } from 'lucide-react';
+import Button from '../common/Button';
 export const ProgressiveStepper = ({ activeStep, onSaveAndContinue }) => {
   const steps = [
     {
@@ -36,38 +36,37 @@ export const ProgressiveStepper = ({ activeStep, onSaveAndContinue }) => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-8">
-      {/* Stepper Header */}
-      <div className="relative flex items-start justify-between mb-12">
+    <div className="w-full mx-auto p-8 bg-white rounded-lg shadow-md">
+      <div className="relative flex md:flex-row flex-col md:items-start md:gap-0 gap-9 justify-between">
         {steps.map((step, index) => {
           const status = getStepStatus(step.id);
           const Icon = step.icon;
           
           return (
             <div key={step.id} className="flex flex-col items-center flex-1 relative">
-              {/* Connecting Line */}
+              {/* Connecting Line Background */}
               {index < steps.length - 1 && (
-                <div className="absolute left-1/2 top-8 w-full h-0.5 -z-10">
-                  <div 
-                    className={`h-full transition-all duration-500 ${
-                      status === 'completed' ? 'bg-purple-600' : 'bg-gray-200'
-                    }`}
-                    style={{
-                      width: status === 'completed' ? '100%' : '0%',
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gray-200" />
-                </div>
+                <div className="absolute left-1/2 top-8 w-full h-0.5 bg-gray-200 -z-10" />
+              )}
+              
+              {/* Connecting Line Progress */}
+              {index < steps.length - 1 && (
+                <div 
+                  className="absolute left-1/2 top-8 h-0.5 bg-[#631891] -z-10 transition-all duration-500"
+                  style={{
+                    width: status === 'completed' ? '100%' : '0%',
+                  }}
+                />
               )}
               
               {/* Step Icon */}
               <div
-                className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 transform ${
+                className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
                   status === 'active'
-                    ? 'bg-purple-600 scale-110 shadow-lg'
+                    ? 'bg-[#631891] scale-110 shadow-lg'
                     : status === 'completed'
-                    ? 'bg-purple-600'
-                    : 'bg-gray-100'
+                    ? 'bg-[#160024]'
+                    : 'bg-[#6318910F]'
                 }`}
               >
                 {status === 'completed' ? (
@@ -75,28 +74,28 @@ export const ProgressiveStepper = ({ activeStep, onSaveAndContinue }) => {
                 ) : (
                   <Icon
                     className={`w-8 h-8 transition-colors duration-300 ${
-                      status === 'active' ? 'text-white' : 'text-gray-400'
+                      status === 'active' ? 'text-white' : 'text-[#631891AD]'
                     }`}
                   />
                 )}
               </div>
 
               {/* Step Info */}
-              <div className="mt-4 text-center max-w-[140px]">
+              <div className="mt-4 text-center max-w-[180px]">
                 <h3
-                  className={`text-sm font-semibold mb-1 transition-colors duration-300 ${
+                  className={`text-lg font-semibold mb-1 transition-colors duration-300 ${
                     status === 'active' || status === 'completed'
                       ? 'text-gray-900'
-                      : 'text-gray-400'
+                      : 'text-[#2B2B2B]'
                   }`}
                 >
                   {step.title}
                 </h3>
                 <p
-                  className={`text-xs transition-colors duration-300 ${
+                  className={`text-md transition-colors duration-300 ${
                     status === 'active' || status === 'completed'
                       ? 'text-gray-600'
-                      : 'text-gray-400'
+                      : 'text-[#6D6D6D]'
                   }`}
                 >
                   {step.description}
@@ -107,16 +106,19 @@ export const ProgressiveStepper = ({ activeStep, onSaveAndContinue }) => {
         })}
       </div>
 
-      {/* Create New Test Button - Only shows when no step is active */}
+      {/* Create New Test Button */}
       {activeStep === 0 && (
-        <div className="flex justify-center animate-fadeIn">
-          <button
-            onClick={() => onSaveAndContinue(1)}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            Create New Test
-            <span className="text-xl">+</span>
-          </button>
+        <div className="flex justify-center mt-8 animate-fadeIn">
+            <Button
+              onClick={() => onSaveAndContinue(1)}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              text="Create New Test"
+              padding = "px-5 py-3"
+              icon={<Plus/>}
+              color='#631891'
+              textSize='text-md'
+              iconPosition='right'
+            />
         </div>
       )}
     </div>

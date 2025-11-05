@@ -75,7 +75,7 @@ const AdminDashboard = () => {
         <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
-            <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#631891]" />
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
               Faculty Details
             </h2>
@@ -144,11 +144,11 @@ const AdminDashboard = () => {
             <Button
               text="Submit"
               color="[#631891]"
-              padding="py-3 sm:py-4"
-              width="w-32 sm:w-40"
+              padding="md:py-3 md:px-8 py-4"
               icon={<ArrowRight size={18} />}
               iconPosition="right"
               onClick={handleSubmit}
+              textSize="lg"
             />
           </div>
         </div>
