@@ -60,13 +60,7 @@ const AdminDashboard = () => {
     { value: "instructor", label: "Instructor" }
   ];
 
-  const sectionOptions = [
-    { value: "", label: "Section A" },
-    { value: "a", label: "Section A" },
-    { value: "b", label: "Section B" },
-    { value: "c", label: "Section C" },
-    { value: "d", label: "Section D" },
-  ];
+
 
   return (
     <div className="relative">
@@ -144,7 +138,7 @@ const AdminDashboard = () => {
             <Button
               text="Submit"
               color="[#631891]"
-              padding="md:py-3 md:px-8 py-4"
+              padding="md:py-3 md:px-8 py-3 px-8"
               icon={<ArrowRight size={18} />}
               iconPosition="right"
               onClick={handleSubmit}
