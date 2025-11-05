@@ -6,6 +6,7 @@ import AdminLayout from "./Layout/Admin/Layout";
 import UserLayout from "./Layout/User/UserLayout";
 import AdminDashboard from "./Pages/Admin/AdminDashboard";
 import UserTests from "./Pages/User/UserTests";
+import UserIndividualTest from "./Pages/User/UserIndividualTest";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -261,6 +262,16 @@ const AppRouter = () => {
                 <UserLayout>
                   <UserTests />
                 </UserLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/user/test"
+            element={
+              <ProtectedRoute allowedRoles={["user"]}>
+                {/* <UserLayout> */}
+                  <UserIndividualTest />
+                {/* </UserLayout> */}
               </ProtectedRoute>
             }
           />
