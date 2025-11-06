@@ -28,7 +28,13 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
   };
 
   const handleViewReport = () => {
-    console.log(`Navigate to /admin/viewreport?testId=${data?.id || id || "default-test-id"}`);
+    const testId = data?.id || testData?.id || id;
+    console.log(`Navigate to /admin/viewreport/${testId}`);
+    if (testId) {
+      navigate(`/admin/viewreport/${testId}`);
+    } else {
+      console.error('No test ID available for navigation');
+    }
   };
 
   return (
