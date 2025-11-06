@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import AllTest from '../../Components/AllTest';
 
-const StudentPerformance = () => {
+function TestReports() {
     const [searchQuery, setSearchQuery] = useState('');
     const allTests = [
         {
@@ -102,8 +102,8 @@ const StudentPerformance = () => {
     const currentTests = allTests.filter(test => test.status === 'completed');
 
     return (
-        <AllTest allTests={allTests} filter={true} userType='admin'/>
+        <AllTest allTests={currentTests} filter={false} />
     );
 }
 
-export default StudentPerformance
+export default TestReports

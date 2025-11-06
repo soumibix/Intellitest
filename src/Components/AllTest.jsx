@@ -2,108 +2,108 @@ import React, { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import TestCard from "../Components/TestCard";
 
-function AllTest({ userType = "user" }) {
+function AllTest({ userType = "user", allTests = 
+  [
+  {
+    id: 1,
+    status: "ongoing",
+    testData: {
+      timeRemaining: "58:07 mins remaining",
+      title: "Machine Learning Mid-Sem Test",
+      questions: 30,
+      marks: 60,
+      duration: "1 hour",
+      department: "CST",
+      semester: "05",
+      createdBy: "Saurabh Kumbhar",
+      createdDate: "Sept 5 04:25",
+      avatarSeed: "Saurabh",
+    },
+    month: "September",
+  },
+  {
+    id: 2,
+    status: "upcoming",
+    testData: {
+      dateTime: "Nov 15 • 2:00 PM",
+      title: "Data Structures Final Exam",
+      questions: 50,
+      marks: 100,
+      duration: "2 hours",
+      department: "CST",
+      semester: "03",
+      createdBy: "Priya Sharma",
+      createdDate: "Oct 20 10:15",
+      avatarSeed: "Priya",
+    },
+    month: "November",
+  },
+  {
+    id: 3,
+    status: "completed",
+    testData: {
+      dateTime: "Oct 10 • 10:00 AM",
+      title: "Database Management Systems Quiz",
+      questions: 20,
+      marks: 40,
+      duration: "45 mins",
+      department: "CST",
+      semester: "04",
+      createdBy: "Rahul Verma",
+      createdDate: "Sept 30 14:20",
+      avatarSeed: "Rahul",
+      marksObtained: 52,
+      totalMarks: 60,
+      timeTaken: "54 minutes",
+      accuracy: "87%",
+    },
+    month: "October",
+  },
+  {
+    id: 4,
+    status: "upcoming",
+    testData: {
+      dateTime: "Nov 20 • 11:00 AM",
+      title: "Computer Networks Test",
+      questions: 40,
+      marks: 80,
+      duration: "1.5 hours",
+      department: "CST",
+      semester: "05",
+      createdBy: "Anjali Singh",
+      createdDate: "Nov 1 09:00",
+      avatarSeed: "Anjali",
+    },
+    month: "November",
+  },
+  {
+    id: 5,
+    status: "completed",
+    testData: {
+      dateTime: "Oct 25 • 3:00 PM",
+      title: "Operating Systems Mid-Term",
+      questions: 35,
+      marks: 70,
+      duration: "1.5 hours",
+      department: "CST",
+      semester: "05",
+      createdBy: "Saurabh Kumbhar",
+      createdDate: "Oct 15 11:30",
+      avatarSeed: "Saurabh",
+      marksObtained: 45,
+      totalMarks: 70,
+      timeTaken: "1 hour 20 mins",
+      accuracy: "64%",
+    },
+    month: "October",
+  },
+], filter = true }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("All");
 
-  // Mock test data
-  const allTests = [
-    {
-      id: 1,
-      status: "ongoing",
-      testData: {
-        timeRemaining: "58:07 mins remaining",
-        title: "Machine Learning Mid-Sem Test",
-        questions: 30,
-        marks: 60,
-        duration: "1 hour",
-        department: "CST",
-        semester: "05",
-        createdBy: "Saurabh Kumbhar",
-        createdDate: "Sept 5 04:25",
-        avatarSeed: "Saurabh",
-      },
-      month: "September",
-    },
-    {
-      id: 2,
-      status: "upcoming",
-      testData: {
-        dateTime: "Nov 15 • 2:00 PM",
-        title: "Data Structures Final Exam",
-        questions: 50,
-        marks: 100,
-        duration: "2 hours",
-        department: "CST",
-        semester: "03",
-        createdBy: "Priya Sharma",
-        createdDate: "Oct 20 10:15",
-        avatarSeed: "Priya",
-      },
-      month: "November",
-    },
-    {
-      id: 3,
-      status: "completed",
-      testData: {
-        dateTime: "Oct 10 • 10:00 AM",
-        title: "Database Management Systems Quiz",
-        questions: 20,
-        marks: 40,
-        duration: "45 mins",
-        department: "CST",
-        semester: "04",
-        createdBy: "Rahul Verma",
-        createdDate: "Sept 30 14:20",
-        avatarSeed: "Rahul",
-        marksObtained: 52,
-        totalMarks: 60,
-        timeTaken: "54 minutes",
-        accuracy: "87%",
-      },
-      month: "October",
-    },
-    {
-      id: 4,
-      status: "upcoming",
-      testData: {
-        dateTime: "Nov 20 • 11:00 AM",
-        title: "Computer Networks Test",
-        questions: 40,
-        marks: 80,
-        duration: "1.5 hours",
-        department: "CST",
-        semester: "05",
-        createdBy: "Anjali Singh",
-        createdDate: "Nov 1 09:00",
-        avatarSeed: "Anjali",
-      },
-      month: "November",
-    },
-    {
-      id: 5,
-      status: "completed",
-      testData: {
-        dateTime: "Oct 25 • 3:00 PM",
-        title: "Operating Systems Mid-Term",
-        questions: 35,
-        marks: 70,
-        duration: "1.5 hours",
-        department: "CST",
-        semester: "05",
-        createdBy: "Saurabh Kumbhar",
-        createdDate: "Oct 15 11:30",
-        avatarSeed: "Saurabh",
-        marksObtained: 45,
-        totalMarks: 70,
-        timeTaken: "1 hour 20 mins",
-        accuracy: "64%",
-      },
-      month: "October",
-    },
-  ];
+
 
   const months = [
     "All",
@@ -137,13 +137,13 @@ function AllTest({ userType = "user" }) {
   const suggestions =
     searchQuery.length > 0
       ? allTests
-          .filter((test) =>
-            test.testData.title
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase())
-          )
-          .map((test) => test.testData.title)
-          .slice(0, 5)
+        .filter((test) =>
+          test.testData.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+        )
+        .map((test) => test.testData.title)
+        .slice(0, 5)
       : [];
 
   // Handler functions
@@ -199,15 +199,14 @@ function AllTest({ userType = "user" }) {
         </div>
 
         {/* Filter Buttons and Filters */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        {filter && <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
             <button
               onClick={() => setActiveFilter("ongoing")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeFilter === "ongoing"
+              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all flex items-center gap-2 whitespace-nowrap ${activeFilter === "ongoing"
                   ? "bg-[#1A0B2E] text-white"
                   : "bg-[#E9D5FF] text-[#6B21A8]"
-              }`}
+                }`}
             >
               Ongoing
               {activeFilter === "ongoing" && (
@@ -217,33 +216,30 @@ function AllTest({ userType = "user" }) {
 
             <button
               onClick={() => setActiveFilter("completed")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
-                activeFilter === "completed"
+              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${activeFilter === "completed"
                   ? "bg-[#1A0B2E] text-white"
                   : "bg-[#E9D5FF] text-[#6B21A8]"
-              }`}
+                }`}
             >
               Completed
             </button>
 
             <button
               onClick={() => setActiveFilter("upcoming")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
-                activeFilter === "upcoming"
+              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${activeFilter === "upcoming"
                   ? "bg-[#1A0B2E] text-white"
                   : "bg-[#E9D5FF] text-[#6B21A8]"
-              }`}
+                }`}
             >
               Upcoming
             </button>
 
             <button
               onClick={() => setActiveFilter("all")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
-                activeFilter === "all"
+              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${activeFilter === "all"
                   ? "bg-[#1A0B2E] text-white"
                   : "bg-[#E9D5FF] text-[#6B21A8]"
-              }`}
+                }`}
             >
               View All
             </button>
@@ -269,11 +265,10 @@ function AllTest({ userType = "user" }) {
                   <div
                     key={month}
                     onClick={() => setSelectedMonth(month)}
-                    className={`px-4 py-2 cursor-pointer text-sm ${
-                      selectedMonth === month
+                    className={`px-4 py-2 cursor-pointer text-sm ${selectedMonth === month
                         ? "bg-purple-50 text-purple-700 font-medium"
                         : "text-gray-700 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {month}
                   </div>
@@ -281,7 +276,7 @@ function AllTest({ userType = "user" }) {
               </div>
             )}
           </div>
-        </div>
+        </div>}
 
         {/* Tests Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
