@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, SlidersHorizontal, X, ArrowRight } from "lucide-react";
 import TestCard from "../Components/TestCard";
 
 function AllTest({ userType = "user", allTests = 
@@ -78,6 +79,44 @@ function AllTest({ userType = "user", allTests =
   },
   {
     id: 5,
+    status: "upcoming",
+    testData: {
+      dateTime: "Nov 20 • 11:00 AM",
+      title: "Computer Networks Test",
+      questions: 40,
+      marks: 80,
+      duration: "1.5 hours",
+      department: "CST",
+      semester: "05",
+      createdBy: "Anjali Singh",
+      createdDate: "Nov 1 09:00",
+      avatarSeed: "Anjali",
+    },
+    month: "November",
+  },
+  {
+    id: 6,
+    status: "completed",
+    testData: {
+      dateTime: "Oct 25 • 3:00 PM",
+      title: "Operating Systems Mid-Term",
+      questions: 35,
+      marks: 70,
+      duration: "1.5 hours",
+      department: "CST",
+      semester: "05",
+      createdBy: "Saurabh Kumbhar",
+      createdDate: "Oct 15 11:30",
+      avatarSeed: "Saurabh",
+      marksObtained: 45,
+      totalMarks: 70,
+      timeTaken: "1 hour 20 mins",
+      accuracy: "64%",
+    },
+    month: "October",
+  },
+  {
+    id: 7,
     status: "completed",
     testData: {
       dateTime: "Oct 25 • 3:00 PM",
@@ -98,6 +137,7 @@ function AllTest({ userType = "user", allTests =
     month: "October",
   },
 ], filter = true }) {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
@@ -133,6 +173,10 @@ function AllTest({ userType = "user", allTests =
     return matchesStatus && matchesSearch && matchesMonth;
   });
 
+  // Limit to 5 tests when "View All" is active
+  const displayTests = activeFilter === "all" ? filteredTests.slice(0, 5) : filteredTests;
+  const hasMoreTests = activeFilter === "all" && filteredTests.length > 5;
+
   // Get suggestions for search
   const suggestions =
     searchQuery.length > 0
@@ -160,6 +204,11 @@ function AllTest({ userType = "user", allTests =
   const handleEditTest = (testId) => {
     console.log("Editing test:", testId);
     // Add your edit test logic here
+  };
+
+  const handleViewMore = () => {
+    // Navigate to StudentPerformance page
+    navigate('/admin/student-performance');
   };
 
   return (
@@ -280,19 +329,43 @@ function AllTest({ userType = "user", allTests =
 
         {/* Tests Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-          {filteredTests.length > 0 ? (
-            filteredTests.map((test) => (
-              <TestCard
-                key={test.id}
-                data={test}
-                userType={userType}
-                status={test.status}
-                testData={test.testData}
-                onStartTest={() => handleStartTest(test.id)}
-                onViewReport={() => handleViewReport(test.id)}
-                onEdit={() => handleEditTest(test.id)}
-              />
-            ))
+          {displayTests.length > 0 ? (
+            <>
+              {displayTests.map((test) => (
+                <TestCard
+                  key={test.id}
+                  data={test}
+                  userType={userType}
+                  status={test.status}
+                  testData={test.testData}
+                  onStartTest={() => handleStartTest(test.id)}
+                  onViewReport={() => handleViewReport(test.id)}
+                  onEdit={() => handleEditTest(test.id)}
+                />
+              ))}
+              
+              {/* View More Card */}
+              {hasMoreTests && (
+                <button
+                  onClick={handleViewMore}
+                  className="bg-[#000000d8]  text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4 min-h-[280px] group relative overflow-hidden"
+                >
+                  {/* Matte sunlight effect overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-40"></div>
+                  
+                  <div className="relative z-10 text-center backdrop-blur-2xl">
+                    <h3 className="text-3xl font-bold mb-2">View More Tests</h3>
+                    <p className="text-[#fff] text-xl ">
+                      {filteredTests.length - 5} more tests available
+                    </p>
+                  </div>
+                  
+                  <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">
+                    <ArrowRight className="w-6 h-6 cursor-pointer" />
+                  </div>
+                </button>
+              )}
+            </>
           ) : (
             <div className="col-span-full text-center py-12 text-gray-500">
               No tests found matching your filters
