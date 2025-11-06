@@ -75,7 +75,7 @@ export function Sidebar({
                     onClick={() => handleItemClick(item)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       active
-                        ? "bg-[#631891] text-white shadow-lg shadow-purple-500/20"
+                        ? "bg-[#631891] text-white shadow-lg"
                         : "text-gray-300 hover:text-white hover:bg-purple-900/30"
                     } ${isCollapsed ? "justify-center" : ""}`}
                     title={isCollapsed ? item.label : ""}
