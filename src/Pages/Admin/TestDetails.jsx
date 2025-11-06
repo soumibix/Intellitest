@@ -1,8 +1,15 @@
-import React, { useState } from 'react'
-import { ProgressiveStepper } from '../../Components/Admin/ProgressiveStepper '
+import React, { useState } from "react";
+import { UploadQuestions } from "../../Components/Admin/UploadQuestions";
+import ScheduleTest from "../../Components/Admin/ScheduleTest";
+import ReviewPublish from "../../Components/Admin/ReviewPublish";
+import { ProgressiveStepper } from "../../Components/Admin/ProgressiveStepper ";
+import { AddTestData } from "../../Components/Admin/AddTestData";
+import AllTest from "../../Components/AllTest";
+import Button from "../../Components/common/Button";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 const TestDetails = () => {
-const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
 
   const handleSaveAndContinue = (nextStep) => {
     setActiveStep(nextStep);
@@ -18,34 +25,49 @@ const [activeStep, setActiveStep] = useState(0);
     setActiveStep(0);
   };
 
-return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <ProgressiveStepper 
-        activeStep={activeStep} 
+  // Render the appropriate component based on active step
+  const renderStepContent = () => {
+    switch (activeStep) {
+      case 1:
+        return <AddTestData />;
+      case 2:
+        return <UploadQuestions />;
+      case 3:
+        return <ScheduleTest />;
+      case 4:
+        return <ReviewPublish />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-10 px-10">
+      <ProgressiveStepper
+        activeStep={activeStep}
         onSaveAndContinue={handleSaveAndContinue}
       />
 
-      {/* Content Area - Shows when a step is active */}
       {activeStep > 0 && (
-        <div className="max-w-3xl mx-auto mt-8 bg-white rounded-lg shadow-md p-8 animate-slideIn">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Step {activeStep} Content
-          </h2>
-          <p className="text-gray-600 mb-6">
-            This is where your form content for step {activeStep} would appear.
-          </p>
+        <div className="mx-auto bg-white rounded-lg shadow-md p-8 mt-0 animate-slideIn">
+          {/* Dynamic Content Based on Active Step */}
+          <div className="mb-8">{renderStepContent()}</div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center pt-6 border-t border-gray-200">
             {activeStep > 1 && (
-              <button
+              <Button
                 onClick={handleBack}
-                className="text-purple-600 hover:text-purple-700 font-medium px-4 py-2 rounded transition-colors duration-300"
-              >
-                ← Back
-              </button>
+                className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
+                text="Back"
+                padding="px-5 py-3"
+                icon={<ArrowLeft />}
+                color="#631891"
+                textSize="text-sm"
+                iconPosition="left"
+              />
             )}
-            
+
             <div className="ml-auto flex gap-3">
               <button
                 onClick={handleReset}
@@ -53,37 +75,45 @@ return (
               >
                 Cancel
               </button>
-              
+
               {activeStep < 4 ? (
-                <button
+                <Button
                   onClick={() => handleSaveAndContinue(activeStep + 1)}
                   className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                >
-                  Save & Continue
-                  <span>→</span>
-                </button>
+                  text="Save & Continue"
+                  padding="px-5 py-3"
+                  icon={<ArrowRight />}
+                  color="#631891"
+                  textSize="text-md"
+                  iconPosition="right"
+                />
               ) : (
-                <button
+                <Button
                   onClick={handleReset}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300"
-                >
-                  Publish Test
-                </button>
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
+                  text="Publish Test"
+                  padding="px-5 py-3"
+                  color="#631891"
+                  textSize="text-md"
+                />
+                // <button
+                //   onClick={handleReset}
+                //   className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300"
+                // >
+                //   Publish Test
+                // </button>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Demo Reset Button */}
-      <div className="flex justify-center mt-8">
-        <button
-          onClick={handleReset}
-          className="text-sm text-gray-500 hover:text-gray-700 underline"
-        >
-          Reset Demo
-        </button>
-      </div>
+      {/* All Tests Section */}
+      {activeStep === 0 && (
+        <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
+          <AllTest userType="admin"/>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes fadeIn {
@@ -118,7 +148,6 @@ return (
       `}</style>
     </div>
   );
-  
 };
 
-export default TestDetails
+export default TestDetails;
