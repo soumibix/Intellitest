@@ -39,7 +39,7 @@ const UserDashboard = () => {
     }
   };
 
-  const institutionOptions =  [
+  const institutionOptions = [
     { value: "", label: "College Campus" },
     { value: "college1", label: "IEM, Salt Lake" },
     { value: "college2", label: "IEM, Newtown" },
@@ -186,7 +186,7 @@ const UserDashboard = () => {
         {!isProfileComplete && (
           <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-8 sm:mt-10 lg:mt-12 px-12 bottom-0">
             <div
-              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl h-full"
+              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl "
               style={{
                 background: "linear-gradient(to bottom, #631891, #1D072B)",
               }}
@@ -204,7 +204,7 @@ const UserDashboard = () => {
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     whiteSpace: "nowrap",
-                    
+
                   }}
                 >
                   IntelliTest
@@ -212,7 +212,7 @@ const UserDashboard = () => {
               </div>
 
               {/* Foreground content */}
-              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-20 justify-center z-10">
+              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-5 lg:top-20 md:top-10  justify-center z-10">
                 <p className="text-[#DEA7FF] text-base sm:text-xl lg:text-2xl font-semibold mb-2">
                   Complete Your Profile to
                 </p>
@@ -222,8 +222,8 @@ const UserDashboard = () => {
               </div>
 
               {/* Lock Icon */}
-              <div className="absolute -top-6 sm:-top-8 lg:-top-10 left-1/2 transform -translate-x-1/2 flex justify-center z-10">
-                <div className="bg-white backdrop-blur-sm rounded-full p-4 sm:p-5 lg:p-6 inline-block border-2 border-[#631891]">
+              <div className="absolute -top-10 lg:-top-10 md:-top-9 left-1/2 transform -translate-x-1/2 flex justify-center z-10">
+                <div className="bg-white rounded-full p-4 sm:p-5 lg:p-6 inline-block border-2 border-[#631891]">
                   <LockKeyhole className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#631891]" />
                 </div>
               </div>

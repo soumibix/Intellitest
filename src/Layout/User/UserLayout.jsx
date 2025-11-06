@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { portalNavItems } from "../../Data/sidebarData";
-import { UserSidebar } from "../../Components/common/UserSidebar"; 
+import { Sidebar } from "../../Components/common/Sidebar";
 import { TopBar } from "../../Components/common/TopBar";
+import { userPortalNavItems } from "../../Data/userSideBarData";
 
 function UserLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -34,8 +34,8 @@ function UserLayout({ children }) {
 
   return (
     <div className="flex h-screen bg-[#F5F5F5]">
-      <UserSidebar
-        navItems={portalNavItems}
+      <Sidebar
+        navItems={userPortalNavItems}
         isOpen={sidebarOpen}
         isCollapsed={sidebarCollapsed}
         onToggle={handleMenuClick}
@@ -43,7 +43,7 @@ function UserLayout({ children }) {
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar onMenuClick={handleMenuClick} />
+        <TopBar userName="Admin" onMenuClick={handleMenuClick} />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
