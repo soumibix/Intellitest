@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { UploadQuestions } from "../../Components/Admin/UploadQuestions";
 import ScheduleTest from "../../Components/Admin/ScheduleTest";
 import ReviewPublish from "../../Components/Admin/ReviewPublish";
-import { ProgressiveStepper } from "../../Components/Admin/ProgressiveStepper ";
+import { ProgressiveStepper } from "../../Components/Admin/ProgressiveStepper";
 import { AddTestData } from "../../Components/Admin/AddTestData";
 import AllTest from "../../Components/AllTest";
 import Button from "../../Components/common/Button";
