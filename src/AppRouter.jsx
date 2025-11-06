@@ -19,6 +19,7 @@ import FacultyDashboard from "./Pages/Faculty/FacultyDashboard";
 import FacultyIndividualStudentPerformance from "./Pages/Faculty/FacultyIndividualStudentPerformance";
 import FacultyStudentPerformance from "./Pages/Faculty/FacultyStudentPerformance";
 import FacultyTestDetails from "./Pages/Faculty/FacultyTestDetails";
+import AddFaculty from "./Pages/Admin/AddFaculty";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -342,6 +343,16 @@ const AppRouter = () => {
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminLayout>
                   <AdminDashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/add-faculties"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout>
+                  <AddFaculty />
                 </AdminLayout>
               </ProtectedRoute>
             }

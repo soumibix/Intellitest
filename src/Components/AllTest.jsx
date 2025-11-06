@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal, X, ArrowRight } from "lucide-react";
 import TestCard from "../Components/TestCard";
 
-function AllTest({ userType = "user", allTests = 
+function AllTest({ heading="All Tests", statusShowing='true', userType = "user", allTests = 
   [
   {
     id: 1,
@@ -232,7 +232,7 @@ function AllTest({ userType = "user", allTests =
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6B21A8]">
-            All Tests
+            {heading}
           </h1>
 
           {/* Search Bar */}
@@ -263,7 +263,7 @@ function AllTest({ userType = "user", allTests =
         </div>
 
         {/* Filter Buttons and Filters */}
-        {filter && <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        {statusShowing && filter && <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
             <button
               onClick={() => setActiveFilter("ongoing")}

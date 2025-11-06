@@ -1,4 +1,4 @@
-import { ChartPie, FileText, GraduationCap, Settings } from "lucide-react";
+import { ChartPie, FileText, GraduationCap, Settings, UserRoundPlus } from "lucide-react";
 
 export const portalNavItems = [
   {
@@ -7,6 +7,13 @@ export const portalNavItems = [
     icon: ChartPie,
     hasDropdown: false,
     route: "/admin/dashboard",
+  },
+  {
+    id: "addfaculties",
+    label: "Add Faculty",
+    icon: UserRoundPlus,
+    hasDropdown: false,
+    route: "/admin/add-faculties",
   },
   {
     id: "test-details",

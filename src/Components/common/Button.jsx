@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 
 const Button = ({
   text = "Click Me",
-  color = "blue", // can be Tailwind color (e.g. "blue") or HEX (e.g. "#631891")
+  color = "#631891", // can be Tailwind color (e.g. "blue") or HEX (e.g. "#631891")
   variant = "filled", // "filled" | "outline" | "ghost"
   padding = "px-5 py-2.5",
   width = "w-auto",

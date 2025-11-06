@@ -56,15 +56,6 @@ const AdminDashboard = () => {
     { value: "instructor", label: "Instructor" }
   ];
 
-  const batchOptions = [
-    { value: "", label: "Your Designation" },
-    { value: "2021", label: "2021-2025" },
-    { value: "2022", label: "2022-2026" },
-    { value: "2023", label: "2023-2027" },
-    { value: "2024", label: "2024-2028" },
-  ];
-
-
 
 
   return (
@@ -76,7 +67,7 @@ const AdminDashboard = () => {
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-              Student Details
+              Admin Details
             </h2>
           </div>
 
@@ -86,7 +77,7 @@ const AdminDashboard = () => {
             <Input
               type="text"
               label="Name"
-              placeholder="Abhirup Ghosh"
+              placeholder="Firstname Lastname"
               value={formData.name}
               onChange={handleChange("name")}
               size="md"
@@ -94,7 +85,7 @@ const AdminDashboard = () => {
             <Input
               type="email"
               label="Email Address"
-              placeholder="abhirupghosh@gmail.com"
+              placeholder="xyz@gmail.com"
               value={formData.email}
               onChange={handleChange("email")}
               size="md"
@@ -129,49 +120,23 @@ const AdminDashboard = () => {
             />
             <Input
               type="dropdown"
-              label="Batch"
+              label="Designation"
               placeholder="Your Designation"
-              value={formData.batch}
-              onChange={handleChange("batch")}
-              options={batchOptions}
+              value={formData.designation}
+              onChange={handleChange("designation")}
+              options={designationOptions}
               size="md"
             />
-
-            {/* Row 3 */}
-            {/* <Input
-              type="text"
-              label="Enrollment Number"
-              placeholder="ABC123456789"
-              value={formData.enrollmentNumber}
-              onChange={handleChange("enrollmentNumber")}
-              size="md"
-            />
-            <Input
-              type="dropdown"
-              label="Section"
-              placeholder="Section A"
-              value={formData.section}
-              onChange={handleChange("section")}
-              options={sectionOptions}
-              size="md"
-            />
-            <Input
-              type="text"
-              label="Roll Number"
-              placeholder="12345"
-              value={formData.rollNumber}
-              onChange={handleChange("rollNumber")}
-              size="md"
-            /> */}
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-center mt-6 sm:mt-8">
+          <div className="flex justify-center md:mt-6">
             <Button
               text="Submit"
               color="[#631891]"
-              padding="py-3 sm:py-4"
-              width="w-32 sm:w-40"
+              padding="md:py-3 py-3"
+              width="md:w-60 w-50"
+              textSize="text-lg"
               icon={<ArrowRight size={18} />}
               iconPosition="right"
               onClick={handleSubmit}
