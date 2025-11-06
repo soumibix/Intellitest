@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal, X, ArrowRight } from "lucide-react";
 import TestCard from "../Components/TestCard";
@@ -142,6 +142,21 @@ function AllTest({ userType = "user", allTests =
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("All");
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowMonthDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
 
 
@@ -295,12 +310,11 @@ function AllTest({ userType = "user", allTests =
           </div>
 
           {/* Filters Dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setShowMonthDropdown(true)}
-            onMouseLeave={() => setShowMonthDropdown(false)}
-          >
-            <button className="bg-[#1A0B2E] text-white px-4 sm:px-6 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2">
+          <div className="relative" ref={dropdownRef}>
+            <button 
+              onClick={() => setShowMonthDropdown(!showMonthDropdown)}
+              className="bg-[#1A0B2E] text-white px-4 sm:px-6 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2"
+            >
               <SlidersHorizontal className="w-3 h-3 sm:w-4 sm:h-4" />
               Filters
             </button>
