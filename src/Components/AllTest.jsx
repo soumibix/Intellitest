@@ -136,7 +136,7 @@ function AllTest({ userType = "user", allTests =
     },
     month: "October",
   },
-], filter = true }) {
+], filter = true, showWrap = false }) {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -174,7 +174,7 @@ function AllTest({ userType = "user", allTests =
   });
 
   // Limit to 5 tests when "View All" is active
-  const displayTests = activeFilter === "all" ? filteredTests.slice(0, 5) : filteredTests;
+  const displayTests = showWrap ? filteredTests.slice(0, 5) : filteredTests;
   const hasMoreTests = activeFilter === "all" && filteredTests.length > 5;
 
   // Get suggestions for search
@@ -345,7 +345,7 @@ function AllTest({ userType = "user", allTests =
               ))}
               
               {/* View More Card */}
-              {hasMoreTests && (
+              {hasMoreTests && showWrap && (
                 <button
                   onClick={handleViewMore}
                   className="bg-[#000000d8]  text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4 min-h-[280px] group relative overflow-hidden"
