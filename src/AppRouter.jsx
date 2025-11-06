@@ -13,6 +13,7 @@ import UserIndividualTest from "./Pages/User/UserIndividualTest";
 import AdminTestDetails from "./Pages/Admin/TestDetails";
 import AdminStudentPerformance from "./Pages/Admin/StudentPerformance";
 import TestReports from "./Pages/User/TestReports";
+import IndividualStudentPerformance from "./Pages/Admin/IndividualStudentPerformance";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -342,13 +343,22 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
-          
           <Route
             path="/admin/student-performance"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminLayout>
                   <AdminStudentPerformance />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/viewreport/:id"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout>
+                  <IndividualStudentPerformance />
                 </AdminLayout>
               </ProtectedRoute>
             }

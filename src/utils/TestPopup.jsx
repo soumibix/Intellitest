@@ -22,12 +22,9 @@ export default function TestPopup({ isOpen, onClose, onStart, testData = {} }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-[#000000b4] bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden">
         <div className="bg-gradient-to-r from-purple-900 to-indigo-900 text-white p-6 text-center relative">
-          <button onClick={onClose} className="absolute top-4 right-4 hover:bg-white hover:bg-opacity-20 rounded-full p-1">
-            <X className="w-5 h-5" />
-          </button>
           <h2 className="text-2xl font-bold mb-2">{title}</h2>
           <div className="flex items-center justify-center gap-4 text-sm opacity-90">
             <span><span className="font-semibold">{questions}</span> Questions</span>
@@ -71,10 +68,10 @@ export default function TestPopup({ isOpen, onClose, onStart, testData = {} }) {
           </div>
 
           <div className="flex gap-3">
-            <button onClick={onClose} className="flex-1 px-6 py-3 border-2 border-red-500 text-red-500 rounded-lg font-semibold hover:bg-red-50">
+            <button onClick={onClose} className="flex-1 px-6 cursor-pointer py-3 border-2 border-red-500 text-red-500 rounded-lg font-semibold hover:bg-red-50">
               Cancel
             </button>
-            <button onClick={onStart} className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 flex items-center justify-center gap-2 shadow-lg">
+            <button onClick={onStart} className="flex-1 px-6 cursor-pointer py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 flex items-center justify-center gap-2 shadow-lg">
               Start Now
               <ArrowRight className="w-5 h-5" />
             </button>

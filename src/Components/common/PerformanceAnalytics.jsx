@@ -59,7 +59,7 @@ export default function PerformanceAnalytics() {
 
   return (
     <div className="">
-      <div className="bg-white rounded-md p-10 w-full ">
+      <div className="bg-white rounded-lg p-10 shadow">
         <h2 className="text-2xl font-bold text-[#3D3D3D] ">Performance Analytics</h2>
         
         <div className="flex items-center justify-between gap-12">

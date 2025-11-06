@@ -28,7 +28,13 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
   };
 
   const handleViewReport = () => {
-    console.log(`Navigate to /admin/viewreport?testId=${data?.id || id || "default-test-id"}`);
+    const testId = data?.id || testData?.id || id;
+    console.log(`Navigate to /admin/viewreport/${testId}`);
+    if (testId) {
+      navigate(`/admin/viewreport/${testId}`);
+    } else {
+      console.error('No test ID available for navigation');
+    }
   };
 
   return (
@@ -96,7 +102,7 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
               {status === "ongoing" && (
-                <button onClick={() => setShowPopup(true)} className="bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2 rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base whitespace-nowrap">
+                <button onClick={() => setShowPopup(true)} className="bg-purple-600 hover:bg-purple-700 cursor-pointer text-white px-4 sm:px-6 py-2 rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base whitespace-nowrap">
                   Start Test
                 </button>
               )}
@@ -124,7 +130,7 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
             </div>
 
             {status === "completed" && (
-              <button onClick={handleViewReport} className="bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2 rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base whitespace-nowrap">
+              <button onClick={handleViewReport} className="bg-purple-600 hover:bg-purple-700 cursor-pointer text-white px-4 sm:px-6 py-2 rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base whitespace-nowrap">
                 View Report
               </button>
             )}
