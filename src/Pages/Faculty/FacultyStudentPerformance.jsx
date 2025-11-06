@@ -138,9 +138,11 @@ const FacultyStudentPerformance = () => {
       },
     ]
 
+  const currentTests = allTests.filter(test => test.status === 'completed');
 
   return (
-    <AllTest allTests={allTests} filter={true} userType='admin'  />
+    // <AllTest allTests={allTests} filter={true} userType='admin'  />
+    <AllTest heading='Student Performance Details'  filter={false} userType='admin' allTests={currentTests}  />
   );
 }
 

@@ -10,10 +10,7 @@ const FacultyDashboard = () => {
     mobile: "",
     institution: "",
     department: "",
-    batch: "",
-    enrollmentNumber: "",
-    section: "",
-    rollNumber: "",
+    designation: "",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
@@ -56,13 +53,6 @@ const FacultyDashboard = () => {
     { value: "instructor", label: "Instructor" }
   ];
 
-  const batchOptions = [
-    { value: "", label: "Your Designation" },
-    { value: "2021", label: "2021-2025" },
-    { value: "2022", label: "2022-2026" },
-    { value: "2023", label: "2023-2027" },
-    { value: "2024", label: "2024-2028" },
-  ];
 
 
 
@@ -76,7 +66,7 @@ const FacultyDashboard = () => {
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-              Student Details
+              Faculty Details
             </h2>
           </div>
 
@@ -129,11 +119,11 @@ const FacultyDashboard = () => {
             />
             <Input
               type="dropdown"
-              label="Batch"
+              label="Designation"
               placeholder="Your Designation"
-              value={formData.batch}
-              onChange={handleChange("batch")}
-              options={batchOptions}
+              value={formData.designation}
+              onChange={handleChange("designation")}
+              options={designationOptions}
               size="md"
             />
 

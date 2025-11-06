@@ -10,10 +10,7 @@ const AdminDashboard = () => {
     mobile: "",
     institution: "",
     department: "",
-    batch: "",
-    enrollmentNumber: "",
-    section: "",
-    rollNumber: "",
+    designation: "",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);

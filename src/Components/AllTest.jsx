@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal, X, ArrowRight } from "lucide-react";
 import TestCard from "../Components/TestCard";
 
-function AllTest({ heading="All Tests", statusShowing='true', userType = "user", allTests = 
+function AllTest({ heading="All Tests", userType = "user", allTests = 
   [
   {
     id: 1,
@@ -263,7 +263,7 @@ function AllTest({ heading="All Tests", statusShowing='true', userType = "user",
         </div>
 
         {/* Filter Buttons and Filters */}
-        {statusShowing && filter && <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+        {filter && <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
             <button
               onClick={() => setActiveFilter("ongoing")}
