@@ -64,13 +64,8 @@ const AdminDashboard = () => {
     { value: "2024", label: "2024-2028" },
   ];
 
-  const sectionOptions = [
-    { value: "", label: "Section A" },
-    { value: "a", label: "Section A" },
-    { value: "b", label: "Section B" },
-    { value: "c", label: "Section C" },
-    { value: "d", label: "Section D" },
-  ];
+
+
 
   return (
     <div className="relative h-full">

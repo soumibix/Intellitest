@@ -1,142 +1,164 @@
-import React, { useState } from 'react';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
-import TestCard from '../Components/TestCard';
+import React, { useState } from "react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
+import TestCard from "../Components/TestCard";
 
-function AllTest() {
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+function AllTest({ userType = "user" }) {
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('All');
-  const [userType] = useState('user'); // Change to 'admin' to test admin view
+  const [selectedMonth, setSelectedMonth] = useState("All");
 
   // Mock test data
   const allTests = [
     {
       id: 1,
-      status: 'ongoing',
+      status: "ongoing",
       testData: {
-        timeRemaining: '58:07 mins remaining',
-        title: 'Machine Learning Mid-Sem Test',
+        timeRemaining: "58:07 mins remaining",
+        title: "Machine Learning Mid-Sem Test",
         questions: 30,
         marks: 60,
-        duration: '1 hour',
-        department: 'CST',
-        semester: '05',
-        createdBy: 'Saurabh Kumbhar',
-        createdDate: 'Sept 5 04:25',
-        avatarSeed: 'Saurabh'
+        duration: "1 hour",
+        department: "CST",
+        semester: "05",
+        createdBy: "Saurabh Kumbhar",
+        createdDate: "Sept 5 04:25",
+        avatarSeed: "Saurabh",
       },
-      month: 'September'
+      month: "September",
     },
     {
       id: 2,
-      status: 'upcoming',
+      status: "upcoming",
       testData: {
-        dateTime: 'Nov 15 • 2:00 PM',
-        title: 'Data Structures Final Exam',
+        dateTime: "Nov 15 • 2:00 PM",
+        title: "Data Structures Final Exam",
         questions: 50,
         marks: 100,
-        duration: '2 hours',
-        department: 'CST',
-        semester: '03',
-        createdBy: 'Priya Sharma',
-        createdDate: 'Oct 20 10:15',
-        avatarSeed: 'Priya'
+        duration: "2 hours",
+        department: "CST",
+        semester: "03",
+        createdBy: "Priya Sharma",
+        createdDate: "Oct 20 10:15",
+        avatarSeed: "Priya",
       },
-      month: 'November'
+      month: "November",
     },
     {
       id: 3,
-      status: 'completed',
+      status: "completed",
       testData: {
-        dateTime: 'Oct 10 • 10:00 AM',
-        title: 'Database Management Systems Quiz',
+        dateTime: "Oct 10 • 10:00 AM",
+        title: "Database Management Systems Quiz",
         questions: 20,
         marks: 40,
-        duration: '45 mins',
-        department: 'CST',
-        semester: '04',
-        createdBy: 'Rahul Verma',
-        createdDate: 'Sept 30 14:20',
-        avatarSeed: 'Rahul',
+        duration: "45 mins",
+        department: "CST",
+        semester: "04",
+        createdBy: "Rahul Verma",
+        createdDate: "Sept 30 14:20",
+        avatarSeed: "Rahul",
         marksObtained: 52,
         totalMarks: 60,
-        timeTaken: '54 minutes',
-        accuracy: '87%'
+        timeTaken: "54 minutes",
+        accuracy: "87%",
       },
-      month: 'October'
+      month: "October",
     },
     {
       id: 4,
-      status: 'upcoming',
+      status: "upcoming",
       testData: {
-        dateTime: 'Nov 20 • 11:00 AM',
-        title: 'Computer Networks Test',
+        dateTime: "Nov 20 • 11:00 AM",
+        title: "Computer Networks Test",
         questions: 40,
         marks: 80,
-        duration: '1.5 hours',
-        department: 'CST',
-        semester: '05',
-        createdBy: 'Anjali Singh',
-        createdDate: 'Nov 1 09:00',
-        avatarSeed: 'Anjali'
+        duration: "1.5 hours",
+        department: "CST",
+        semester: "05",
+        createdBy: "Anjali Singh",
+        createdDate: "Nov 1 09:00",
+        avatarSeed: "Anjali",
       },
-      month: 'November'
+      month: "November",
     },
     {
       id: 5,
-      status: 'completed',
+      status: "completed",
       testData: {
-        dateTime: 'Oct 25 • 3:00 PM',
-        title: 'Operating Systems Mid-Term',
+        dateTime: "Oct 25 • 3:00 PM",
+        title: "Operating Systems Mid-Term",
         questions: 35,
         marks: 70,
-        duration: '1.5 hours',
-        department: 'CST',
-        semester: '05',
-        createdBy: 'Saurabh Kumbhar',
-        createdDate: 'Oct 15 11:30',
-        avatarSeed: 'Saurabh',
+        duration: "1.5 hours",
+        department: "CST",
+        semester: "05",
+        createdBy: "Saurabh Kumbhar",
+        createdDate: "Oct 15 11:30",
+        avatarSeed: "Saurabh",
         marksObtained: 45,
         totalMarks: 70,
-        timeTaken: '1 hour 20 mins',
-        accuracy: '64%'
+        timeTaken: "1 hour 20 mins",
+        accuracy: "64%",
       },
-      month: 'October'
-    }
+      month: "October",
+    },
   ];
 
-  const months = ['All', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const months = [
+    "All",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   // Filter tests based on active filter
-  const filteredTests = allTests.filter(test => {
-    const matchesStatus = activeFilter === 'all' || test.status === activeFilter;
-    const matchesSearch = test.testData.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesMonth = selectedMonth === 'All' || test.month === selectedMonth;
+  const filteredTests = allTests.filter((test) => {
+    const matchesStatus =
+      activeFilter === "all" || test.status === activeFilter;
+    const matchesSearch = test.testData.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesMonth =
+      selectedMonth === "All" || test.month === selectedMonth;
     return matchesStatus && matchesSearch && matchesMonth;
   });
 
   // Get suggestions for search
-  const suggestions = searchQuery.length > 0 
-    ? allTests
-        .filter(test => test.testData.title.toLowerCase().includes(searchQuery.toLowerCase()))
-        .map(test => test.testData.title)
-        .slice(0, 5)
-    : [];
+  const suggestions =
+    searchQuery.length > 0
+      ? allTests
+          .filter((test) =>
+            test.testData.title
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          )
+          .map((test) => test.testData.title)
+          .slice(0, 5)
+      : [];
 
   // Handler functions
   const handleStartTest = (testId) => {
-    console.log('Starting test:', testId);
+    console.log("Starting test:", testId);
     // Add your start test logic here
   };
 
   const handleViewReport = (testId) => {
-    console.log('Viewing report for test:', testId);
+    console.log("Viewing report for test:", testId);
     // Add your view report logic here
   };
 
   const handleEditTest = (testId) => {
-    console.log('Editing test:', testId);
+    console.log("Editing test:", testId);
     // Add your edit test logic here
   };
 
@@ -145,8 +167,10 @@ function AllTest() {
       <div className="w-full mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6B21A8]">All Tests</h1>
-          
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6B21A8]">
+            All Tests
+          </h1>
+
           {/* Search Bar */}
           <div className="relative w-full sm:w-80 lg:w-96">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -178,45 +202,47 @@ function AllTest() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
             <button
-              onClick={() => setActiveFilter('ongoing')}
+              onClick={() => setActiveFilter("ongoing")}
               className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeFilter === 'ongoing'
-                  ? 'bg-[#1A0B2E] text-white'
-                  : 'bg-[#E9D5FF] text-[#6B21A8]'
+                activeFilter === "ongoing"
+                  ? "bg-[#1A0B2E] text-white"
+                  : "bg-[#E9D5FF] text-[#6B21A8]"
               }`}
             >
               Ongoing
-              {activeFilter === 'ongoing' && <X className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {activeFilter === "ongoing" && (
+                <X className="w-3 h-3 sm:w-4 sm:h-4" />
+              )}
             </button>
-            
+
             <button
-              onClick={() => setActiveFilter('completed')}
+              onClick={() => setActiveFilter("completed")}
               className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
-                activeFilter === 'completed'
-                  ? 'bg-[#1A0B2E] text-white'
-                  : 'bg-[#E9D5FF] text-[#6B21A8]'
+                activeFilter === "completed"
+                  ? "bg-[#1A0B2E] text-white"
+                  : "bg-[#E9D5FF] text-[#6B21A8]"
               }`}
             >
               Completed
             </button>
-            
+
             <button
-              onClick={() => setActiveFilter('upcoming')}
+              onClick={() => setActiveFilter("upcoming")}
               className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
-                activeFilter === 'upcoming'
-                  ? 'bg-[#1A0B2E] text-white'
-                  : 'bg-[#E9D5FF] text-[#6B21A8]'
+                activeFilter === "upcoming"
+                  ? "bg-[#1A0B2E] text-white"
+                  : "bg-[#E9D5FF] text-[#6B21A8]"
               }`}
             >
               Upcoming
             </button>
-            
+
             <button
-              onClick={() => setActiveFilter('all')}
+              onClick={() => setActiveFilter("all")}
               className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
-                activeFilter === 'all'
-                  ? 'bg-[#1A0B2E] text-white'
-                  : 'bg-[#E9D5FF] text-[#6B21A8]'
+                activeFilter === "all"
+                  ? "bg-[#1A0B2E] text-white"
+                  : "bg-[#E9D5FF] text-[#6B21A8]"
               }`}
             >
               View All
@@ -224,7 +250,7 @@ function AllTest() {
           </div>
 
           {/* Filters Dropdown */}
-          <div 
+          <div
             className="relative"
             onMouseEnter={() => setShowMonthDropdown(true)}
             onMouseLeave={() => setShowMonthDropdown(false)}
@@ -233,7 +259,7 @@ function AllTest() {
               <SlidersHorizontal className="w-3 h-3 sm:w-4 sm:h-4" />
               Filters
             </button>
-            
+
             {showMonthDropdown && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-10 max-h-64 overflow-y-auto">
                 <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
@@ -245,8 +271,8 @@ function AllTest() {
                     onClick={() => setSelectedMonth(month)}
                     className={`px-4 py-2 cursor-pointer text-sm ${
                       selectedMonth === month
-                        ? 'bg-purple-50 text-purple-700 font-medium'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? "bg-purple-50 text-purple-700 font-medium"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     {month}
@@ -261,7 +287,7 @@ function AllTest() {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {filteredTests.length > 0 ? (
             filteredTests.map((test) => (
-              <TestCard 
+              <TestCard
                 key={test.id}
                 data={test}
                 userType={userType}
