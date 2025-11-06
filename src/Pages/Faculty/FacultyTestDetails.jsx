@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { UploadQuestions } from "../../Components/Admin/UploadQuestions";
-import ScheduleTest from "../../Components/Admin/ScheduleTest";
-import ReviewPublish from "../../Components/Admin/ReviewPublish";
-import { ProgressiveStepper } from "../../Components/Admin/ProgressiveStepper";
-import { AddTestData } from "../../Components/Admin/AddTestData";
+import { FacultyUploadQuestions } from "../../Components/Faculty/FacultyUploadQuestions";
+import FacultyScheduleTest from "../../Components/Faculty/FacultyScheduleTest";
+import FacultyReviewPublish from "../../Components/Faculty/FacultyReviewPublish";
+import { FacultyProgressiveStepper } from "../../Components/Faculty/FacultyProgressiveStepper";
+import { FacultyAddTestData } from "../../Components/Faculty/FacultyAddTestData";
 import AllTest from "../../Components/AllTest";
 import Button from "../../Components/common/Button";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
-const TestDetails = () => {
+const FacultyTestDetails = () => {
 
   const [activeStep, setActiveStep] = useState(0);
   const allTests =
@@ -164,13 +164,13 @@ const TestDetails = () => {
   const renderStepContent = () => {
     switch (activeStep) {
       case 1:
-        return <AddTestData />;
+        return <FacultyAddTestData />;
       case 2:
-        return <UploadQuestions />;
+        return <FacultyUploadQuestions />;
       case 3:
-        return <ScheduleTest />;
+        return <FacultyScheduleTest />;
       case 4:
-        return <ReviewPublish />;
+        return <FacultyReviewPublish />;
       default:
         return null;
     }
@@ -178,7 +178,7 @@ const TestDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-10">
-      <ProgressiveStepper
+      <FacultyProgressiveStepper
         activeStep={activeStep}
         onSaveAndContinue={handleSaveAndContinue}
       />
@@ -285,4 +285,4 @@ const TestDetails = () => {
   );
 };
 
-export default TestDetails;
+export default FacultyTestDetails;

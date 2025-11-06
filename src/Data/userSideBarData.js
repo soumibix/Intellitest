@@ -19,10 +19,10 @@ export const userPortalNavItems = [
       icon: BarChart3,
       route: "/user/test-reports",
     },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      route: "/user/settings",
-    },
+    // {
+    //   id: "settings",
+    //   label: "Settings",
+    //   icon: Settings,
+    //   route: "/user/settings",
+    // },
   ];

@@ -14,6 +14,11 @@ import AdminTestDetails from "./Pages/Admin/TestDetails";
 import AdminStudentPerformance from "./Pages/Admin/StudentPerformance";
 import TestReports from "./Pages/User/TestReports";
 import IndividualStudentPerformance from "./Pages/Admin/IndividualStudentPerformance";
+import FacultyLayout from "./Layout/Faculty/FacultyLayout";
+import FacultyDashboard from "./Pages/Faculty/FacultyDashboard";
+import FacultyIndividualStudentPerformance from "./Pages/Faculty/FacultyIndividualStudentPerformance";
+import FacultyStudentPerformance from "./Pages/Faculty/FacultyStudentPerformance";
+import FacultyTestDetails from "./Pages/Faculty/FacultyTestDetails";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -24,6 +29,7 @@ const NotFound = () => <h2>404 - Page Not Found</h2>;
 // *** REDIRECT COMPONENTS FOR ROLE-BASED DASHBOARDS ***
 const AdminDashboardRedirect = () => <Navigate to="/admin/dashboard" replace />;
 const UserDashboardRedirect = () => <Navigate to="/user/dashboard" replace />;
+const FacultyDashboardRedirect = () => <Navigate to="/faculty/dashboard" replace />;
 
 // *** UTILITY FUNCTIONS ***
 const isTokenValid = () => {
@@ -159,13 +165,22 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
   if (!isAuthenticated) {
     // Redirect to appropriate login based on required role
-    const loginPath = allowedRoles?.includes("admin") ? "/admin/signin" : "/signin";
+    const loginPath = allowedRoles?.includes("admin") 
+      ? "/admin/signin" 
+      : allowedRoles?.includes("faculty")
+      ? "/faculty/signin"
+      : "/signin";
     return <Navigate to={loginPath} replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(role)) {
     // Redirect to their appropriate dashboard
-    const redirectPath = role === "admin" ? "/admin/dashboard" : role === "faculty" ? "/faculty/dashboard" : "/user/dashboard";
+    const redirectPath = 
+      role === "admin" 
+        ? "/admin/dashboard" 
+        : role === "faculty" 
+        ? "/faculty/dashboard" 
+        : "/user/dashboard";
     return <Navigate to={redirectPath} replace />;
   }
 
@@ -283,7 +298,6 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
-          {/* UPDATED: Changed from /user/test to /user/test/:id */}
           <Route
             path="/user/test/:id"
             element={
@@ -332,7 +346,6 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
-          
           <Route
             path="/admin/test-details"
             element={
@@ -363,19 +376,7 @@ const AppRouter = () => {
               </ProtectedRoute>
             }
           />
-          
-          {/* NEW: View Report Route for Admin */}
-          <Route
-            path="/admin/viewreport"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminLayout>
-                  {/* Replace with your actual ViewReport component */}
-                  <div>View Report Component Here</div>
-                </AdminLayout>
-              </ProtectedRoute>
-            }
-          />
+
           
           {/* ---------- FACULTY ROUTES ---------- */}
           <Route
@@ -390,18 +391,49 @@ const AppRouter = () => {
             path="/faculty"
             element={
               <ProtectedRoute allowedRoles={["faculty"]}>
-                <AdminDashboardRedirect />
+                <FacultyLayout>
+                  <FacultyDashboardRedirect />
+                </FacultyLayout>
               </ProtectedRoute>
             }
           />
-          
           <Route
             path="/faculty/dashboard"
             element={
               <ProtectedRoute allowedRoles={["faculty"]}>
-                <AdminLayout>
-                  <AdminDashboard />
-                </AdminLayout>
+                <FacultyLayout>
+                  <FacultyDashboard />
+                </FacultyLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faculty/test-details"
+            element={
+              <ProtectedRoute allowedRoles={["faculty"]}>
+                <FacultyLayout>
+                  <FacultyTestDetails />
+                </FacultyLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faculty/student-performance"
+            element={
+              <ProtectedRoute allowedRoles={["faculty"]}>
+                <FacultyLayout>
+                  <FacultyStudentPerformance />
+                </FacultyLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faculty/viewreport/:id"
+            element={
+              <ProtectedRoute allowedRoles={["faculty"]}>
+                <FacultyLayout>
+                  <FacultyIndividualStudentPerformance />
+                </FacultyLayout>
               </ProtectedRoute>
             }
           />

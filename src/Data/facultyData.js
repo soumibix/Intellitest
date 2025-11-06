@@ -1,32 +1,32 @@
 import { ChartPie, FileText, GraduationCap, Settings } from "lucide-react";
 
-export const portalNavItems = [
+export const facultyPortalNavItems = [
   {
     id: "dashboard",
     label: "Dashboard",
     icon: ChartPie,
     hasDropdown: false,
-    route: "/admin/dashboard",
+    route: "/faculty/dashboard",
   },
   {
     id: "test-details",
     label: "Test Details",
     icon: FileText,
     hasDropdown: false,
-    route: "/admin/test-details",
+    route: "/faculty/test-details",
   },
   {
     id: "student-performance",
     label: "Student Performance",
     icon: GraduationCap,
     hasDropdown: false,
-    route: "/admin/student-performance",
+    route: "/faculty/student-performance",
   },
   // {
   //   id: "settings",
   //   label: "Settings",
   //   icon: Settings,
   //   hasDropdown: false,
-  //   route: "/admin/settings",
+  //   route: "/faculty/settings",
   // },
 ];
