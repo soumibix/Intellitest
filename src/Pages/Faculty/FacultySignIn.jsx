@@ -44,7 +44,7 @@ export const FacultySignIn = () => {
       <button
         type="button"
         className="text-sm font-medium text-[#2B2B2B] cursor-pointer"
-        onClick={() => alert('Forgot password clicked')}
+        onClick={() => navigate('/faculty/forgot-password')}
       >
         Forgot password?
       </button>
@@ -70,9 +70,9 @@ export const FacultySignIn = () => {
       additionalElements={additionalElements}
       bottomLinks={[
         {
-          text: "Don't have an account? Sign Up",
-          action: () => navigate('/admin/signup'),
-          className: 'text-gray-700 hover:text-purple-600 font-semibold',
+          text: "Not faculty? Sign In as Admin",
+          action: () => navigate('/admin/signin'),
+          className: 'text-gray-700 hover:text-[#6B21A8] font-semibold cursor-pointer',
         },
       ]}
       errors={errors}

@@ -102,7 +102,7 @@ function TestReports() {
     const currentTests = allTests.filter(test => test.status === 'completed');
 
     return (
-        <AllTest allTests={currentTests} filter={false} />
+        <AllTest allTests={currentTests} filter={false} userType='user' />
     );
 }
 

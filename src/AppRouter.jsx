@@ -20,6 +20,9 @@ import FacultyIndividualStudentPerformance from "./Pages/Faculty/FacultyIndividu
 import FacultyStudentPerformance from "./Pages/Faculty/FacultyStudentPerformance";
 import FacultyTestDetails from "./Pages/Faculty/FacultyTestDetails";
 import AddFaculty from "./Pages/Admin/AddFaculty";
+import { ForgotPassword as FacultyForgotPassword } from "./Pages/Faculty/ForgotPassword";
+import FacultyOTPVerification from "./Pages/Faculty/OTPVerification";
+import FacultyResetNewPassword from "./Pages/Faculty/ResetNewPassword";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -378,7 +381,7 @@ const AppRouter = () => {
             }
           />
           <Route
-            path="/admin/viewreport/:id"
+            path="/admin/student-performance/viewreport/:id"
             element={
               <ProtectedRoute allowedRoles={["admin"]}>
                 <AdminLayout>
@@ -395,6 +398,30 @@ const AppRouter = () => {
             element={
               <GuestOnlyRoute>
                 <FacultySignIn />
+              </GuestOnlyRoute>
+            }
+          />
+          <Route
+            path="/faculty/forgot-password"
+            element={
+              <GuestOnlyRoute>
+                <FacultyForgotPassword />
+              </GuestOnlyRoute>
+            }
+          />
+          <Route
+            path="/faculty/otp-verification"
+            element={
+              <GuestOnlyRoute>
+                <FacultyOTPVerification />
+              </GuestOnlyRoute>
+            }
+          />
+          <Route
+            path="/faculty/reset-new-password"
+            element={
+              <GuestOnlyRoute>
+                <FacultyResetNewPassword />
               </GuestOnlyRoute>
             }
           />
@@ -439,7 +466,7 @@ const AppRouter = () => {
             }
           />
           <Route
-            path="/faculty/viewreport/:id"
+            path="/faculty/student-performance/viewreport/:id"
             element={
               <ProtectedRoute allowedRoles={["faculty"]}>
                 <FacultyLayout>

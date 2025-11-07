@@ -76,7 +76,7 @@ const FacultyDashboard = () => {
             <Input
               type="text"
               label="Name"
-              placeholder="Abhirup Ghosh"
+              placeholder="Fullname Lastname"
               value={formData.name}
               onChange={handleChange("name")}
               size="md"
@@ -84,7 +84,7 @@ const FacultyDashboard = () => {
             <Input
               type="email"
               label="Email Address"
-              placeholder="abhirupghosh@gmail.com"
+              placeholder="xyz@gmail.com"
               value={formData.email}
               onChange={handleChange("email")}
               size="md"
@@ -92,7 +92,7 @@ const FacultyDashboard = () => {
             <Input
               type="tel"
               label="Mobile Number"
-              placeholder="+91"
+              placeholder="+91 9874563210"
               value={formData.mobile}
               onChange={handleChange("mobile")}
               size="md"

@@ -142,7 +142,7 @@ const FacultyStudentPerformance = () => {
 
   return (
     // <AllTest allTests={allTests} filter={true} userType='admin'  />
-    <AllTest heading='Student Performance Details'  filter={false} userType='admin' allTests={currentTests}  />
+    <AllTest heading='Student Performance Details'  filter={false} userType='faculty' allTests={currentTests}  />
   );
 }
 

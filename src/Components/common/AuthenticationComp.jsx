@@ -7,6 +7,7 @@ const AuthenticationComp = ({
   image,
   leftTitle = "Connect to Your Smart Dashboard",
   leftDescription = "Monitor your devices, track sensor performance, and stay updated on maintenance tasks",
+  rightDescription = "",
   heading = "Welcome",
   colorHeading = "",
   fields = [],
@@ -88,6 +89,9 @@ const AuthenticationComp = ({
               )}
             </h1>
           </div>
+          {rightDescription && (
+            <p className="text-center text-gray-500 mb-8">{rightDescription}</p>
+          )}
 
           {/* Form */}
           <form

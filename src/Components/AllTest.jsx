@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal, X, ArrowRight } from "lucide-react";
 import TestCard from "../Components/TestCard";
 
-function AllTest({ heading="All Tests", userType = "user", allTests = 
+function AllTest({ heading="All Tests", userType='user', allTests = 
   [
   {
     id: 1,
@@ -143,6 +143,8 @@ function AllTest({ heading="All Tests", userType = "user", allTests =
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("All");
   const dropdownRef = useRef(null);
+
+  console.log("AllTest-userType: ",userType)
 
   // Close dropdown when clicking outside
   useEffect(() => {

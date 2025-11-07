@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import logo from '../assets/iem.jpg';
 import TestPopup from "../utils/TestPopup";
 
-function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEdit, data }) {
+function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }) {
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
+  console.log("userType:", userType);
 
   const {
     id = null, dateTime = "Nov 10 • 10:00 AM", title = "Machine Learning Mid-Sem Test",
@@ -30,8 +31,10 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
   const handleViewReport = () => {
     const testId = data?.id || testData?.id || id;
     console.log(`Navigate to /admin/viewreport/${testId}`);
-    if (testId) {
-      navigate(`/admin/viewreport/${testId}`);
+    if (userType === "admin" && testId) {
+      navigate(`/admin/student-performance/viewreport/${testId}`);
+    }  else if (userType === "faculty" && testId) {
+      navigate(`/faculty/student-performance/viewreport/${testId}`);
     } else {
       console.error('No test ID available for navigation');
     }
@@ -49,7 +52,7 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
           </div>
         </div>
 
-        {userType === "admin" && (status === "ongoing" || status === "upcoming") && (
+        {userType === "admin" || userType === "faculty" && (status === "ongoing" || status === "upcoming") && (
           <button onClick={onEdit} className="p-2 hover:bg-gray-50 rounded-lg">
             <SquarePen className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
           </button>
@@ -69,7 +72,7 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
       <div className="text-gray-600 mb-2 text-sm sm:text-base">Department: {department}</div>
       <div className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Semester: {semester}</div>
 
-      {status === "completed" && userType !== "admin" && (
+      {status === "completed" && userType === "user" && (
         <div className="bg-purple-50 border border-purple-200 rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
@@ -118,7 +121,7 @@ function TestCard({ userType = "admin", status = "upcoming", testData = {}, onEd
         </div>
       )}
 
-      {userType === "admin" && (
+      {(userType === "admin" || userType === "faculty") && (
         <div className="border-t border-gray-200 pt-4 mt-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3">

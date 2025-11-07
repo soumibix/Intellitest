@@ -246,7 +246,7 @@ const FacultyTestDetails = () => {
       {/* All Tests Section */}
       {activeStep === 0 && (
         <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
-          <AllTest userType="admin" allTests={allTests} showWrap={true} />
+          <AllTest userType="faculty" allTests={allTests} showWrap={true} />
         </div>
       )}
 

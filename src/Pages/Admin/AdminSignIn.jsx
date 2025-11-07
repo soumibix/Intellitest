@@ -69,9 +69,9 @@ export const AdminSignIn = () => {
       additionalElements={additionalElements}
       bottomLinks={[
         {
-          text: "Don't have an account? Sign Up",
-          action: () => navigate('/admin/signup'),
-          className: 'text-gray-700 hover:text-purple-600 font-semibold',
+          text: "Not admin? Sign In as Faculty",
+          action: () => navigate('/faculty/signin'),
+          className: 'text-gray-700 hover:text-[#6B21A8] font-semibold cursor-pointer',
         },
       ]}
       errors={errors}
