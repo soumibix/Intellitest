@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
-import SignInImg from "../../assets/AdminSignIn.jpg";
+import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
 import Button from "../../Components/common/Button";
 
@@ -54,7 +54,7 @@ export const FacultySignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest Faculty"
+      leftTitle="IntelliTest - Faculty Sign In"
       leftDescription="Comprehensive assessment and evaluation platform for modern education"
       heading="Welcome"
       colorHeading="Back"

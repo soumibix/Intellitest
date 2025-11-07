@@ -3,7 +3,7 @@ import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
 
-export const ForgotPassword = () => {
+const UserForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export const ForgotPassword = () => {
       console.log("Email Submitted:", formData.email);
       setIsLoading(false);
       // After successful email validation, go to OTP Verification
-      navigate("/faculty/otp-verification", { state: { email: formData.email } });
+      navigate("/otp-verification", { state: { email: formData.email } });
     }, 1500);
   };
 
@@ -34,9 +34,9 @@ export const ForgotPassword = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Faculty"
+      leftTitle="IntelliTest - Student"
       leftDescription="Once registered, you can access all your upcoming and completed tests in one place."
-      rightDescription="Enter your registered email address, and we’ll send you an OTP to verify your identity."
+      rightDescription="Enter your registered email address, and we'll send you an OTP to verify your identity."
       heading="Reset Your Password"
       fields={fields}
       initialFormData={{ email: "" }}
@@ -47,3 +47,5 @@ export const ForgotPassword = () => {
     />
   );
 };
+
+export default UserForgotPassword;

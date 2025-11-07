@@ -4,7 +4,7 @@ import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 import Button from "../../Components/common/Button";
 
-function OTPVerification() {
+function UserOTPVerification() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "";
@@ -26,7 +26,7 @@ function OTPVerification() {
 
     setTimeout(() => {
       if (formData.otp === "123456") {
-        navigate("/faculty/reset-new-password", { state: { email } });
+        navigate("/reset-new-password", { state: { email } });
       } else {
         setErrors({ otp: "Invalid OTP. Please try again." });
       }
@@ -72,7 +72,7 @@ function OTPVerification() {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Faculty"
+      leftTitle="IntelliTest - Student"
       leftDescription="Secure verification for resetting your password."
       heading="Verify OTP to proceed"
       rightDescription="Please enter the 6-digit code below to verify your identity."
@@ -87,4 +87,4 @@ function OTPVerification() {
   );
 }
 
-export default OTPVerification;
+export default UserOTPVerification;

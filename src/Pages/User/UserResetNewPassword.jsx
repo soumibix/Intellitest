@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 
-const ResetNewPassword = () => {
+const UserResetNewPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "";
@@ -25,7 +25,7 @@ const ResetNewPassword = () => {
     setTimeout(() => {
       console.log("Password reset for:", email);
       setIsLoading(false);
-      navigate("/faculty/signin"); // redirect to login page
+      navigate("/signin");
     }, 1500);
   };
 
@@ -49,7 +49,7 @@ const ResetNewPassword = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Faculty"
+      leftTitle="IntelliTest - Student"
       leftDescription="Set a strong password to protect your account."
       rightDescription="Create a new password to regain access to your IntelliTest account."
       heading="Set New Password"
@@ -66,4 +66,4 @@ const ResetNewPassword = () => {
   );
 };
 
-export default ResetNewPassword;
+export default UserResetNewPassword;

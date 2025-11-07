@@ -17,7 +17,7 @@ const InputFieldsComp = ({ fields, formData, onChange, errors }) => {
           type={field.type}
           label={field.label}
           placeholder={field.placeholder}
-          value={formData[field.name] || ''}
+          value={formData[field.name] || ""}
           onChange={(e) => handleChange(field.name, e.target.value)}
           error={errors[field.name]}
           options={field.options}
@@ -27,9 +27,12 @@ const InputFieldsComp = ({ fields, formData, onChange, errors }) => {
             handleChange(field.rememberMeName, checked)
           }
           rememberMeLabel={field.rememberMeLabel}
+          otpLength={field.otpLength} // Pass OTP length to Input
+          disabled={field.disabled}
         />
       ))}
     </div>
   );
 };
+
 export default InputFieldsComp;

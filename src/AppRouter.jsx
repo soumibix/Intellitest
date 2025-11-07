@@ -23,6 +23,10 @@ import AddFaculty from "./Pages/Admin/AddFaculty";
 import { ForgotPassword as FacultyForgotPassword } from "./Pages/Faculty/ForgotPassword";
 import FacultyOTPVerification from "./Pages/Faculty/OTPVerification";
 import FacultyResetNewPassword from "./Pages/Faculty/ResetNewPassword";
+import UserForgotPassword from "./Pages/User/UserForgotPassword";
+import UserOTPVerification from "./Pages/User/UserOTPVerification";
+import ResetNewPassword from "./Pages/Faculty/ResetNewPassword";
+import UserResetNewPassword from "./Pages/User/UserResetNewPassword";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = false; // When true = routes are protected, when false = open access
@@ -269,6 +273,27 @@ const AppRouter = () => {
             element={
               <GuestOnlyRoute>
                 <UserSignIn />
+              </GuestOnlyRoute>
+            }
+          /><Route
+            path="/forgot-password"
+            element={
+              <GuestOnlyRoute>
+                <UserForgotPassword />
+              </GuestOnlyRoute>
+            }
+          /><Route
+            path="/otp-verification"
+            element={
+              <GuestOnlyRoute>
+                <UserOTPVerification />
+              </GuestOnlyRoute>
+            }
+          /><Route
+            path="/reset-new-password"
+            element={
+              <GuestOnlyRoute>
+                <UserResetNewPassword />
               </GuestOnlyRoute>
             }
           />

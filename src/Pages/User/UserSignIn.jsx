@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
-import SignInImg from "../../assets/AdminSignIn.jpg";
+import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
 
 const UserSignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const nagigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = (formData) => {
     setIsLoading(true);
@@ -49,7 +49,7 @@ const UserSignIn = () => {
       <button
         type="button"
         className="text-sm font-medium text-[#2B2B2B] cursor-pointer"
-        onClick={() => alert('Forgot password clicked')}
+        onClick={() => navigate('/forgot-password')}
       >
         Forgot password?
       </button>
@@ -59,7 +59,7 @@ const UserSignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest Students"
+      leftTitle="IntelliTest - Students"
       leftDescription="Comprehensive assessment and evaluation platform for modern education"
       heading="Welcome"
       colorHeading="Back"
@@ -70,13 +70,13 @@ const UserSignIn = () => {
         rememberMe: false,
       }}
       onSubmit={handleSubmit}
-      submitButtonText="Sign Up"
+      submitButtonText="Sign In"
       isLoading={isLoading}
       additionalElements={additionalElements}
       bottomLinks={[
         {
           text: "Don't have an account? Sign Up",
-          action: () => nagigate('/signup'),
+          action: () => navigate('/signup'),
           className: 'text-gray-700 hover:text-[#631891] font-semibold cursor-pointer',
         },
       ]}
