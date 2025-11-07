@@ -72,7 +72,7 @@ const UserDashboard = () => {
 
   return (
     <div className="relative">
-      <div className="mx-4 sm:mx-6 lg:mx-8">
+      <div className="mx-4 sm:mx-6 lg:mx-8 flex flex-col justify-between min-h-screen">
         {/* Student Details Card */}
         <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
