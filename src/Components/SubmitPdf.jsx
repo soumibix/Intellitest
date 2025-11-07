@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Check, X } from 'lucide-react';
 
-function SubmitPdf() {
-  const [isOpen, setIsOpen] = useState(true);
+function SubmitPdf({isOpen, setIsOpen}) {
+  // const [isOpen, setIsOpen] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleCancel = () => {
@@ -16,31 +16,13 @@ function SubmitPdf() {
     }, 2000);
   };
 
-  if (!isOpen) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <button 
-          onClick={() => setIsOpen(true)}
-          className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-        >
-          Open Popup
-        </button>
-      </div>
-    );
-  }
+
 
   return (
-    <div className="bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 fixed inset-0">
+    <div className="bg-[#0007] bg-opacity-50 flex items-center justify-center p-4 fixed inset-0 z-[100]">
       <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-8 relative">
         {!isSubmitted ? (
           <>
-            <button 
-              onClick={handleCancel}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X size={24} />
-            </button>
-
             <div className="flex flex-col items-center">
               <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-6">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
