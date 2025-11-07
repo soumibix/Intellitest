@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Check, X } from 'lucide-react';
+import { Check, CircleX  } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function SubmitPdf({isOpen, setIsOpen}) {
   // const [isOpen, setIsOpen] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   const handleCancel = () => {
     setIsOpen(false);
@@ -13,6 +15,7 @@ function SubmitPdf({isOpen, setIsOpen}) {
     setIsSubmitted(true);
     setTimeout(() => {
       setIsOpen(false);
+      navigate('/user/test-reports');
     }, 2000);
   };
 
@@ -24,7 +27,7 @@ function SubmitPdf({isOpen, setIsOpen}) {
         {!isSubmitted ? (
           <>
             <div className="flex flex-col items-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                   <path d="M9 12h6M9 16h6M13 2H8.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C5 3.52 5 4.08 5 5.2v13.6c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C6.52 22 7.08 22 8.2 22h7.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C19 20.48 19 19.92 19 18.8V9m-6-7 6 6m-6-6v4.4c0 .56 0 .84.109 1.054a1 1 0 0 0 .437.437C13.76 8 14.04 8 14.6 8H19" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
@@ -38,18 +41,18 @@ function SubmitPdf({isOpen, setIsOpen}) {
                 You won't be able to make changes after submission
               </p>
 
-              <div className="flex gap-3 w-full">
+              <div className="flex justify-center gap-3 w-[65%]">
                 <button 
                   onClick={handleCancel}
-                  className="flex-1 px-6 py-3 border-2 border-red-500 text-red-500 rounded-xl hover:bg-red-50 transition-colors font-medium flex items-center justify-center gap-2"
+                  className="flex-1 max-w-[50%] px-3 py-3 border-2 bg-[#FFEAEA] text-red-500 rounded-xl transition-colors font-medium flex items-center justify-center gap-2"
                 >
-                  <X size={20} />
+                  <CircleX  size={20} />
                   Cancel
                 </button>
 
                 <button 
                   onClick={handleSubmit}
-                  className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-medium"
+                  className="flex-1 max-w-[50%] px-6 py-3 bg-[#631891] text-white rounded-xl hover:bg-purple-700 transition-colors font-medium w-[100px]"
                 >
                   Submit Now
                 </button>
@@ -58,7 +61,7 @@ function SubmitPdf({isOpen, setIsOpen}) {
           </>
         ) : (
           <div className="flex flex-col items-center py-8">
-            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-bounce">
+            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 ">
               <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center">
                 <Check size={48} className="text-white animate-pulse" strokeWidth={3} />
               </div>
