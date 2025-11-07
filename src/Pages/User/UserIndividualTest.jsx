@@ -4,6 +4,7 @@ import QuestionCard from '../../Components/User/QuestionCard';
 import FileUploader from '../../Components/common/FileUploader';
 import { useNavigate } from 'react-router-dom';
 import ExitConfirmationModal from '../../utils/ExitConfirmationModal';
+import SubmitPdf from '../../Components/SubmitPdf';
 
 const UserIndividualTest = () => {
     const [questions, setQuestions] = useState(
@@ -16,8 +17,11 @@ const UserIndividualTest = () => {
         }))
     );
     const navigate = useNavigate();
+    const [submitModal, setSubmitModal] = useState(false);
     const [timeRemaining, setTimeRemaining] = useState(3600);
     const [showExitModal, setShowExitModal] = useState(false);
+
+
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -77,7 +81,7 @@ const UserIndividualTest = () => {
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto">
                         <button onClick={() => setShowExitModal(true)} className="flex-1 md:flex-none px-6 cursor-pointer text-red-600 text-sm font-medium hover:bg-red-50 rounded border border-red-600 py-2">Exit Test</button>
-                        <button className="flex-1 md:flex-none px-4 cursor-pointer py-1.5 bg-purple-600 text-white text-sm font-medium rounded hover:bg-purple-700 flex items-center justify-center gap-2">Submit<span className="text-lg">→</span></button>
+                        <button onClick={()=> setSubmitModal(true)} className="flex-1 md:flex-none px-4 cursor-pointer py-1.5 bg-purple-600 text-white text-sm font-medium rounded hover:bg-purple-700 flex items-center justify-center gap-2">Submit<span className="text-lg">→</span></button>
                     </div>
                 </div>
             </div>
@@ -146,6 +150,9 @@ const UserIndividualTest = () => {
                     </div>
                 </div>
             </div>
+            {
+                submitModal && <SubmitPdf isOpen={submitModal} setIsOpen={setSubmitModal}/>
+            }
         </div>
     );
 };
