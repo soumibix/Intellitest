@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
-import SignInImg from "../../assets/AdminSignIn.jpg";
+// import SignInImg from "../../assets/AdminSignIn.jpg";
+import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
 
 export const AdminSignIn = () => {
@@ -53,8 +54,8 @@ export const AdminSignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest Admin"
-      leftDescription="Continue from where you left off and keep track of your test submissions."
+      leftTitle = "IntelliTest Administration Portal"
+      leftDescription = "Log in to manage platform operations, review test activities, and ensure smooth functioning across all accounts."
       heading="Welcome"
       colorHeading="Back"
       fields={fields}

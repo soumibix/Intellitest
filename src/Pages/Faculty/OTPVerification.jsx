@@ -72,8 +72,8 @@ function OTPVerification() {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Faculty"
-      leftDescription="Secure verification for resetting your password."
+      leftTitle = "Verify your account"
+      leftDescription = "Enter the OTP sent to your registered email to confirm your identity and activate your IntelliTest faculty account."
       heading="Verify OTP to proceed"
       rightDescription="Please enter the 6-digit code below to verify your identity."
       fields={fields}

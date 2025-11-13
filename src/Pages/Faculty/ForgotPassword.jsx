@@ -34,8 +34,8 @@ export const ForgotPassword = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Faculty"
-      leftDescription="Once registered, you can access all your upcoming and completed tests in one place."
+      leftTitle = "Forgot your password?"
+      leftDescription = "Enter your registered email address and we’ll send you a otp to reset your IntelliTest faculty account password."
       rightDescription="Enter your registered email address, and we’ll send you an OTP to verify your identity."
       heading="Reset Your Password"
       fields={fields}

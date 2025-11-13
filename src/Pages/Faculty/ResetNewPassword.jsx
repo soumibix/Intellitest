@@ -49,8 +49,8 @@ const ResetNewPassword = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Faculty"
-      leftDescription="Set a strong password to protect your account."
+      leftTitle = "Let’s get you back in"
+      leftDescription = "Reset your password securely and continue managing your IntelliTest assessments without interruption."
       rightDescription="Create a new password to regain access to your IntelliTest account."
       heading="Set New Password"
       fields={fields}

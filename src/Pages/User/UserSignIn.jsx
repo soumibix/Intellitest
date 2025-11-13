@@ -59,8 +59,8 @@ const UserSignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Students"
-      leftDescription="Comprehensive assessment and evaluation platform for modern education"
+      leftTitle = "Welcome back, learner!"
+      leftDescription = "Sign in to take your next test, check your scores, and stay on top of your goals with IntelliTest."
       heading="Welcome"
       colorHeading="Back"
       fields={fields}

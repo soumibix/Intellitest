@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import { useNavigate } from "react-router-dom";
+import SignInImg from "../../assets/Authentication3.jpg";
 
 export const UserSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +56,7 @@ export const UserSignUp = () => {
 
   return (
     <AuthenticationComp
-      image="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop"
+      image={SignInImg}
       leftTitle="Join thousands of educators and students"
       leftDescription="Create your account and start your IntelliTest experience"
       heading="Create"

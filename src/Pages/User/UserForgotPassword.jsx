@@ -34,8 +34,8 @@ const UserForgotPassword = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Student"
-      leftDescription="Once registered, you can access all your upcoming and completed tests in one place."
+      leftTitle = "Recover your IntelliTest account"
+      leftDescription = "Submit your registered email address to receive a otp for resetting your password."
       rightDescription="Enter your registered email address, and we'll send you an OTP to verify your identity."
       heading="Reset Your Password"
       fields={fields}

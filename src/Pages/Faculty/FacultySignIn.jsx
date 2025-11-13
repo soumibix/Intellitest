@@ -54,8 +54,8 @@ export const FacultySignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="IntelliTest - Faculty Sign In"
-      leftDescription="Comprehensive assessment and evaluation platform for modern education"
+      leftTitle = "Welcome back, educator!"
+      leftDescription = "Sign in to manage your assessments, monitor student progress, and continue your IntelliTest teaching journey."
       heading="Welcome"
       colorHeading="Back"
       fields={fields}
