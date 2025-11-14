@@ -129,8 +129,12 @@ const AddFaculty = () => {
 
                       <div className="space-y-2 mb-3">
                         <div className="flex items-center text-sm">
-                          <span className="text-gray-500 font-medium w-20">Email:</span>
-                          <span className="text-gray-900 truncate">{faculty.email}</span>
+                          <span className="text-gray-500 font-medium w-20">
+                            Email:
+                          </span>
+                          <span className="text-gray-900 truncate">
+                            {faculty.email}
+                          </span>
                         </div>
                         {/* <div className="flex items-center text-sm">
                           <span className="text-gray-500 font-medium w-20">Added:</span>
@@ -209,7 +213,6 @@ const AddFaculty = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
                             <div className="flex items-center justify-center gap-3">
-
                               <button
                                 onClick={() => handleEditClick(faculty)}
                                 className="text-purple-600 hover:text-purple-900 transition p-1"
@@ -254,7 +257,7 @@ const AddFaculty = () => {
         faculty={selectedFaculty}
       />
 
-      <ConfirmationModal
+      {/* <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false);
@@ -262,6 +265,20 @@ const AddFaculty = () => {
         }}
         onConfirm={handleConfirmDelete}
         facultyName={selectedFaculty?.fullName}
+      /> */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedFaculty(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Faculty"
+        message={`Are you sure you want to delete ${
+          selectedFaculty?.fullName || "this faculty"
+        }? This action cannot be undone.`}
+        confirmText="Delete Faculty"
+        confirmIcon={<Trash2 size={18} />}
       />
     </div>
   );
