@@ -62,13 +62,36 @@ const UserDashboard = () => {
     { value: "2024", label: "2024-2028" },
   ];
 
-  const sectionOptions = [
-    { value: "", label: "Section A" },
-    { value: "a", label: "Section A" },
-    { value: "b", label: "Section B" },
-    { value: "c", label: "Section C" },
-    { value: "d", label: "Section D" },
-  ];
+const sectionOptions = [
+  { value: "", label: "Select Section" },
+  { value: "a", label: "Section A" },
+  { value: "b", label: "Section B" },
+  { value: "c", label: "Section C" },
+  { value: "d", label: "Section D" },
+  { value: "e", label: "Section E" },
+  { value: "f", label: "Section F" },
+  { value: "g", label: "Section G" },
+  { value: "h", label: "Section H" },
+  { value: "i", label: "Section I" },
+  { value: "j", label: "Section J" },
+  { value: "k", label: "Section K" },
+  { value: "l", label: "Section L" },
+  { value: "m", label: "Section M" },
+  { value: "n", label: "Section N" },
+  { value: "o", label: "Section O" },
+  { value: "p", label: "Section P" },
+  { value: "q", label: "Section Q" },
+  { value: "r", label: "Section R" },
+  { value: "s", label: "Section S" },
+  { value: "t", label: "Section T" },
+  { value: "u", label: "Section U" },
+  { value: "v", label: "Section V" },
+  { value: "w", label: "Section W" },
+  { value: "x", label: "Section X" },
+  { value: "y", label: "Section Y" },
+  { value: "z", label: "Section Z" },
+];
+
 
   return (
     <div className="relative">
@@ -89,7 +112,7 @@ const UserDashboard = () => {
             <Input
               type="text"
               label="Name"
-              placeholder="Abhirup Ghosh"
+              placeholder="Firstname Lastname"
               value={formData.name}
               onChange={handleChange("name")}
               size="md"
@@ -97,7 +120,7 @@ const UserDashboard = () => {
             <Input
               type="email"
               label="Email Address"
-              placeholder="abhirupghosh@gmail.com"
+              placeholder="xyz@gmail.com"
               value={formData.email}
               onChange={handleChange("email")}
               size="md"
@@ -105,7 +128,7 @@ const UserDashboard = () => {
             <Input
               type="tel"
               label="Mobile Number"
-              placeholder="+91"
+              placeholder="+91 9876543210"
               value={formData.mobile}
               onChange={handleChange("mobile")}
               size="md"

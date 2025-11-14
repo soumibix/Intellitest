@@ -1,16 +1,26 @@
-// src/utils/AddFacultyModal.jsx
-import { UserPlus, X } from "lucide-react";
-import React, { useState } from "react";
+import { Edit2, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import Button from "../Components/common/Button";
 import Input from "../Components/common/Input";
 
-export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
+export const EditFacultyModal = ({ isOpen, onClose, onUpdateFaculty, faculty }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     designation: ''
   });
   const [errors, setErrors] = useState({});
+
+  // Populate form when faculty changes
+  useEffect(() => {
+    if (faculty) {
+      setFormData({
+        fullName: faculty.fullName || '',
+        email: faculty.email || '',
+        designation: faculty.designation || ''
+      });
+    }
+  }, [faculty]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -35,8 +45,7 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
 
   const handleSubmit = () => {
     if (validateForm()) {
-      onAddFaculty(formData);
-      setFormData({ fullName: '', email: '', designation: '' });
+      onUpdateFaculty(formData);
       setErrors({});
       onClose();
     }
@@ -64,7 +73,6 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
   };
 
   const handleClose = () => {
-    setFormData({ fullName: '', email: '', designation: '' });
     setErrors({});
     onClose();
   };
@@ -72,10 +80,10 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur  bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 backdrop-blur bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Add New Faculty</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Edit Faculty</h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-red-600 transition cursor-pointer"
@@ -125,17 +133,17 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3">
-            {/* <Button
+            <Button
               onClick={handleClose}
               text="Cancel"
               textSize="text-sm sm:text-md"
               color="#6B7280"
               padding="w-full sm:w-auto px-4 py-2"
-            /> */}
+            />
             <Button
               onClick={handleSubmit}
-              text="Add Faculty"
-              icon={<UserPlus size={18} />}
+              text="Update Faculty"
+              icon={<Edit2 size={18} />}
               textSize="text-sm sm:text-md"
               color="#631891"
               padding="w-full sm:w-auto px-4 py-2"

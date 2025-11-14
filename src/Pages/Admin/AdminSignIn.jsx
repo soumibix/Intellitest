@@ -1,67 +1,150 @@
+// src/Pages/Admin/AdminSignIn.jsx
 import React, { useState } from "react";
-import AuthenticationComp from "../../Components/common/AuthenticationComp";
-// import SignInImg from "../../assets/AdminSignIn.jpg";
-import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
+import AuthenticationComp from "../../Components/common/AuthenticationComp";
+import SignInImg from "../../assets/Authentication3.jpg";
+import { useNotification } from "../../Context/NotificationContext";
+import { adminAuthAPI } from "../../apis/auth/adminAuth";
+import { useAuth } from "../../context/AuthContext";
+import { useHttp } from "../../Hooks/useHttps";
 
 export const AdminSignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const httpHook = useHttp();
+  const { login } = useAuth();
+  const { showNotification } = useNotification();
 
-  const handleSubmit = (formData) => {
-    setIsLoading(true);
-    setErrors({});
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Sign In Data:', formData);
-      setIsLoading(false);
-      // Add your authentication logic here
-    }, 2000);
+  // Validate form data
+  const validateForm = (formData) => {
+    const newErrors = {};
+
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    return newErrors;
   };
 
+  // Handle form submission
+  const handleSubmit = async (formData) => {
+    // Reset errors
+    setErrors({});
+
+    // Validate form
+    const validationErrors = validateForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Prepare credentials
+      const credentials = {
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      };
+
+      // Call API
+      const response = await adminAuthAPI.signin(httpHook, credentials);
+
+      if (response.success) {
+        // Extract data from response
+        const { token, admin, user } = response.data || response;
+
+        // Use admin data if available, otherwise use user data
+        const userData = admin || user;
+
+        if (!userData || !token) {
+          throw new Error("Invalid response from server");
+        }
+
+        // Store authentication data
+        login(userData, "admin", token, formData.rememberMe || false);
+
+        // Show success message
+        showNotification("Sign in successful! Redirecting...", "success");
+
+        // Redirect to admin dashboard
+        setTimeout(() => {
+          navigate("/admin/dashboard", { replace: true });
+        }, 1000);
+      } else {
+        // Handle error response
+        const errorMessage = response.message || "Sign in failed. Please try again.";
+        setErrors({ form: errorMessage });
+        showNotification(errorMessage, "error");
+      }
+    } catch (error) {
+      console.error("Admin sign in error:", error);
+      const errorMessage = error.message || "An unexpected error occurred. Please try again.";
+      setErrors({ form: errorMessage });
+      showNotification(errorMessage, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Form fields configuration
   const fields = [
     {
-      name: 'email',
-      type: 'text',
-      label: 'Email Address',
-      placeholder: 'Enter your email',
+      name: "email",
+      type: "email",
+      label: "Email Address",
+      placeholder: "admin@intellitest.com",
+      autoComplete: "email",
     },
     {
-      name: 'password',
-      type: 'password',
-      label: 'Password',
-      placeholder: 'Enter your password',
+      name: "password",
+      type: "password",
+      label: "Password",
+      placeholder: "Enter your password",
       showRememberMe: true,
-      rememberMeName: 'rememberMe',
-      rememberMeLabel: 'Remember me',
+      rememberMeName: "rememberMe",
+      rememberMeLabel: "Keep me signed in",
+      autoComplete: "current-password",
     },
   ];
 
+  // Additional elements (if you need forgot password later)
   const additionalElements = (
     <div className="text-right">
+      {/* Uncomment when forgot password is implemented
       <button
         type="button"
-        className="text-sm font-medium text-[#2B2B2B] cursor-pointer"
-        onClick={() => alert('Forgot password clicked')}
+        className="text-sm font-medium text-[#2B2B2B] hover:text-[#6B21A8] transition-colors cursor-pointer"
+        onClick={() => navigate('/admin/forgot-password')}
       >
         Forgot password?
       </button>
+      */}
     </div>
   );
 
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle = "IntelliTest Administration Portal"
-      leftDescription = "Log in to manage platform operations, review test activities, and ensure smooth functioning across all accounts."
+      leftTitle="IntelliTest Administration Portal"
+      leftDescription="Log in to manage platform operations, review test activities, and ensure smooth functioning across all accounts."
       heading="Welcome"
       colorHeading="Back"
       fields={fields}
       initialFormData={{
-        email: '',
-        password: '',
+        email: "",
+        password: "",
         rememberMe: false,
       }}
       onSubmit={handleSubmit}
@@ -71,8 +154,8 @@ export const AdminSignIn = () => {
       bottomLinks={[
         {
           text: "Not admin? Sign In as Faculty",
-          action: () => navigate('/faculty/signin'),
-          className: 'text-gray-700 hover:text-[#6B21A8] font-semibold cursor-pointer',
+          action: () => navigate("/faculty/signin"),
+          className: "text-gray-700 hover:text-[#6B21A8] font-semibold cursor-pointer transition-colors",
         },
       ]}
       errors={errors}
