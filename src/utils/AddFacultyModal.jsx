@@ -1,4 +1,3 @@
-// src/utils/AddFacultyModal.jsx
 import { UserPlus, X } from "lucide-react";
 import React, { useState } from "react";
 import Button from "../Components/common/Button";
@@ -6,10 +5,9 @@ import Input from "../Components/common/Input";
 
 // Institution options
 const INSTITUTIONS = [
-  { value: "college_campus", label: "College Campus" },
-  { value: "iem_salt_lake", label: "IEM, Salt Lake" },
-  { value: "iem_newtown", label: "IEM, Newtown" },
-  { value: "iem_jaipur", label: "IEM, Jaipur" },
+  { value: "IEM Saltlake", label: "IEM, Salt Lake" },
+  { value: "IEM Newtown", label: "IEM, Newtown" },
+  { value: "UEM Jaipur", label: "IEM, Jaipur" },
 ];
 
 // Department options
@@ -27,21 +25,21 @@ const DEPARTMENTS = [
   { value: "other", label: "Other" },
 ];
 
-export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
+export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = false }) => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
     designation: "",
     department: "",
-    institution: "",
+    campus: "",
   });
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required";
     }
 
     if (!formData.designation.trim()) {
@@ -58,8 +56,8 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
       newErrors.department = "Department is required";
     }
 
-    if (!formData.institution) {
-      newErrors.institution = "Institution is required";
+    if (!formData.campus) {
+      newErrors.campus = "Institution is required";
     }
 
     setErrors(newErrors);
@@ -67,17 +65,10 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
   };
 
   const handleSubmit = () => {
-    if (validateForm()) {
+    if (validateForm() && !isSubmitting) {
       onAddFaculty(formData);
-      setFormData({
-        fullName: "",
-        email: "",
-        designation: "",
-        department: "",
-        institution: "",
-      });
-      setErrors({});
-      onClose();
+      // Don't reset form or close modal here - parent will handle closing
+      // after successful API call
     }
   };
 
@@ -96,22 +87,24 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isSubmitting) {
       e.preventDefault();
       handleSubmit();
     }
   };
 
   const handleClose = () => {
-    setFormData({
-      fullName: "",
-      email: "",
-      designation: "",
-      department: "",
-      institution: "",
-    });
-    setErrors({});
-    onClose();
+    if (!isSubmitting) {
+      setFormData({
+        name: "",
+        email: "",
+        designation: "",
+        department: "",
+        campus: "",
+      });
+      setErrors({});
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -125,7 +118,10 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
           </h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-red-600 transition cursor-pointer"
+            disabled={isSubmitting}
+            className={`text-gray-400 hover:text-red-600 transition ${
+              isSubmitting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            }`}
           >
             <X size={24} />
           </button>
@@ -135,13 +131,14 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
           <div className="mb-4">
             <Input
               type="text"
-              name="fullName"
+              name="name"
               label="Full Name"
               placeholder="Enter Full Name"
-              value={formData.fullName}
+              value={formData.name}
               onChange={handleChange}
               onKeyPress={handleKeyPress}
-              error={errors.fullName}
+              error={errors.name}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -155,6 +152,7 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
               onChange={handleChange}
               onKeyPress={handleKeyPress}
               error={errors.email}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -168,6 +166,7 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
               onChange={handleChange}
               onKeyPress={handleKeyPress}
               error={errors.designation}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -183,32 +182,35 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty }) => {
               }
               options={DEPARTMENTS}
               error={errors.department}
+              disabled={isSubmitting}
             />
           </div>
 
           <div className="mb-6">
             <Input
               type="dropdown"
-              name="institution"
+              name="campus"
               label="Institution"
               placeholder="Select Institution"
-              value={formData.institution}
+              value={formData.campus}
               onChange={(e) =>
-                handleChange({ target: { name: "institution", value: e.target.value } })
+                handleChange({ target: { name: "campus", value: e.target.value } })
               }
               options={INSTITUTIONS}
-              error={errors.institution}
+              error={errors.campus}
+              disabled={isSubmitting}
             />
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3">
             <Button
               onClick={handleSubmit}
-              text="Add Faculty"
-              icon={<UserPlus size={18} />}
+              text={isSubmitting ? "Adding Faculty..." : "Add Faculty"}
+              icon={!isSubmitting && <UserPlus size={18} />}
               textSize="text-sm sm:text-md"
               color="#631891"
               padding="w-full sm:w-auto px-4 py-2"
+              disabled={isSubmitting}
             />
           </div>
         </div>

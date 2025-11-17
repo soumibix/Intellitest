@@ -20,3 +20,77 @@ export const adminAuthAPI = {
     }
   },
 };
+
+export const adminFacultyAPI = {
+  // Add Faculty
+  addFaculty: async (httpHook, facultyData, token) => {
+    try {
+      const response = await httpHook.postReq(
+        API_ENDPOINTS.ADD_FACULTY,
+        token,
+        facultyData
+      );
+      return response;
+    } catch (error) {
+      console.log("Add faculty error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to add faculty",
+      };
+    }
+  },
+
+  // Get All Faculties with pagination and filters
+  getAllFaculties: async (httpHook, token, queryParams = "") => {
+    try {
+      const url = queryParams 
+        ? `${API_ENDPOINTS.GET_ALL_FACULTIES}?${queryParams}`
+        : API_ENDPOINTS.GET_ALL_FACULTIES;
+      
+      const response = await httpHook.getReq(url, token);
+      console.log(response.data.length)
+      return response;
+    } catch (error) {
+      console.log("Get all faculties error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to get faculties",
+      };
+    }
+  },
+
+  // Update Faculty
+  updateFaculty: async (httpHook, id, updateData, token) => {
+    try {
+      const response = await httpHook.patchReq(
+        API_ENDPOINTS.UPDATE_FACULTY(id),
+        token,
+        updateData
+      );
+      return response;
+    } catch (error) {
+      console.log("Update faculty error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to update faculty",
+      };
+    }
+  },
+
+  // Delete Faculty
+  deleteFaculty: async (httpHook, id, token) => {
+    try {
+      const response = await httpHook.deleteReq(
+        API_ENDPOINTS.DELETE_FACULTY(id),
+        token
+      );
+      return response;
+    } catch (error) {
+      console.log("Delete faculty error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to delete faculty",
+      };
+    }
+  },
+};
