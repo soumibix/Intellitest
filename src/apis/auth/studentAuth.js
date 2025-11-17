@@ -1,7 +1,8 @@
 // src/apis/auth/studentAuth.js
-import { API_ENDPOINTS } from "../../Config/config"
+import { API_ENDPOINTS } from "../../Config/config";
 
 export const studentAuthAPI = {
+  
   // Student Signup
   signup: async (httpHook, userData) => {
     try {
@@ -38,38 +39,46 @@ export const studentAuthAPI = {
     }
   },
 
-  // Forgot Password - Request OTP
-  forgotPassword: async (httpHook, email) => {
+  // Send OTP to Email (for signup verification)
+  // If only email is provided, OTP will be sent
+  // If both email and OTP are provided, verification will happen
+  verifyEmail: async (httpHook, email, otp = null) => {
     try {
+      const payload = otp ? { email, otp } : { email };
+      
       const response = await httpHook.postReq(
-        API_ENDPOINTS.STUDENT_FORGOT_PASSWORD,
+        API_ENDPOINTS.STUDENT_VERIFY_EMAIL,
         "",
-        { email }
+        payload
       );
       return response;
     } catch (error) {
-      console.error("Student forgot password error:", error);
+      console.error("Email verification error:", error);
       return {
         success: false,
-        message: error.message || "Failed to send OTP",
+        message: error.message || (otp ? "OTP verification failed" : "Failed to send OTP"),
       };
     }
   },
 
-  // Verify OTP
-  verifyOTP: async (httpHook, email, otp) => {
+  // Forgot Password - Request OTP or Verify OTP
+  // If only email is provided, OTP will be sent
+  // If both email and OTP are provided, verification will happen
+  forgotPassword: async (httpHook, email, otp = null) => {
     try {
+      const payload = otp ? { email, otp } : { email };
+      
       const response = await httpHook.postReq(
-        API_ENDPOINTS.STUDENT_VERIFY_OTP,
+        API_ENDPOINTS.STUDENT_FORGOT_PASSWORD,
         "",
-        { email, otp }
+        payload
       );
       return response;
     } catch (error) {
-      console.error("Student OTP verification error:", error);
+      console.error("Forgot password error:", error);
       return {
         success: false,
-        message: error.message || "OTP verification failed",
+        message: error.message || (otp ? "OTP verification failed" : "Failed to send OTP"),
       };
     }
   },
@@ -84,10 +93,69 @@ export const studentAuthAPI = {
       );
       return response;
     } catch (error) {
-      console.error("Student reset password error:", error);
+      console.error("Reset password error:", error);
       return {
         success: false,
         message: error.message || "Password reset failed",
+      };
+    }
+  },
+
+  // Update Profile
+  updateProfile: async (httpHook, token, profileData) => {
+    try {
+      const response = await httpHook.patchReq(
+        API_ENDPOINTS.STUDENT_UPDATE_PROFILE,
+        token,
+        profileData
+      );
+      
+      // Update sessionStorage with new profile data if successful
+      if (response.success && response.data) {
+        const currentUser = JSON.parse(sessionStorage.getItem("user") || "{}");
+        const updatedUser = {
+          ...currentUser,
+          ...response.data,
+          allFieldsComplete: response.data.allFieldsComplete || false
+        };
+        sessionStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+      
+      return response;
+    } catch (error) {
+      console.error("Update profile error:", error);
+      return {
+        success: false,
+        message: error.message || "Profile update failed",
+      };
+    }
+  },
+
+  // Get Profile
+  getProfile: async (httpHook, token) => {
+    try {
+      const response = await httpHook.getReq(
+        API_ENDPOINTS.STUDENT_GET_PROFILE,
+        token
+      );
+      
+      // Update sessionStorage with fetched profile data if successful
+      if (response.success && response.data) {
+        const currentUser = JSON.parse(sessionStorage.getItem("user") || "{}");
+        const updatedUser = {
+          ...currentUser,
+          ...response.data,
+          allFieldsComplete: response.data.allFieldsComplete || false
+        };
+        sessionStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+      
+      return response;
+    } catch (error) {
+      console.error("Get profile error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch profile",
       };
     }
   },

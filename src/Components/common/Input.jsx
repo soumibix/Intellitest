@@ -31,7 +31,7 @@ const Input = ({
 
   const baseInputClasses = `w-full rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#631891] focus:border-transparent transition-all ${
     sizeClasses[size]
-  } ${disabled ? "bg-gray-100 cursor-not-allowed text-gray-400" : "bg-white"} ${
+  } ${disabled ? "bg-gray-100 cursor-not-allowed text-black" : "bg-white"} ${
     error ? "border-red-500 focus:ring-red-500" : ""
   } ${className}`;
 

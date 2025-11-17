@@ -40,6 +40,9 @@ import UserResetNewPassword from "./Pages/User/UserResetNewPassword";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationProvider } from "./Context/NotificationContext";
 
+// Profile Completion Guard
+import ProfileCompletionGuard from "./components/ProfileCompletionGuard";
+
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production
 
@@ -225,7 +228,7 @@ const AppRouter = () => {
               }
             />
 
-            {/* Protected User Routes */}
+            {/* Protected User Routes - Dashboard accessible, other pages locked when profile incomplete */}
             <Route
               path="/user"
               element={
@@ -250,9 +253,11 @@ const AppRouter = () => {
               path="/user/tests"
               element={
                 <ProtectedRoute allowedRoles={["user"]}>
-                  <UserLayout>
-                    <UserTests />
-                  </UserLayout>
+                  <ProfileCompletionGuard allowDashboard={false}>
+                    <UserLayout>
+                      <UserTests />
+                    </UserLayout>
+                  </ProfileCompletionGuard>
                 </ProtectedRoute>
               }
             />
@@ -260,7 +265,9 @@ const AppRouter = () => {
               path="/user/test/:id"
               element={
                 <ProtectedRoute allowedRoles={["user"]}>
-                  <UserIndividualTest />
+                  <ProfileCompletionGuard allowDashboard={false}>
+                    <UserIndividualTest />
+                  </ProfileCompletionGuard>
                 </ProtectedRoute>
               }
             />
@@ -268,9 +275,11 @@ const AppRouter = () => {
               path="/user/test-reports"
               element={
                 <ProtectedRoute allowedRoles={["user"]}>
-                  <UserLayout>
-                    <TestReports />
-                  </UserLayout>
+                  <ProfileCompletionGuard allowDashboard={false}>
+                    <UserLayout>
+                      <TestReports />
+                    </UserLayout>
+                  </ProfileCompletionGuard>
                 </ProtectedRoute>
               }
             />

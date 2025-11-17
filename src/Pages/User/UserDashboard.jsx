@@ -1,14 +1,21 @@
-import React, { useState } from "react";
-import { User, Lock, ArrowRight, LockKeyhole } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { User, ArrowRight, LockKeyhole, Unlock } from "lucide-react";
 import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
+import { studentAuthAPI } from "../../apis/auth/studentAuth";
+import { useHttp } from "../../Hooks/useHttps";
 
 const UserDashboard = () => {
+  const httpHook = useHttp();
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    mobile: "",
-    institution: "",
+    mobileNumber: "",
+    institutionName: "",
     department: "",
     batch: "",
     enrollmentNumber: "",
@@ -18,6 +25,43 @@ const UserDashboard = () => {
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
 
+  // Fetch profile data on component mount
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
+    setLoading(true);
+    try {
+      const response = await studentAuthAPI.getProfile(httpHook, token);
+
+      if (response.success && response.data) {
+        const userData = response.data;
+
+        // Update form data with fetched profile
+        setFormData({
+          name: userData.name || "",
+          email: userData.email || "",
+          mobileNumber: userData.mobileNumber || "",
+          institutionName: userData.institutionName || "",
+          department: userData.department || "",
+          batch: userData.batch || "",
+          enrollmentNumber: userData.enrollmentNumber || "",
+          section: userData.section || "",
+          rollNumber: userData.rollNumber || "",
+        });
+
+        // Set profile completion status
+        setIsProfileComplete(userData.allFieldsComplete || false);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      alert("Failed to load profile data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -25,73 +69,117 @@ const UserDashboard = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate if all fields are filled
     const allFieldsFilled = Object.values(formData).every(
       (value) => value.trim() !== ""
     );
 
-    if (allFieldsFilled) {
-      setIsProfileComplete(true);
-      alert("Profile submitted successfully!");
-    } else {
+    if (!allFieldsFilled) {
       alert("Please fill all fields");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // Prepare data for API (matching backend expected field names)
+      const profileData = {
+        mobileNumber: formData.mobileNumber,
+        institutionName: formData.institutionName,
+        department: formData.department,
+        batch: formData.batch,
+        section: formData.section,
+        rollNumber: formData.rollNumber,
+      };
+
+      const response = await studentAuthAPI.updateProfile(httpHook, token, profileData);
+
+      if (response.success) {
+        alert("Profile updated successfully!");
+
+        // Update profile completion status from response
+        if (response.data && response.data.allFieldsComplete !== undefined) {
+          setIsProfileComplete(response.data.allFieldsComplete);
+        } else {
+          // If backend doesn't return the field, check manually
+          setIsProfileComplete(allFieldsFilled);
+        }
+      } else {
+        alert(response.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating profile");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const institutionOptions = [
     { value: "", label: "College Campus" },
-    { value: "college1", label: "IEM, Salt Lake" },
-    { value: "college2", label: "IEM, Newtown" },
-    { value: "college3", label: "IEM, Jaipur" },
+    { value: "IEM, Salt Lake", label: "IEM, Salt Lake" },
+    { value: "IEM, Newtown", label: "IEM, Newtown" },
+    { value: "IEM, Jaipur", label: "IEM, Jaipur" },
   ];
 
   const departmentOptions = [
     { value: "", label: "Civil Engineering" },
-    { value: "civil", label: "Civil Engineering" },
-    { value: "mechanical", label: "Mechanical Engineering" },
-    { value: "electrical", label: "Electrical Engineering" },
-    { value: "computer", label: "Computer Science" },
+    { value: "Civil Engineering", label: "Civil Engineering" },
+    { value: "Mechanical Engineering", label: "Mechanical Engineering" },
+    { value: "Electrical Engineering", label: "Electrical Engineering" },
+    { value: "Computer Science", label: "Computer Science" },
+    { value: "CSE", label: "CSE" },
   ];
 
   const batchOptions = [
     { value: "", label: "Your Designation" },
-    { value: "2021", label: "2021-2025" },
-    { value: "2022", label: "2022-2026" },
-    { value: "2023", label: "2023-2027" },
-    { value: "2024", label: "2024-2028" },
+    { value: "2021-2025", label: "2021-2025" },
+    { value: "2022-2026", label: "2022-2026" },
+    { value: "2023-2027", label: "2023-2027" },
+    { value: "2024-2028", label: "2024-2028" },
+    { value: "2020-2024", label: "2020-2024" },
   ];
 
-const sectionOptions = [
-  { value: "", label: "Select Section" },
-  { value: "a", label: "Section A" },
-  { value: "b", label: "Section B" },
-  { value: "c", label: "Section C" },
-  { value: "d", label: "Section D" },
-  { value: "e", label: "Section E" },
-  { value: "f", label: "Section F" },
-  { value: "g", label: "Section G" },
-  { value: "h", label: "Section H" },
-  { value: "i", label: "Section I" },
-  { value: "j", label: "Section J" },
-  { value: "k", label: "Section K" },
-  { value: "l", label: "Section L" },
-  { value: "m", label: "Section M" },
-  { value: "n", label: "Section N" },
-  { value: "o", label: "Section O" },
-  { value: "p", label: "Section P" },
-  { value: "q", label: "Section Q" },
-  { value: "r", label: "Section R" },
-  { value: "s", label: "Section S" },
-  { value: "t", label: "Section T" },
-  { value: "u", label: "Section U" },
-  { value: "v", label: "Section V" },
-  { value: "w", label: "Section W" },
-  { value: "x", label: "Section X" },
-  { value: "y", label: "Section Y" },
-  { value: "z", label: "Section Z" },
-];
+  const sectionOptions = [
+    { value: "", label: "Select Section" },
+    { value: "A", label: "Section A" },
+    { value: "B", label: "Section B" },
+    { value: "C", label: "Section C" },
+    { value: "D", label: "Section D" },
+    { value: "E", label: "Section E" },
+    { value: "F", label: "Section F" },
+    { value: "G", label: "Section G" },
+    { value: "H", label: "Section H" },
+    { value: "I", label: "Section I" },
+    { value: "J", label: "Section J" },
+    { value: "K", label: "Section K" },
+    { value: "L", label: "Section L" },
+    { value: "M", label: "Section M" },
+    { value: "N", label: "Section N" },
+    { value: "O", label: "Section O" },
+    { value: "P", label: "Section P" },
+    { value: "Q", label: "Section Q" },
+    { value: "R", label: "Section R" },
+    { value: "S", label: "Section S" },
+    { value: "T", label: "Section T" },
+    { value: "U", label: "Section U" },
+    { value: "V", label: "Section V" },
+    { value: "W", label: "Section W" },
+    { value: "X", label: "Section X" },
+    { value: "Y", label: "Section Y" },
+    { value: "Z", label: "Section Z" },
+  ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
@@ -108,7 +196,7 @@ const sectionOptions = [
 
           {/* Form Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Row 1 */}
+            {/* Row 1 - These fields are from signup, so disabled */}
             <Input
               type="text"
               label="Name"
@@ -116,6 +204,7 @@ const sectionOptions = [
               value={formData.name}
               onChange={handleChange("name")}
               size="md"
+              disabled={true}
             />
             <Input
               type="email"
@@ -124,13 +213,14 @@ const sectionOptions = [
               value={formData.email}
               onChange={handleChange("email")}
               size="md"
+              disabled={true}
             />
             <Input
               type="tel"
               label="Mobile Number"
               placeholder="+91 9876543210"
-              value={formData.mobile}
-              onChange={handleChange("mobile")}
+              value={formData.mobileNumber}
+              onChange={handleChange("mobileNumber")}
               size="md"
             />
 
@@ -139,8 +229,8 @@ const sectionOptions = [
               type="dropdown"
               label="Institution Name"
               placeholder="College Name"
-              value={formData.institution}
-              onChange={handleChange("institution")}
+              value={formData.institutionName}
+              onChange={handleChange("institutionName")}
               options={institutionOptions}
               size="md"
             />
@@ -163,7 +253,7 @@ const sectionOptions = [
               size="md"
             />
 
-            {/* Row 3 */}
+            {/* Row 3 - Enrollment number from signup, so disabled */}
             <Input
               type="text"
               label="Enrollment Number"
@@ -171,6 +261,7 @@ const sectionOptions = [
               value={formData.enrollmentNumber}
               onChange={handleChange("enrollmentNumber")}
               size="md"
+              disabled={true}
             />
             <Input
               type="dropdown"
@@ -194,22 +285,30 @@ const sectionOptions = [
           {/* Submit Button */}
           <div className="flex justify-center mt-6 sm:mt-8">
             <Button
-              text="Submit"
+              text={
+                submitting
+                  ? "Submitting..."
+                  : isProfileComplete
+                    ? "Update"
+                    : "Submit"
+              }
               color="[#631891]"
               padding="py-3 sm:py-4"
               width="w-32 sm:w-40"
               icon={<ArrowRight size={18} />}
               iconPosition="right"
               onClick={handleSubmit}
+              disabled={submitting}
             />
           </div>
+
         </div>
 
-        {/* Unlock Tests Card */}
-        {!isProfileComplete && (
+        {/* Unlock Tests Card or Unlocked Message */}
+        {!isProfileComplete ? (
           <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-8 sm:mt-10 lg:mt-12 px-12 bottom-0">
             <div
-              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl "
+              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl"
               style={{
                 background: "linear-gradient(to bottom, #631891, #1D072B)",
               }}
@@ -219,7 +318,7 @@ const sectionOptions = [
                 <span
                   className="font-extrabold text-transparent bg-clip-text select-none translate-y-0"
                   style={{
-                    fontSize: "15vw", // scales with screen width
+                    fontSize: "15vw",
                     lineHeight: 1,
                     backgroundImage: "linear-gradient(to bottom, #59158100, #6D209A)",
                     backgroundSize: "100% 100%",
@@ -227,7 +326,6 @@ const sectionOptions = [
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     whiteSpace: "nowrap",
-
                   }}
                 >
                   IntelliTest
@@ -235,7 +333,7 @@ const sectionOptions = [
               </div>
 
               {/* Foreground content */}
-              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-5 lg:top-20 md:top-10  justify-center z-10">
+              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-5 lg:top-20 md:top-10 justify-center z-10">
                 <p className="text-[#DEA7FF] text-base sm:text-xl lg:text-2xl font-semibold mb-2">
                   Complete Your Profile to
                 </p>
@@ -252,35 +350,20 @@ const sectionOptions = [
               </div>
             </div>
           </div>
-        )}
-
-
-
-
-        {/* Success Message */}
-        {isProfileComplete && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6 text-center mt-6 sm:mt-8">
-            <div className="flex justify-center mb-3">
-              <div className="bg-green-100 rounded-full p-2 sm:p-3">
-                <svg
-                  className="w-6 h-6 sm:w-8 sm:h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+        ) : (
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-6 sm:p-8 text-center mt-6 sm:mt-8 shadow-lg">
+            <div className="flex justify-center mb-4">
+              <div className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-full p-3 sm:p-4 shadow-lg">
+                <Unlock className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
               </div>
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold text-green-800 mb-2">
+            <h3 className="text-xl sm:text-2xl font-bold text-green-800 mb-2">
               Profile Complete!
             </h3>
-            <p className="text-sm sm:text-base text-green-700">
+            <p className="text-base sm:text-lg text-green-700 font-medium">
+              All tests are now unlocked
+            </p>
+            <p className="text-sm sm:text-base text-green-600 mt-2">
               You can now access all available tests
             </p>
           </div>
