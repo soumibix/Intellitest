@@ -1,24 +1,69 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
-import Button from "../../Components/common/Button";
+import { useHttp } from "../../Hooks/useHttps"; 
+import { facultyAuthAPI } from "../../apis/auth/facultyAuth"; 
+import { useAuth } from "../../AppRouter";
 
 export const FacultySignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const httpHook = useHttp(); 
 
-  const handleSubmit = (formData) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (formData) => {
     setIsLoading(true);
     setErrors({});
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Sign In Data:', formData);
+    try {
+      const credentials = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      const response = await facultyAuthAPI.signin(httpHook, {
+        email: formData.email, 
+        password: formData.password
+      });
+      
+      if (response.success) {
+        // Check if user is verified
+        if (response.data?.isVerified) {
+          // Call login with correct parameters
+          login(
+            response.data.user || response.data, // userData
+            response.data.role || 'faculty',      // userRole
+            response.data.token,                  // token
+            formData.rememberMe || false          // rememberMe
+          );
+
+          // Navigate to dashboard based on role
+          const role = response.data.role || 'faculty';
+          navigate(`/${role.toLowerCase()}/dashboard`);
+          
+        } else {
+          // User is not verified, redirect to reset password
+          navigate('/faculty/reset-new-password', { 
+            state: { email: formData.email } 
+          });
+        }
+      } else {
+        // Handle error response
+        setErrors({ 
+          general: response.message || "Sign in failed. Please check your credentials." 
+        });
+      }
+    } catch (error) {
+      console.error('Sign in error:', error);
+      setErrors({ 
+        general: "An unexpected error occurred. Please try again." 
+      });
+    } finally {
       setIsLoading(false);
-      // Add your authentication logic here
-    }, 2000);
+    }
   };
 
   const fields = [
@@ -43,7 +88,7 @@ export const FacultySignIn = () => {
     <div className="text-right">
       <button
         type="button"
-        className="text-sm font-medium text-[#2B2B2B] cursor-pointer"
+        className="text-sm font-medium text-[#2B2B2B] cursor-pointer hover:underline"
         onClick={() => navigate('/faculty/forgot-password')}
       >
         Forgot password?
@@ -54,15 +99,15 @@ export const FacultySignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle = "Welcome back, educator!"
-      leftDescription = "Sign in to manage your assessments, monitor student progress, and continue your IntelliTest teaching journey."
+      leftTitle="Welcome back, educator!"
+      leftDescription="Sign in to manage your assessments, monitor student progress, and continue your IntelliTest teaching journey."
       heading="Welcome"
       colorHeading="Back"
       fields={fields}
       initialFormData={{
-        email: '',
+        email: localStorage.getItem('rememberFacultyEmail') || '',
         password: '',
-        rememberMe: false,
+        rememberMe: !!localStorage.getItem('rememberFacultyEmail'),
       }}
       onSubmit={handleSubmit}
       submitButtonText="Sign In"
