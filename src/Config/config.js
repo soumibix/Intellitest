@@ -14,6 +14,10 @@ export const API_ENDPOINTS = {
 
   // Admin endpoints
   ADMIN_SIGNIN: "superAdmin/signin",
+  ADD_FACULTY: "superAdmin/faculty",
+  GET_ALL_FACULTIES: "superAdmin/faculty",
+  UPDATE_FACULTY: (id) => `superAdmin/faculty/${id}`, // PATCH
+  DELETE_FACULTY: (id) => `superAdmin/faculty/${id}`, // DELETE
 
   // Faculty endpoints
   FACULTY_SIGNIN: "faculty/signin",

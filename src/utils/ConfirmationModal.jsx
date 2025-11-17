@@ -12,13 +12,13 @@ export const ConfirmationModal = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   confirmIcon = null,
+  isLoading = false,
 }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 backdrop-blur shadow-top bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
-        
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-3">
@@ -32,7 +32,10 @@ export const ConfirmationModal = ({
 
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-red-600 transition cursor-pointer"
+            disabled={isLoading}
+            className={`text-gray-400 hover:text-red-600 transition ${
+              isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+            }`}
           >
             <X size={24} />
           </button>
@@ -46,13 +49,14 @@ export const ConfirmationModal = ({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row justify-center w-full gap-5 p-4 sm:p-6 ">
+        <div className="flex flex-col sm:flex-row justify-center w-full gap-5 p-4 sm:p-6">
           <Button
             onClick={onClose}
             text={cancelText}
             textSize="text-md sm:text-md"
             color="#6B7280"
             padding="w-full sm:w-auto px-10 py-2"
+            disabled={isLoading}
           />
           <Button
             onClick={onConfirm}
@@ -61,11 +65,12 @@ export const ConfirmationModal = ({
             textSize="text-md sm:text-md"
             color="#DC2626"
             padding="w-full sm:w-auto px-10 py-2"
+            disabled={isLoading}
           />
         </div>
-
       </div>
     </div>
   );
 };
+
 export default ConfirmationModal;

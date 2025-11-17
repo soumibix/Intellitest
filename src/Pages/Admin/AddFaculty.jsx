@@ -1,10 +1,12 @@
-// src/Pages/Admin/AddFaculty.jsx
 import { UserPlus, Edit2, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AddFacultyModal } from "../../utils/AddFacultyModal";
 import { EditFacultyModal } from "../../utils/EditFacultyModal";
 import { ConfirmationModal } from "../../utils/ConfirmationModal";
 import Button from "../../Components/common/Button";
+import { useHttp } from "../../Hooks/useHttps";
+import { useAuth } from "../../AppRouter";
+import { adminFacultyAPI } from "../../apis/auth/adminAuth";
 
 const AddFaculty = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -12,14 +14,62 @@ const AddFaculty = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [faculties, setFaculties] = useState([]);
   const [selectedFaculty, setSelectedFaculty] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const http = useHttp();
+  const { token } = useAuth();
 
-  const handleAddFaculty = (newFaculty) => {
-    const faculty = {
-      id: Date.now(),
-      ...newFaculty,
-      addedAt: new Date().toLocaleString(),
-    };
-    setFaculties((prev) => [...prev, faculty]);
+  // Fetch all faculties on component mount
+  useEffect(() => {
+    fetchFaculties();
+  }, [token]);
+
+  const fetchFaculties = async () => {
+    setIsLoading(true);
+    try {
+      const response = await adminFacultyAPI.getAllFaculties(http, token);
+
+      if (response?.success) {
+        setFaculties(response.data);
+      } else {
+        console.error("Failed to fetch faculties:", response?.message);
+      }
+    } catch (error) {
+      console.error("Error fetching faculties:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle adding new faculty
+  const handleAddFaculty = async (newFacultyData) => {
+    setIsSubmitting(true);
+    try {
+      const response = await adminFacultyAPI.addFaculty(
+        http,
+        newFacultyData,
+        token
+      );
+
+      if (response?.success) {
+        // Add the new faculty to the state immediately
+        setFaculties((prev) => [...prev, response.data]);
+
+        // Close modal
+        setIsAddModalOpen(false);
+
+        console.log("Faculty added successfully!");
+      } else {
+        console.error("Failed to add faculty:", response?.message);
+        alert(response?.message || "Failed to add faculty. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error adding faculty:", error);
+      alert("An error occurred while adding faculty. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleEditClick = (faculty) => {
@@ -27,15 +77,45 @@ const AddFaculty = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateFaculty = (updatedFaculty) => {
-    setFaculties((prev) =>
-      prev.map((faculty) =>
-        faculty.id === selectedFaculty.id
-          ? { ...faculty, ...updatedFaculty }
-          : faculty
-      )
-    );
-    setSelectedFaculty(null);
+  // Handle updating faculty with API
+  const handleUpdateFaculty = async (updatedFacultyData) => {
+    setIsSubmitting(true);
+    try {
+      const response = await adminFacultyAPI.updateFaculty(
+        http,
+        selectedFaculty._id,
+        updatedFacultyData,
+        token
+      );
+      console.log(selectedFaculty._id)
+
+      if (response?.success) {
+        // Update the faculty in the state
+        setFaculties((prev) =>
+          prev.map((faculty) =>
+            faculty._id === selectedFaculty._id
+              ? { ...faculty, ...response.data }
+              : faculty
+          )
+        );
+
+        // Close modal
+        setIsEditModalOpen(false);
+        setSelectedFaculty(null);
+
+        console.log("Faculty updated successfully!");
+      } else {
+        console.error("Failed to update faculty:", response?.message);
+        alert(
+          response?.message || "Failed to update faculty. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error updating faculty:", error);
+      alert("An error occurred while updating faculty. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDeleteClick = (faculty) => {
@@ -43,12 +123,57 @@ const AddFaculty = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    setFaculties((prev) =>
-      prev.filter((faculty) => faculty.id !== selectedFaculty.id)
-    );
-    setSelectedFaculty(null);
-    setIsDeleteModalOpen(false);
+  // Handle deleting faculty with API
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await adminFacultyAPI.deleteFaculty(
+        http,
+        selectedFaculty.id,
+        token
+      );
+
+      if (response?.success) {
+        // Remove the faculty from the state
+        setFaculties((prev) =>
+          prev.filter((faculty) => faculty.id !== selectedFaculty.id)
+        );
+
+        // Close modal
+        setIsDeleteModalOpen(false);
+        setSelectedFaculty(null);
+
+        console.log("Faculty deleted successfully!");
+      } else {
+        console.error("Failed to delete faculty:", response?.message);
+        alert(
+          response?.message || "Failed to delete faculty. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting faculty:", error);
+      alert("An error occurred while deleting faculty. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Helper function to get department label
+  const getDepartmentLabel = (value) => {
+    const departments = {
+      computer_science: "Computer Science & Engineering",
+      electronics: "Electronics & Communication Engineering",
+      electrical: "Electrical Engineering",
+      mechanical: "Mechanical Engineering",
+      civil: "Civil Engineering",
+      information_technology: "Information Technology",
+      mathematics: "Mathematics",
+      physics: "Physics",
+      chemistry: "Chemistry",
+      management: "Management Studies",
+      other: "Other",
+    };
+    return departments[value] || value;
   };
 
   return (
@@ -79,7 +204,20 @@ const AddFaculty = () => {
 
           {/* Content Section */}
           <div className="p-4 sm:p-6">
-            {faculties.length === 0 ? (
+            {isLoading ? (
+              // Loading State
+              <div className="text-center py-12 md:py-16 lg:h-[700px] flex flex-col items-center justify-center px-4">
+                <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full mb-4 animate-pulse">
+                  <UserPlus
+                    size={24}
+                    className="text-purple-400 sm:w-8 sm:h-8"
+                  />
+                </div>
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
+                  Loading faculties...
+                </h3>
+              </div>
+            ) : faculties?.length === 0 ? (
               // Empty State - Responsive
               <div className="text-center py-12 md:py-16 lg:h-[700px] flex flex-col items-center justify-center px-4">
                 <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-full mb-4">
@@ -113,12 +251,12 @@ const AddFaculty = () => {
                         <div className="flex items-center flex-1">
                           <div className="flex-shrink-0 h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
                             <span className="text-purple-600 font-semibold text-lg">
-                              {faculty.fullName.charAt(0).toUpperCase()}
+                              {faculty.name?.charAt(0).toUpperCase() || "F"}
                             </span>
                           </div>
                           <div className="ml-3 flex-1 min-w-0">
                             <div className="text-base font-semibold text-gray-900 truncate">
-                              {faculty.fullName}
+                              {faculty.name}
                             </div>
                             <div className="text-sm text-gray-600 mt-0.5">
                               {faculty.designation}
@@ -129,17 +267,21 @@ const AddFaculty = () => {
 
                       <div className="space-y-2 mb-3">
                         <div className="flex items-center text-sm">
-                          <span className="text-gray-500 font-medium w-20">
+                          <span className="text-gray-500 font-medium w-24">
                             Email:
                           </span>
                           <span className="text-gray-900 truncate">
                             {faculty.email}
                           </span>
                         </div>
-                        {/* <div className="flex items-center text-sm">
-                          <span className="text-gray-500 font-medium w-20">Added:</span>
-                          <span className="text-gray-700">{faculty.addedAt}</span>
-                        </div> */}
+                        <div className="flex items-center text-sm">
+                          <span className="text-gray-500 font-medium w-24">
+                            Department:
+                          </span>
+                          <span className="text-gray-900 truncate">
+                            {getDepartmentLabel(faculty.department)}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="flex gap-2 pt-3 border-t border-gray-100">
@@ -168,13 +310,16 @@ const AddFaculty = () => {
                     <thead>
                       <tr className="bg-gray-50 border-b">
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Full Name
+                          Name
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Email
+                          Email Address
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Designation
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Department
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Actions
@@ -182,24 +327,25 @@ const AddFaculty = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {faculties.map((faculty) => (
+                      {faculties?.map((faculty) => (
                         <tr
-                          key={faculty.id}
+                          key={faculty._id}
                           className="hover:bg-gray-50 transition"
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
+                            {/* <div className="flex items-center">
                               <div className="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
                                 <span className="text-purple-600 font-medium">
-                                  {faculty.fullName.charAt(0).toUpperCase()}
+                                  {faculty.fullName?.charAt(0).toUpperCase() ||
+                                    "F"}
                                 </span>
-                              </div>
-                              <div className="ml-4">
+                              </div> */}
+                              {/* <div className="ml-4"> */}
                                 <div className="text-sm font-medium text-gray-900">
-                                  {faculty.fullName}
+                                  {faculty.name}
                                 </div>
-                              </div>
-                            </div>
+                              {/* </div> */}
+                            {/* </div> */}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
@@ -209,6 +355,11 @@ const AddFaculty = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-700">
                               {faculty.designation}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-700">
+                              {getDepartmentLabel(faculty.department)}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -245,6 +396,7 @@ const AddFaculty = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddFaculty={handleAddFaculty}
+        isSubmitting={isSubmitting}
       />
 
       <EditFacultyModal
@@ -255,17 +407,9 @@ const AddFaculty = () => {
         }}
         onUpdateFaculty={handleUpdateFaculty}
         faculty={selectedFaculty}
+        isSubmitting={isSubmitting}
       />
 
-      {/* <ConfirmationModal
-        isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedFaculty(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        facultyName={selectedFaculty?.fullName}
-      /> */}
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
@@ -277,8 +421,9 @@ const AddFaculty = () => {
         message={`Are you sure you want to delete ${
           selectedFaculty?.fullName || "this faculty"
         }? This action cannot be undone.`}
-        confirmText="Delete Faculty"
-        confirmIcon={<Trash2 size={18} />}
+        confirmText={isDeleting ? "Deleting..." : "Delete Faculty"}
+        confirmIcon={!isDeleting && <Trash2 size={18} />}
+        isLoading={isDeleting}
       />
     </div>
   );
