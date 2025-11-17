@@ -3,15 +3,25 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 import Button from "../../Components/common/Button";
+import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
+import { useHttp } from "../../Hooks/useHttps";
 
 function OTPVerification() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "";
+  const httpHook = useHttp();
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [timer, setTimer] = useState(30);
+
+  // Redirect to forgot password if no email
+  useEffect(() => {
+    if (!email) {
+      navigate("/faculty/forgot-password");
+    }
+  }, [email, navigate]);
 
   useEffect(() => {
     if (timer > 0) {
@@ -20,23 +30,51 @@ function OTPVerification() {
     }
   }, [timer]);
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = async (formData) => {
     setIsLoading(true);
     setErrors({});
 
-    setTimeout(() => {
-      if (formData.otp === "123456") {
-        navigate("/faculty/reset-new-password", { state: { email } });
+    try {
+      // Call verify OTP API (using forgotPassword endpoint with both email and otp)
+      const response = await facultyAuthAPI.verifyOTP(httpHook, email, formData.otp);
+      
+      if (response.success) {
+        console.log("OTP verified successfully");
+        // Navigate to reset password page
+        navigate("/faculty/reset-new-password", { 
+          state: { email } 
+        });
       } else {
-        setErrors({ otp: "Invalid OTP. Please try again." });
+        // Handle error response
+        setErrors({ 
+          otp: response.message || "Invalid OTP. Please try again." 
+        });
       }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setErrors({ 
+        otp: "An error occurred. Please try again." 
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleResend = () => {
-    setTimer(30);
-    console.log("OTP resent to:", email);
+  const handleResend = async () => {
+    try {
+      // Resend OTP by calling forgot password API again
+      const response = await facultyAuthAPI.forgotPassword(httpHook, email);
+      
+      if (response.success) {
+        setTimer(30);
+        console.log("OTP resent to:", email);
+        // Optionally show a success message
+      } else {
+        console.error("Failed to resend OTP:", response.message);
+      }
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+    }
   };
 
   const fields = [
@@ -72,8 +110,8 @@ function OTPVerification() {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle = "Verify your account"
-      leftDescription = "Enter the OTP sent to your registered email to confirm your identity and activate your IntelliTest faculty account."
+      leftTitle="Verify your account"
+      leftDescription="Enter the OTP sent to your registered email to confirm your identity and activate your IntelliTest faculty account."
       heading="Verify OTP to proceed"
       rightDescription="Please enter the 6-digit code below to verify your identity."
       fields={fields}

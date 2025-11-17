@@ -22,9 +22,8 @@ export const API_ENDPOINTS = {
 
   // Faculty endpoints
   FACULTY_SIGNIN: "faculty/signin",
-  FACULTY_FORGOT_PASSWORD: "faculty/forgot-password",
-  FACULTY_VERIFY_OTP: "faculty/verify-otp",
-  FACULTY_RESET_PASSWORD: "faculty/changePassword",
+  FACULTY_FORGOT_PASSWORD: "faculty/forgotPassword",
+  FACULTY_RESET_PASSWORD: "faculty/resetPassword",
 };
 
 export default {
