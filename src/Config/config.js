@@ -3,6 +3,7 @@
 // Base API URL (automatically switches based on .env)
 export const BASE_URL = import.meta.env.VITE_API_URL;
 
+
 // API endpoints
 export const API_ENDPOINTS = {
   // Student endpoints
@@ -23,7 +24,7 @@ export const API_ENDPOINTS = {
   FACULTY_SIGNIN: "faculty/signin",
   FACULTY_FORGOT_PASSWORD: "faculty/forgot-password",
   FACULTY_VERIFY_OTP: "faculty/verify-otp",
-  FACULTY_RESET_PASSWORD: "faculty/reset-password",
+  FACULTY_RESET_PASSWORD: "faculty/changePassword",
 };
 
 export default {
