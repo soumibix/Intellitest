@@ -40,13 +40,15 @@ export const adminFacultyAPI = {
     }
   },
 
-  // Get All Faculties
-  getAllFaculties: async (httpHook, token) => {
+  // Get All Faculties with pagination and filters
+  getAllFaculties: async (httpHook, token, queryParams = "") => {
     try {
-      const response = await httpHook.getReq(
-        API_ENDPOINTS.GET_ALL_FACULTIES,
-        token
-      );
+      const url = queryParams 
+        ? `${API_ENDPOINTS.GET_ALL_FACULTIES}?${queryParams}`
+        : API_ENDPOINTS.GET_ALL_FACULTIES;
+      
+      const response = await httpHook.getReq(url, token);
+      console.log(response.data.length)
       return response;
     } catch (error) {
       console.log("Get all faculties error:", error);

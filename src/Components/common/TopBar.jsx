@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
+import React, { useState } from "react";
+import { Search, Bell, ChevronDown, Menu } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export const TopBar = ({
   userName = "User",
@@ -9,6 +10,8 @@ export const TopBar = ({
   profileImage = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const role = sessionStorage.getItem("role") || localStorage.getItem("role");
+  const navigate = useNavigate();
 
   return (
     <div className="w-full bg-white border-b border-gray-200 px-4 lg:px-6 py-3">
@@ -91,6 +94,15 @@ export const TopBar = ({
                   >
                     Logout
                   </button>
+                  {role === "superadmin" && (
+                    <button
+                      onClick={() => {navigate("/admin/dashboard");
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      Your Profile
+                    </button>
+                  )}
                 </div>
               </>
             )}
