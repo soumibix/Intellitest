@@ -41,7 +41,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationProvider } from "./Context/NotificationContext";
 
 // *** CONFIGURATION ***
-const ENFORCE_ROUTE_PROTECTION = false; // Set to false for development, true for production
+const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production
 
 // *** LOADING SCREEN ***
 const LoadingScreen = () => (
@@ -91,7 +91,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
   // Check authentication
   if (!isAuthenticated) {
     // Redirect to appropriate login based on required role
-    const loginPath = allowedRoles?.includes("admin") 
+    const loginPath = allowedRoles?.includes("superadmin") 
       ? "/admin/signin" 
       : allowedRoles?.includes("faculty")
       ? "/faculty/signin"
@@ -103,7 +103,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
   if (allowedRoles && !allowedRoles.includes(role)) {
     // Redirect to their appropriate dashboard
     const redirectPath = 
-      role === "admin" 
+      role === "superadmin" 
         ? "/admin/dashboard" 
         : role === "faculty" 
         ? "/faculty/dashboard" 
@@ -130,7 +130,7 @@ const GuestOnlyRoute = ({ children }) => {
 
   // If user is authenticated, redirect them based on role
   if (isAuthenticated && role) {
-    if (role === "admin") {
+    if (role === "superadmin") {
       return <Navigate to="/admin/dashboard" replace />;
     } else if (role === "faculty") {
       return <Navigate to="/faculty/dashboard" replace />;
@@ -159,7 +159,7 @@ const SmartRedirect = () => {
 
   // If user is authenticated, redirect based on role
   if (isAuthenticated && role) {
-    if (role === "admin") {
+    if (role === "superadmin") {
       return <Navigate to="/admin/dashboard" replace />;
     } else if (role === "faculty") {
       return <Navigate to="/faculty/dashboard" replace />;
@@ -291,7 +291,7 @@ const AppRouter = () => {
             <Route
               path="/admin"
               element={
-                <ProtectedRoute allowedRoles={["admin"]}>
+                <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <AdminDashboardRedirect />
                   </AdminLayout>
@@ -301,7 +301,7 @@ const AppRouter = () => {
             <Route
               path="/admin/dashboard"
               element={
-                <ProtectedRoute allowedRoles={["admin"]}>
+                <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <AdminDashboard />
                   </AdminLayout>
@@ -311,7 +311,7 @@ const AppRouter = () => {
             <Route
               path="/admin/add-faculties"
               element={
-                <ProtectedRoute allowedRoles={["admin"]}>
+                <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <AddFaculty />
                   </AdminLayout>
@@ -321,7 +321,7 @@ const AppRouter = () => {
             <Route
               path="/admin/test-details"
               element={
-                <ProtectedRoute allowedRoles={["admin"]}>
+                <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <AdminTestDetails />
                   </AdminLayout>
@@ -331,7 +331,7 @@ const AppRouter = () => {
             <Route
               path="/admin/student-performance"
               element={
-                <ProtectedRoute allowedRoles={["admin"]}>
+                <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <AdminStudentPerformance />
                   </AdminLayout>
@@ -341,7 +341,7 @@ const AppRouter = () => {
             <Route
               path="/admin/student-performance/viewreport/:id"
               element={
-                <ProtectedRoute allowedRoles={["admin"]}>
+                <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <IndividualStudentPerformance />
                   </AdminLayout>

@@ -68,9 +68,11 @@ export const AuthProvider = ({ children }) => {
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("role");
     sessionStorage.removeItem("user");
+    sessionStorage.removeItem("userData");
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("user");
+    localStorage.removeItem("userData");
   };
 
   // Login function

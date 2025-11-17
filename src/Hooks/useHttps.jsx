@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useNotification } from "../Context/NotificationContext";
-import { BASE_URL } from "../config/config";
+import { BASE_URL } from "../Config/config";
 
 export const useHttp = () => {
   const [loading, setLoading] = useState(false);

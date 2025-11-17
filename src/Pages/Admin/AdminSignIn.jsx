@@ -1,4 +1,3 @@
-// src/Pages/Admin/AdminSignIn.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
@@ -63,19 +62,33 @@ export const AdminSignIn = () => {
 
       if (response.success) {
         // Extract data from response
-        const { token, admin, user } = response.data || response;
-
-        // Use admin data if available, otherwise use user data
-        const userData = admin || user;
+        const { token } = response.data;
+        const userData = response.data;
 
         if (!userData || !token) {
           throw new Error("Invalid response from server");
         }
 
-        // Store authentication data
-        login(userData, "admin", token, formData.rememberMe || false);
+        // Determine storage type based on rememberMe
+        // const storage = formData.rememberMe ? localStorage : sessionStorage;
 
-        // Show success message
+        // Store authentication data
+        // storage.setItem("token", token);
+        // storage.setItem("role", userData.role);
+        // storage.setItem("user", JSON.stringify({
+        //   _id: userData._id,
+        //   email: userData.email,
+        //   role: userData.role,
+        //   campus: userData.campus,
+        //   createdAt: userData.createdAt,
+        //   updatedAt: userData.updatedAt
+        // }));
+
+
+        // Also update auth context
+        login(userData, userData.role, token, formData.rememberMe || false);
+
+        // Show success message with correct variant
         showNotification("Sign in successful! Redirecting...", "success");
 
         // Redirect to admin dashboard

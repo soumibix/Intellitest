@@ -13,7 +13,7 @@ export const API_ENDPOINTS = {
   STUDENT_RESET_PASSWORD: "student/reset-password",
 
   // Admin endpoints
-  ADMIN_SIGNIN: "admin/signin",
+  ADMIN_SIGNIN: "superAdmin/signin",
 
   // Faculty endpoints
   FACULTY_SIGNIN: "faculty/signin",
