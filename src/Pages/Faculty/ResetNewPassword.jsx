@@ -2,16 +2,20 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
+import { facultyAuthAPI } from "../../apis/auth/facultyAuth"; 
+import { useHttp } from "../../Hooks/useHttps";
+
 
 const ResetNewPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || "";
+  const httpHook = useHttp(); 
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = async(formData) => {
     setIsLoading(true);
     setErrors({});
 
@@ -20,6 +24,9 @@ const ResetNewPassword = () => {
       setIsLoading(false);
       return;
     }
+
+    const response = await facultyAuthAPI.resetPassword(httpHook , email, formData.newPassword)
+    // console.log(response)
 
     // Simulate API call
     setTimeout(() => {
