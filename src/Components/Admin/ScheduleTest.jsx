@@ -36,7 +36,7 @@ const ScheduleTest = () => {
         required
         value={schedule.duration}
         onChange={(e) => setSchedule({ ...schedule, duration: e.target.value })}
-        placeholder="e.g., 60"
+        placeholder="e.g. 60"
       />
       
       <BorderLabelInput

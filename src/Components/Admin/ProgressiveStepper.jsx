@@ -12,15 +12,15 @@ export const ProgressiveStepper = ({ activeStep, onSaveAndContinue }) => {
     },
     {
       id: 2,
-      icon: Upload,
-      title: 'Upload Questions',
-      description: 'Import questions from your files.',
-    },
-    {
-      id: 3,
       icon: Calendar,
       title: 'Schedule Test',
       description: 'Set test date, time, and duration.',
+    },
+    {
+      id: 3,
+      icon: Upload,
+      title: 'Upload Questions',
+      description: 'Import questions from your files.',
     },
     {
       id: 4,
