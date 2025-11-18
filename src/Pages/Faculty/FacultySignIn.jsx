@@ -36,7 +36,7 @@ export const FacultySignIn = () => {
           login(
             response.data.user || response.data, // userData
             response.data.role || 'faculty',      // userRole
-            response.data.token,                  // token
+            response.token,                  // token
             formData.rememberMe || false          // rememberMe
           );
 
