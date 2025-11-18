@@ -75,11 +75,11 @@ export const facultyAuthAPI = {
   },
 
   // Get Profile Data
-  getProfile: async (httpHook, facultyId) => {
+  getProfile: async (httpHook, token, facultyId) => {
     try {
       const response = await httpHook.getReq(
         `${API_ENDPOINTS.FACULTY_GET_PROFILE}/${facultyId}`,
-        ""
+        token
       );
       return response;
     } catch (error) {
@@ -92,11 +92,11 @@ export const facultyAuthAPI = {
   },
 
   // Update Profile
-  updateProfile: async (httpHook, facultyId, profileData) => {
+  updateProfile: async (httpHook, token, facultyId, profileData) => {
     try {
       const response = await httpHook.patchReq(
         `${API_ENDPOINTS.FACULTY_UPDATE_PROFILE}/${facultyId}`,
-        "",
+        token,
         profileData
       );
       return response;
