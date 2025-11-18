@@ -73,4 +73,39 @@ export const facultyAuthAPI = {
       };
     }
   },
+
+  // Get Profile Data
+  getProfile: async (httpHook, facultyId) => {
+    try {
+      const response = await httpHook.getReq(
+        `${API_ENDPOINTS.FACULTY_GET_PROFILE}/${facultyId}`,
+        ""
+      );
+      return response;
+    } catch (error) {
+      console.error("Faculty get profile error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to fetch profile data",
+      };
+    }
+  },
+
+  // Update Profile
+  updateProfile: async (httpHook, facultyId, profileData) => {
+    try {
+      const response = await httpHook.patchReq(
+        `${API_ENDPOINTS.FACULTY_UPDATE_PROFILE}/${facultyId}`,
+        "",
+        profileData
+      );
+      return response;
+    } catch (error) {
+      console.error("Faculty update profile error:", error);
+      return {
+        success: false,
+        message: error.message || "Failed to update profile",
+      };
+    }
+  },
 };
