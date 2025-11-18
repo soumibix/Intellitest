@@ -8,7 +8,6 @@ export const AddTestData = () => {
     subjectName: "",
     subjectCode: "",
     testCategory: "",
-    testType: "",
     numberOfQuestions: "",
   });
 
@@ -63,19 +62,6 @@ export const AddTestData = () => {
           { label: "6th Semester", value: "6" },
           { label: "7th Semester", value: "7" },
           { label: "8th Semester", value: "8" },
-        ]}
-      />
-
-      <BorderLabelInput
-        label="Test Type"
-        name="testType"
-        type="select"
-        required
-        value={formData.testType}
-        onChange={handleChange}
-        options={[
-          { label: "Subjective", value: "subjective" },
-          { label: "Objective", value: "objective" },
         ]}
       />
 
