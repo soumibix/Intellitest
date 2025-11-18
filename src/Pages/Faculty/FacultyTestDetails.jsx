@@ -6,10 +6,23 @@ import { FacultyProgressiveStepper } from "../../Components/Faculty/FacultyProgr
 import { FacultyAddTestData } from "../../Components/Faculty/FacultyAddTestData";
 import AllTest from "../../Components/AllTest";
 import Button from "../../Components/common/Button";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useHttp } from '../../Hooks/useHttps'
 
 const FacultyTestDetails = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const { postReq, loading } = useHttp();
+  
+  // State to hold form data across steps
+  const [testFormData, setTestFormData] = useState({
+    department: "",
+    semester: "",
+    subjectName: "",
+    subjectCode: "",
+    testCategory: "",
+    numberOfQuestions: "",
+  });
+
   const allTests = [
     {
       id: 1,
@@ -144,8 +157,56 @@ const FacultyTestDetails = () => {
     },
   ];
 
-  const handleSaveAndContinue = (nextStep) => {
-    setActiveStep(nextStep);
+  // Get auth token from localStorage
+  const getAuthToken = () => {
+    return sessionStorage.getItem("token") || localStorage.getItem("token") || "";
+  };
+
+  // Validate form data
+  const validateFormData = () => {
+    const { department, semester, subjectName, subjectCode, testCategory, numberOfQuestions } = testFormData;
+    
+    if (!department || !semester || !subjectName || !subjectCode || !testCategory || !numberOfQuestions) {
+      return false;
+    }
+    return true;
+  };
+
+  // Handle Save & Continue button click
+  const handleSaveAndContinue = async (nextStep) => {
+    // If on step 1 (FacultyAddTestData), call the API
+    if (activeStep === 1) {
+      // Validate form data
+      if (!validateFormData()) {
+        alert("Please fill all required fields");
+        return;
+      }
+
+      // Prepare API payload
+      const payload = {
+        department: testFormData.department,
+        testCategory: testFormData.testCategory,
+        semester: testFormData.semester,
+        subjectName: testFormData.subjectName,
+        subjectCode: testFormData.subjectCode,
+        numberOfQuestions: testFormData.numberOfQuestions,
+      };
+
+      // Call API
+      const token = getAuthToken();
+      const response = await postReq("test/testDetail", token, payload);
+
+      if (response.success) {
+        // Move to next step only if API call is successful
+        setActiveStep(nextStep);
+      } else {
+        // Error is already handled by useHttp hook (notification will be shown)
+        console.error("Failed to save test details:", response.message);
+      }
+    } else {
+      // For other steps, just move to next step
+      setActiveStep(nextStep);
+    }
   };
 
   const handleBack = () => {
@@ -156,13 +217,27 @@ const FacultyTestDetails = () => {
 
   const handleReset = () => {
     setActiveStep(0);
+    // Optionally reset form data
+    setTestFormData({
+      department: "",
+      semester: "",
+      subjectName: "",
+      subjectCode: "",
+      testCategory: "",
+      numberOfQuestions: "",
+    });
   };
 
   // Render the appropriate component based on active step
   const renderStepContent = () => {
     switch (activeStep) {
       case 1:
-        return <FacultyAddTestData />;
+        return (
+          <FacultyAddTestData 
+            formData={testFormData} 
+            setFormData={setTestFormData} 
+          />
+        );
       case 2:
         return <FacultyScheduleTest />;
       case 3:
@@ -213,12 +288,13 @@ const FacultyTestDetails = () => {
                 <Button
                   onClick={() => handleSaveAndContinue(activeStep + 1)}
                   className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                  text="Save & Continue"
+                  text={loading ? "Saving..." : "Save & Continue"}
                   padding="px-5 py-3"
-                  icon={<ArrowRight />}
+                  icon={!loading && <ArrowRight />}
                   color="#631891"
                   textSize="text-md"
                   iconPosition="right"
+                  disabled={loading}
                 />
               ) : (
                 <Button
@@ -229,12 +305,6 @@ const FacultyTestDetails = () => {
                   color="#631891"
                   textSize="text-md"
                 />
-                // <button
-                //   onClick={handleReset}
-                //   className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300"
-                // >
-                //   Publish Test
-                // </button>
               )}
             </div>
           </div>

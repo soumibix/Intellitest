@@ -1,16 +1,7 @@
 import React, { useState } from "react";
 import BorderLabelInput from "../common/BorderLabelInput";
 
-export const FacultyAddTestData = () => {
-  const [formData, setFormData] = useState({
-    department: "",
-    semester: "",
-    subjectName: "",
-    subjectCode: "",
-    testCategory: "",
-    numberOfQuestions: "",
-  });
-
+export const FacultyAddTestData = ({ formData, setFormData }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -26,9 +17,9 @@ export const FacultyAddTestData = () => {
         value={formData.department}
         onChange={handleChange}
         options={[
-          { label: "Computer Science and Technology", value: "cst" },
-          { label: "Information Technology", value: "it" },
-          { label: "Electronics and Communication", value: "ece" },
+          { label: "Computer Science and Technology", value: "CSE" },
+          { label: "Information Technology", value: "IT" },
+          { label: "Electronics and Communication", value: "ECE" },
         ]}
       />
 
@@ -40,9 +31,9 @@ export const FacultyAddTestData = () => {
         value={formData.testCategory}
         onChange={handleChange}
         options={[
-          { label: "Midterm Examination", value: "midterm" },
-          { label: "Final Examination", value: "final" },
-          { label: "Class Test", value: "classtest" },
+          { label: "Midterm Examination", value: "Midterm Examination" },
+          { label: "Semester Final", value: "Semester Final" },
+          { label: "Class Test", value: "Class Test" },
         ]}
       />
 
@@ -54,14 +45,14 @@ export const FacultyAddTestData = () => {
         value={formData.semester}
         onChange={handleChange}
         options={[
-          { label: "1st Semester", value: "1" },
-          { label: "2nd Semester", value: "2" },
-          { label: "3rd Semester", value: "3" },
-          { label: "4th Semester", value: "4" },
-          { label: "5th Semester", value: "5" },
-          { label: "6th Semester", value: "6" },
-          { label: "7th Semester", value: "7" },
-          { label: "8th Semester", value: "8" },
+          { label: "1st Semester", value: "1st Semester" },
+          { label: "2nd Semester", value: "2nd Semester" },
+          { label: "3rd Semester", value: "3rd Semester" },
+          { label: "4th Semester", value: "4th Semester" },
+          { label: "5th Semester", value: "5th Semester" },
+          { label: "6th Semester", value: "6th Semester" },
+          { label: "7th Semester", value: "7th Semester" },
+          { label: "8th Semester", value: "8th Semester" },
         ]}
       />
 
@@ -73,10 +64,11 @@ export const FacultyAddTestData = () => {
         value={formData.subjectName}
         onChange={handleChange}
         options={[
-          { label: "Machine Learning", value: "machine_learning" },
-          { label: "Artificial Intelligence", value: "ai" },
-          { label: "Database Management System", value: "dbms" },
-          { label: "Operating System", value: "os" },
+          { label: "Machine Learning", value: "Machine Learning" },
+          { label: "Artificial Intelligence", value: "Artificial Intelligence" },
+          { label: "Database Management System", value: "Database Management System" },
+          { label: "Operating System", value: "Operating System" },
+          { label: "Computer Network", value: "Computer network" },
         ]}
       />
 
@@ -101,6 +93,7 @@ export const FacultyAddTestData = () => {
           { label: "PCCS572", value: "PCCS572" },
           { label: "PCCS501", value: "PCCS501" },
           { label: "PCCS601", value: "PCCS601" },
+          { label: "CCSS123DE", value: "CCSS123DE" },
         ]}
       />
     </div>
