@@ -9,6 +9,7 @@ const FacultyDashboard = () => {
   const httpHook = useHttp();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const token= sessionStorage.getItem('token');
   
   // Get user data from sessionStorage
   const userDataStr = sessionStorage.getItem('user');
@@ -35,7 +36,7 @@ const FacultyDashboard = () => {
   const fetchProfileData = async () => {
     setLoading(true);
     try {
-      const response = await facultyAuthAPI.getProfile(httpHook, facultyId);
+      const response = await facultyAuthAPI.getProfile(httpHook, token, facultyId);
 
       if (response.success && response.data) {
         const profileData = response.data;
@@ -94,6 +95,7 @@ const FacultyDashboard = () => {
 
       const response = await facultyAuthAPI.updateProfile(
         httpHook,
+        token,
         facultyId,
         profileData
       );
