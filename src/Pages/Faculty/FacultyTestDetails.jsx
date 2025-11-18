@@ -1,188 +1,188 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FacultyUploadQuestions } from "../../Components/Faculty/FacultyUploadQuestions";
 import FacultyScheduleTest from "../../Components/Faculty/FacultyScheduleTest";
 import FacultyReviewPublish from "../../Components/Faculty/FacultyReviewPublish";
 import { FacultyProgressiveStepper } from "../../Components/Faculty/FacultyProgressiveStepper";
 import { FacultyAddTestData } from "../../Components/Faculty/FacultyAddTestData";
 import AllTest from "../../Components/AllTest";
-import Button from "../../Components/common/Button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useHttp } from '../../Hooks/useHttps'
+import { useHttp } from "../../Hooks/useHttps";
+import { useAuth } from "../../AppRouter";
+import ConfirmationModal from "../../utils/ConfirmationModal";
+import { TestAPI } from "../../apis/Tests/TestCRUD";
+
+const STORAGE_KEY = "facultyTestProgress";
 
 const FacultyTestDetails = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const { postReq, loading } = useHttp();
-  
-  // State to hold form data across steps
-  const [testFormData, setTestFormData] = useState({
-    department: "",
-    semester: "",
-    subjectName: "",
-    subjectCode: "",
-    testCategory: "",
-    numberOfQuestions: "",
-  });
+  // Initialize state from localStorage if available
+  const getInitialState = () => {
+    try {
+      const savedState = localStorage.getItem(STORAGE_KEY);
+      if (savedState) {
+        return JSON.parse(savedState);
+      }
+    } catch (error) {
+      console.error("Error loading saved state:", error);
+    }
+    return {
+      activeStep: 0,
+      testId: null,
+      testFormData: {
+        department: "",
+        semester: "",
+        subjectName: "",
+        subjectCode: "",
+        testCategory: "",
+        numberOfQuestions: "",
+      },
+      scheduleFormData: {
+        testDate: "",
+        startTime: "",
+        endTime: "",
+        duration: "",
+      },
+      questionFileUrl: "",
+      answerFileUrl: "",
+    };
+  };
+
+  const initialState = getInitialState();
+
+  const [activeStep, setActiveStep] = useState(initialState.activeStep);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [testId, setTestId] = useState(initialState.testId);
+  const { token } = useAuth();
+  const httpHook = useHttp();
+  const { loading } = httpHook;
+
+  const [testFormData, setTestFormData] = useState(initialState.testFormData);
+  const [scheduleFormData, setScheduleFormData] = useState(initialState.scheduleFormData);
+
+  // State to hold file upload data
+  const [questionFile, setQuestionFile] = useState(null);
+  const [answerFile, setAnswerFile] = useState(null);
+  const [questionFileUrl, setQuestionFileUrl] = useState(initialState.questionFileUrl);
+  const [answerFileUrl, setAnswerFileUrl] = useState(initialState.answerFileUrl);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    const stateToSave = {
+      activeStep,
+      testId,
+      testFormData,
+      scheduleFormData,
+      questionFileUrl,
+      answerFileUrl,
+    };
+    
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    } catch (error) {
+      console.error("Error saving state:", error);
+    }
+  }, [activeStep, testId, testFormData, scheduleFormData, questionFileUrl, answerFileUrl]);
 
   const allTests = [
     {
       id: 1,
       status: "ongoing",
       testData: {
-        timeRemaining: "58:07 mins remaining",
         title: "Machine Learning Mid-Sem Test",
         questions: 30,
         marks: 60,
-        duration: "1 hour",
-        department: "CST",
-        semester: "05",
-        createdBy: "Saurabh Kumbhar",
-        createdDate: "Sept 5 04:25",
-        avatarSeed: "Saurabh",
       },
-      month: "September",
     },
     {
       id: 2,
       status: "upcoming",
       testData: {
-        dateTime: "Nov 15 • 2:00 PM",
         title: "Data Structures Final Exam",
         questions: 50,
         marks: 100,
-        duration: "2 hours",
-        department: "CST",
-        semester: "03",
-        createdBy: "Priya Sharma",
-        createdDate: "Oct 20 10:15",
-        avatarSeed: "Priya",
       },
-      month: "November",
-    },
-    {
-      id: 3,
-      status: "completed",
-      testData: {
-        dateTime: "Oct 10 • 10:00 AM",
-        title: "Database Management Systems Quiz",
-        questions: 20,
-        marks: 40,
-        duration: "45 mins",
-        department: "CST",
-        semester: "04",
-        createdBy: "Rahul Verma",
-        createdDate: "Sept 30 14:20",
-        avatarSeed: "Rahul",
-        marksObtained: 52,
-        totalMarks: 60,
-        timeTaken: "54 minutes",
-        accuracy: "87%",
-      },
-      month: "October",
-    },
-    {
-      id: 4,
-      status: "upcoming",
-      testData: {
-        dateTime: "Nov 20 • 11:00 AM",
-        title: "Computer Networks Test",
-        questions: 40,
-        marks: 80,
-        duration: "1.5 hours",
-        department: "CST",
-        semester: "05",
-        createdBy: "Anjali Singh",
-        createdDate: "Nov 1 09:00",
-        avatarSeed: "Anjali",
-      },
-      month: "November",
-    },
-    {
-      id: 5,
-      status: "upcoming",
-      testData: {
-        dateTime: "Nov 20 • 11:00 AM",
-        title: "Computer Networks Test",
-        questions: 40,
-        marks: 80,
-        duration: "1.5 hours",
-        department: "CST",
-        semester: "05",
-        createdBy: "Anjali Singh",
-        createdDate: "Nov 1 09:00",
-        avatarSeed: "Anjali",
-      },
-      month: "November",
-    },
-    {
-      id: 6,
-      status: "completed",
-      testData: {
-        dateTime: "Oct 25 • 3:00 PM",
-        title: "Operating Systems Mid-Term",
-        questions: 35,
-        marks: 70,
-        duration: "1.5 hours",
-        department: "CST",
-        semester: "05",
-        createdBy: "Saurabh Kumbhar",
-        createdDate: "Oct 15 11:30",
-        avatarSeed: "Saurabh",
-        marksObtained: 45,
-        totalMarks: 70,
-        timeTaken: "1 hour 20 mins",
-        accuracy: "64%",
-      },
-      month: "October",
-    },
-    {
-      id: 7,
-      status: "completed",
-      testData: {
-        dateTime: "Oct 25 • 3:00 PM",
-        title: "Operating Systems Mid-Term",
-        questions: 35,
-        marks: 70,
-        duration: "1.5 hours",
-        department: "CST",
-        semester: "05",
-        createdBy: "Saurabh Kumbhar",
-        createdDate: "Oct 15 11:30",
-        avatarSeed: "Saurabh",
-        marksObtained: 45,
-        totalMarks: 70,
-        timeTaken: "1 hour 20 mins",
-        accuracy: "64%",
-      },
-      month: "October",
     },
   ];
 
-  // Get auth token from localStorage
-  const getAuthToken = () => {
-    return sessionStorage.getItem("token") || localStorage.getItem("token") || "";
+  // Handle file upload to server
+  const handleUploadToServer = async (file, type) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await TestAPI.uploadFile(httpHook, formData, token);
+    if (response.success) {
+      const fileUrl = response.fileUrl;
+
+      if (type === "question") {
+        setQuestionFileUrl(fileUrl);
+        console.log("Question file uploaded successfully:", fileUrl);
+      } else {
+        setAnswerFileUrl(fileUrl);
+        console.log("Answer file uploaded successfully:", fileUrl);
+      }
+    } else {
+      console.error(`Failed to upload ${type} file:`, response.message);
+      alert(`Failed to upload ${type} file. Please try again.`);
+    }
   };
 
-  // Validate form data
-  const validateFormData = () => {
-    const { department, semester, subjectName, subjectCode, testCategory, numberOfQuestions } = testFormData;
-    
-    if (!department || !semester || !subjectName || !subjectCode || !testCategory || !numberOfQuestions) {
-      return false;
+  // Upload question file when it changes
+  useEffect(() => {
+    if (questionFile) {
+      handleUploadToServer(questionFile, "question");
+    }
+  }, [questionFile]);
+
+  // Upload answer file when it changes
+  useEffect(() => {
+    if (answerFile) {
+      handleUploadToServer(answerFile, "answer");
+    }
+  }, [answerFile]);
+
+  // Validate form data based on step
+  const validateStep = (step) => {
+    if (step === 1) {
+      const {
+        department,
+        semester,
+        subjectName,
+        subjectCode,
+        testCategory,
+        numberOfQuestions,
+      } = testFormData;
+      return (
+        department &&
+        semester &&
+        subjectName &&
+        subjectCode &&
+        testCategory &&
+        numberOfQuestions
+      );
+    }
+    if (step === 2) {
+      const { testDate, startTime, endTime, duration } = scheduleFormData;
+      return testDate && startTime && endTime && duration;
+    }
+    if (step === 3) {
+      return questionFile && questionFileUrl;
     }
     return true;
   };
 
-  // Handle Save & Continue button click
+  // Handle Save & Continue
   const handleSaveAndContinue = async (nextStep) => {
-    // If on step 1 (FacultyAddTestData), call the API
-    if (activeStep === 1) {
-      // Validate form data
-      if (!validateFormData()) {
-        alert("Please fill all required fields");
-        return;
-      }
+    // Validate current step
+    if (!validateStep(activeStep)) {
+      alert("Please fill all required fields");
+      return;
+    }
 
-      // Prepare API payload
+    let response;
+
+    // Step 1: Test Details (Create or Update)
+    if (activeStep === 1) {
       const payload = {
         department: testFormData.department,
         testCategory: testFormData.testCategory,
@@ -192,19 +192,66 @@ const FacultyTestDetails = () => {
         numberOfQuestions: testFormData.numberOfQuestions,
       };
 
-      // Call API
-      const token = getAuthToken();
-      const response = await postReq("test/testDetail", token, payload);
+      if (!testId) {
+        // First time - CREATE test using TestAPI
+        response = await TestAPI.addTest(httpHook, payload, token);
+        if (response.success && response.data) {
+          setTestId(response.data._id || response.data.testId);
+          alert("Test created successfully!");
+          setActiveStep(nextStep);
+        } else {
+          alert("Failed to create test: " + response.message);
+        }
+      } else {
+        // Going back and updating - UPDATE test using TestAPI
+        response = await TestAPI.updateTest(httpHook, testId, payload, token);
+        if (response.success) {
+          alert("Test details updated successfully!");
+          setActiveStep(nextStep);
+        } else {
+          alert("Failed to update test: " + response.message);
+        }
+      }
+    }
+    // Step 2: Schedule Test
+    else if (activeStep === 2) {
+      // Check if testId exists
+      if (!testId) {
+        alert("Test ID is missing. Please complete step 1 first.");
+        return;
+      }
 
+      const payload = {
+        testDate: scheduleFormData.testDate,
+        startTime: scheduleFormData.startTime,
+        endTime: scheduleFormData.endTime,
+        duration: parseInt(scheduleFormData.duration),
+      };
+
+      response = await TestAPI.scheduleTest(httpHook, testId, payload, token);
       if (response.success) {
-        // Move to next step only if API call is successful
+        alert("Schedule updated successfully!");
         setActiveStep(nextStep);
       } else {
-        // Error is already handled by useHttp hook (notification will be shown)
-        console.error("Failed to save test details:", response.message);
+        alert("Failed to update schedule: " + response.message);
       }
-    } else {
-      // For other steps, just move to next step
+    }
+    // Step 3: Upload Questions - Files already uploaded, just validate and move
+    else if (activeStep === 3) {
+      if (!validateStep(3)) {
+        alert("Please upload the question paper");
+        return;
+      }
+      console.log(
+        "Files uploaded - Question:",
+        questionFileUrl,
+        "Answer:",
+        answerFileUrl
+      );
+      setActiveStep(nextStep);
+    }
+    // Other steps
+    else {
       setActiveStep(nextStep);
     }
   };
@@ -215,9 +262,31 @@ const FacultyTestDetails = () => {
     }
   };
 
+  const handleCancelClick = () => {
+    setShowCancelModal(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (testId) {
+      const response = await TestAPI.deleteTest(httpHook, testId, token);
+      if (response.success) {
+        alert("Test deleted successfully!");
+        handleReset();
+      } else {
+        alert("Failed to delete test: " + response.message);
+      }
+    } else {
+      handleReset();
+    }
+    setShowCancelModal(false);
+  };
+
   const handleReset = () => {
+    // Clear localStorage
+    localStorage.removeItem(STORAGE_KEY);
+    
     setActiveStep(0);
-    // Optionally reset form data
+    setTestId(null);
     setTestFormData({
       department: "",
       semester: "",
@@ -226,22 +295,65 @@ const FacultyTestDetails = () => {
       testCategory: "",
       numberOfQuestions: "",
     });
+    setScheduleFormData({
+      testDate: "",
+      startTime: "",
+      endTime: "",
+      duration: "",
+    });
+    setQuestionFile(null);
+    setAnswerFile(null);
+    setQuestionFileUrl("");
+    setAnswerFileUrl("");
   };
 
-  // Render the appropriate component based on active step
+  const handlePublish = async () => {
+    // Save Question & Answer URLs before publishing
+    if (testId && questionFileUrl) {
+      const payload = {
+        questionPaper: questionFileUrl,
+        answerKey: answerFileUrl || "", // Optional
+      };
+
+      const response = await TestAPI.saveQA(httpHook, testId, payload, token);
+      if (response.success) {
+        alert("Test published successfully!");
+        handleReset();
+      } else {
+        alert("Failed to publish test: " + response.message);
+      }
+    } else {
+      alert("Please complete all steps before publishing");
+    }
+  };
+
   const renderStepContent = () => {
     switch (activeStep) {
       case 1:
         return (
-          <FacultyAddTestData 
-            formData={testFormData} 
-            setFormData={setTestFormData} 
+          <FacultyAddTestData
+            formData={testFormData}
+            setFormData={setTestFormData}
           />
         );
       case 2:
-        return <FacultyScheduleTest />;
+        return (
+          <FacultyScheduleTest
+            formData={scheduleFormData}
+            setFormData={setScheduleFormData}
+          />
+        );
       case 3:
-        return <FacultyUploadQuestions />;
+        return (
+          <FacultyUploadQuestions
+            questionFile={questionFile}
+            setQuestionFile={setQuestionFile}
+            answerFile={answerFile}
+            setAnswerFile={setAnswerFile}
+            questionFileUrl={questionFileUrl}
+            answerFileUrl={answerFileUrl}
+          />
+        );
       case 4:
         return <FacultyReviewPublish />;
       default:
@@ -257,98 +369,73 @@ const FacultyTestDetails = () => {
       />
 
       {activeStep > 0 && (
-        <div className="mx-auto bg-white rounded-lg shadow-md p-8 mt-0 animate-slideIn">
-          {/* Dynamic Content Based on Active Step */}
+        <div className="mx-auto bg-white rounded-lg shadow-md p-8 mt-0">
           <div className="mb-8">{renderStepContent()}</div>
 
-          {/* Action Buttons */}
           <div className="flex justify-between items-center pt-6 border-t border-gray-200">
             {activeStep > 1 && (
-              <Button
+              <button
                 onClick={handleBack}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                text="Back"
-                padding="px-5 py-3"
-                icon={<ArrowLeft />}
-                color="#631891"
-                textSize="text-sm"
-                iconPosition="left"
-              />
+                className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2"
+                disabled={loading}
+              >
+                <ArrowLeft size={18} />
+                Back
+              </button>
             )}
 
             <div className="ml-auto flex gap-3">
               <button
-                onClick={handleReset}
+                onClick={handleCancelClick}
                 className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-2 rounded transition-all duration-300"
+                disabled={loading}
               >
                 Cancel
               </button>
 
               {activeStep < 4 ? (
-                <Button
+                <button
                   onClick={() => handleSaveAndContinue(activeStep + 1)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                  text={loading ? "Saving..." : "Save & Continue"}
-                  padding="px-5 py-3"
-                  icon={!loading && <ArrowRight />}
-                  color="#631891"
-                  textSize="text-md"
-                  iconPosition="right"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2"
                   disabled={loading}
-                />
+                >
+                  {loading ? "Saving..." : "Save & Continue"}
+                  {!loading && <ArrowRight size={18} />}
+                </button>
               ) : (
-                <Button
-                  onClick={handleReset}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                  text="Publish Test"
-                  padding="px-5 py-3"
-                  color="#631891"
-                  textSize="text-md"
-                />
+                <button
+                  onClick={handlePublish}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded transition-all duration-300"
+                  disabled={loading}
+                >
+                  Publish Test
+                </button>
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* All Tests Section */}
       {activeStep === 0 && (
         <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
           <AllTest userType="faculty" allTests={allTests} showWrap={true} />
         </div>
       )}
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+      <ConfirmationModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleConfirmCancel}
+        title="Cancel Test Creation"
+        message={
+          testId
+            ? "Are you sure you want to cancel? This will delete the test you've created."
+            : "Are you sure you want to cancel? All progress will be lost."
         }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out;
-        }
-
-        .animate-slideIn {
-          animation: slideIn 0.4s ease-out;
-        }
-      `}</style>
+        confirmText="Delete Test"
+        cancelText="Keep Editing"
+        isLoading={loading}
+      />
     </div>
   );
 };

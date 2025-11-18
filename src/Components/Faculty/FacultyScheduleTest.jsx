@@ -1,43 +1,34 @@
-
-
-
 import React, { useEffect, useState } from "react";
 import BorderLabelInput from "../common/BorderLabelInput";
 
-const FacultyScheduleTest = () => {
-  const [schedule, setSchedule] = useState({
-    startDate: "",
-    startTime: "",
-    endTime: "",
-    duration: "",
-  });
-
-  useEffect(() => {
-    if (schedule.startTime && schedule.endTime) {
-      const start = convertToMinutes(schedule.startTime);
-      const end = convertToMinutes(schedule.endTime);
-
-      if (end > start) {
-        const diff = end - start;
-        const formatted = formatDuration(diff);
-        setSchedule((prev) => ({ ...prev, duration: formatted }));
-      } else {
-        setSchedule((prev) => ({ ...prev, duration: "" }));
+const FacultyScheduleTest = ({ formData, setFormData }) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      
+      // Auto-calculate duration
+      if (updated.startTime && updated.endTime) {
+        const start = convertToMinutes(updated.startTime);
+        const end = convertToMinutes(updated.endTime);
+        if (end > start) {
+          const diff = end - start;
+          updated.duration = formatDuration(diff);
+        }
       }
-    }
-  }, [schedule.startTime, schedule.endTime]);
+      
+      return updated;
+    });
+  };
 
-  // Helper: Convert "HH:MM" → minutes
   const convertToMinutes = (time) => {
     const [h, m] = time.split(":").map(Number);
     return h * 60 + m;
   };
 
-  // Helper: Convert minutes → "H hr M min"
   const formatDuration = (minutes) => {
     const hrs = Math.floor(minutes / 60);
     const mins = minutes % 60;
-
     if (hrs > 0 && mins > 0) return `${hrs} hr ${mins} min`;
     if (hrs > 0) return `${hrs} hr`;
     return `${mins} min`;
@@ -50,54 +41,31 @@ const FacultyScheduleTest = () => {
         name="testDate"
         type="date"
         required
-        value={schedule.testDate}
-        onChange={(e) => setSchedule({ ...schedule, testDate: e.target.value })}
+        value={formData.testDate}
+        onChange={handleChange}
       />
-
       <BorderLabelInput
         label="Start Time"
         name="startTime"
         type="time"
         required
-        value={schedule.startTime}
-        onChange={(e) =>
-          setSchedule({ ...schedule, startTime: e.target.value })
-        }
+        value={formData.startTime}
+        onChange={handleChange}
       />
-      {/*       
-      <BorderLabelInput
-        label="End Date"
-        name="endDate"
-        type="date"
-        required
-        value={schedule.endDate}
-        onChange={(e) => setSchedule({ ...schedule, endDate: e.target.value })}
-      /> */}
-
       <BorderLabelInput
         label="End Time"
         name="endTime"
         type="time"
         required
-        value={schedule.endTime}
-        onChange={(e) => setSchedule({ ...schedule, endTime: e.target.value })}
+        value={formData.endTime}
+        onChange={handleChange}
       />
-      {/* <BorderLabelInput
-        label="Duration (minutes)"
-        name="duration"
-        type="number"
-        required
-        value={schedule.duration}
-        onChange={(e) => setSchedule({ ...schedule, duration: e.target.value })}
-        placeholder="e.g. 60"
-      /> */}
-
       <BorderLabelInput
         label="Duration"
         name="duration"
         type="text"
         required
-        value={schedule.duration}
+        value={formData.duration}
         placeholder="Auto calculated"
         disabled
       />

@@ -27,6 +27,20 @@ export const API_ENDPOINTS = {
   FACULTY_RESET_PASSWORD: "faculty/resetPassword",
   FACULTY_GET_PROFILE: 'faculty/getProfileData',
   FACULTY_UPDATE_PROFILE: 'faculty/updateProfile',
+
+  //        TEST APIs
+  // ===========================
+  TEST_ADD: "test/testDetail",                         // POST
+  TEST_SCHEDULE: (id) => `test/scheduleTest/${id}`,    // POST
+  FILE_UPLOAD: "upload/uploadFile",                    // POST (form-data)
+  GENERATE_ANSWER: (id) => `test/generateAnswer/${id}`,// POST
+  TEST_SAVE_QA: (id) => `test/saveQA/${id}`,           // POST
+  TEST_GET: "test/testData",                           // GET list + filter
+  TEST_GET_BY_ID: (id) => `test/testData?id=${id}`,    // GET single
+  TEST_UPDATE: (id) => `test/updateTest/${id}`,        // PATCH
+  TEST_UPDATE_SCORE: (tid, qid) =>
+    `test/update/${tid}/question/${qid}/score`,        // PATCH
+  TEST_DELETE: (id) => `test/deleteTest/${id}`,        // DELETE
 };
 
 export default {

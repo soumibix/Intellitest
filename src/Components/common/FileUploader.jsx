@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Upload, X, Check, Trash2 } from 'lucide-react';
 
-export default function FileUploader() {
+// FileUploader Component
+export default function  FileUploader ({ onFileSelect, uploadedFileUrl }) {
     const [file, setFile] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -52,6 +53,10 @@ export default function FileUploader() {
                     clearInterval(interval);
                     setIsUploading(false);
                     setFile(selectedFile);
+                    // Pass file to parent component
+                    if (onFileSelect) {
+                        onFileSelect(selectedFile);
+                    }
                     return 100;
                 }
                 return prev + 10;
@@ -63,6 +68,10 @@ export default function FileUploader() {
         setFile(null);
         setUploadProgress(0);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        // Notify parent that file is removed
+        if (onFileSelect) {
+            onFileSelect(null);
+        }
     };
 
     const handleCancel = () => {
@@ -172,12 +181,17 @@ export default function FileUploader() {
                         <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
                             <div className="flex items-center gap-4">
                                 <div className="bg-red-500 rounded-lg p-3 flex items-center justify-center min-w-[48px]">
-                                    <span className="text-white text-xs font-bold">PDF</span>
+                                    <span className="text-white text-xs font-bold">
+                                        {file.type.includes('pdf') ? 'PDF' : file.type.includes('zip') ? 'ZIP' : 'IMG'}
+                                    </span>
                                 </div>
 
                                 <div className="text-left">
                                     <p className="text-gray-800 font-medium">{file.name}</p>
                                     <p className="text-sm text-gray-500">{formatFileSize(file.size)} - uploaded</p>
+                                    {uploadedFileUrl && (
+                                        <p className="text-xs text-green-600 mt-1">✓ Saved to server</p>
+                                    )}
                                 </div>
                             </div>
 
@@ -202,4 +216,4 @@ export default function FileUploader() {
             </p>
         </div>
     );
-}
+};

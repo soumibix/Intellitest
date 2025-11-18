@@ -22,7 +22,6 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
           { label: "Electronics and Communication", value: "ECE" },
         ]}
       />
-
       <BorderLabelInput
         label="Test Category"
         name="testCategory"
@@ -36,7 +35,6 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
           { label: "Class Test", value: "Class Test" },
         ]}
       />
-
       <BorderLabelInput
         label="Semester"
         name="semester"
@@ -55,7 +53,6 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
           { label: "8th Semester", value: "8th Semester" },
         ]}
       />
-
       <BorderLabelInput
         label="Subject Name"
         name="subjectName"
@@ -68,10 +65,9 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
           { label: "Artificial Intelligence", value: "Artificial Intelligence" },
           { label: "Database Management System", value: "Database Management System" },
           { label: "Operating System", value: "Operating System" },
-          { label: "Computer Network", value: "Computer network" },
+          { label: "Computer Network", value: "Computer Network" },
         ]}
       />
-
       <BorderLabelInput
         label="Number of Questions"
         name="numberOfQuestions"
@@ -81,7 +77,6 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         onChange={handleChange}
         placeholder="Enter number of questions"
       />
-
       <BorderLabelInput
         label="Subject Code"
         name="subjectCode"
