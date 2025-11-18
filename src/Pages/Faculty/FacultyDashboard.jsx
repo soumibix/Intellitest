@@ -1,19 +1,69 @@
-import React, { useState } from "react";
-import { User, ArrowRight, LockKeyhole } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { User, ArrowRight, LockKeyhole, Unlock } from "lucide-react";
 import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
+import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
+import { useHttp } from "../../Hooks/useHttps";
 
 const FacultyDashboard = () => {
+  const httpHook = useHttp();
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const token= sessionStorage.getItem('token');
+  
+  // Get user data from sessionStorage
+  const userDataStr = sessionStorage.getItem('user');
+  const userData = userDataStr ? JSON.parse(userDataStr) : null;
+  const facultyId = userData?._id;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    mobile: "",
-    institution: "",
+    campus: "",
     department: "",
     designation: "",
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+
+  // Fetch profile data on component mount
+  useEffect(() => {
+    if (facultyId) {
+      fetchProfileData();
+    }
+  }, [facultyId]);
+
+  const fetchProfileData = async () => {
+    setLoading(true);
+    try {
+      const response = await facultyAuthAPI.getProfile(httpHook, token, facultyId);
+
+      if (response.success && response.data) {
+        const profileData = response.data;
+
+        // Update form data with fetched profile
+        setFormData({
+          name: profileData.name || "",
+          email: profileData.email || "",
+          campus: profileData.campus || "",
+          department: profileData.department || "",
+          designation: profileData.designation || "",
+        });
+
+        // Check if profile is complete
+        const isComplete = 
+          profileData.campus && 
+          profileData.department && 
+          profileData.designation;
+        setIsProfileComplete(isComplete);
+      }
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      alert("Failed to load profile data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
@@ -22,45 +72,95 @@ const FacultyDashboard = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    // Validate if all fields are filled
-    const allFieldsFilled = Object.values(formData).every(
-      (value) => value.trim() !== ""
+  const handleSubmit = async () => {
+    // Validate if required fields are filled
+    const requiredFields = ['campus', 'department', 'designation'];
+    const allFieldsFilled = requiredFields.every(
+      (field) => formData[field].trim() !== ""
     );
 
-    if (allFieldsFilled) {
-      setIsProfileComplete(true);
-      alert("Profile submitted successfully!");
-    } else {
-      alert("Please fill all fields");
+    if (!allFieldsFilled) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // Prepare data for API
+      const profileData = {
+        campus: formData.campus,
+        department: formData.department,
+        designation: formData.designation,
+      };
+
+      const response = await facultyAuthAPI.updateProfile(
+        httpHook,
+        token,
+        facultyId,
+        profileData
+      );
+
+      if (response.success) {
+        alert("Profile updated successfully!");
+        
+        // Update profile completion status
+        setIsProfileComplete(true);
+        
+        // Update sessionStorage with new data
+        if (response.data) {
+          sessionStorage.setItem('user', JSON.stringify(response.data));
+        }
+      } else {
+        alert(response.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating profile");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const institutionOptions =  [
-    { value: "", label: "College Campus" },
-    { value: "college1", label: "IEM, Salt Lake" },
-    { value: "college2", label: "IEM, Newtown" },
-    { value: "college3", label: "IEM, Jaipur" },
+  const campusOptions = [
+    { value: "", label: "Select Campus" },
+    { value: "IEM Salt Lake", label: "IEM SaltLake" },
+    { value: "IEM Newtown", label: "IEM Newtown" },
+    { value: "UEM Jaipur", label: "UEM Jaipur" },
   ];
 
+  const departmentOptions = [
+    { value: "", label: "Select Department" },
+    { value: "Civil Engineering", label: "Civil Engineering" },
+    { value: "Mechanical Engineering", label: "Mechanical Engineering" },
+    { value: "Electrical Engineering", label: "Electrical Engineering" },
+    { value: "Computer Science", label: "Computer Science" },
+    { value: "CSE", label: "CSE" },
+  ];
 
   const designationOptions = [
-    { value: "", label: "Your Designation" },
-    { value: "professor", label: "Professor" },
-    { value: "associateProfessor", label: "Associate Professor" },
-    { value: "assistantProfessor", label: "Assistant Professor" },
-    { value: "lecturer", label: "Lecturer" },
-    { value: "instructor", label: "Instructor" }
+    { value: "", label: "Select Designation" },
+    { value: "Professor", label: "Professor" },
+    { value: "Associate Professor", label: "Associate Professor" },
+    { value: "Assistant Professor", label: "Assistant Professor" },
+    { value: "Lecturer", label: "Lecturer" },
+    { value: "Teaching Assistant", label: "Teaching Assistant" },
   ];
 
-
-
-
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative h-full">
+    <div className="relative">
       <div className="mx-4 sm:mx-6 lg:mx-8 flex flex-col justify-between min-h-screen">
-        {/* Student Details Card */}
+        {/* Faculty Details Card */}
         <div className="p-4 sm:p-6 lg:p-8">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
@@ -71,15 +171,16 @@ const FacultyDashboard = () => {
           </div>
 
           {/* Form Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-20">
-            {/* Row 1 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* Row 1 - Name and Email (disabled, from signup) */}
             <Input
               type="text"
               label="Name"
-              placeholder="Fullname Lastname"
+              placeholder="Firstname Lastname"
               value={formData.name}
               onChange={handleChange("name")}
               size="md"
+              disabled={true}
             />
             <Input
               type="email"
@@ -88,92 +189,65 @@ const FacultyDashboard = () => {
               value={formData.email}
               onChange={handleChange("email")}
               size="md"
-            />
-            <Input
-              type="tel"
-              label="Mobile Number"
-              placeholder="+91 9874563210"
-              value={formData.mobile}
-              onChange={handleChange("mobile")}
-              size="md"
+              disabled={true}
             />
 
-            {/* Row 2 */}
+            {/* Row 2 - Campus, Department, Designation */}
             <Input
               type="dropdown"
-              label="Institution Name"
-              placeholder="College Name"
-              value={formData.institution}
-              onChange={handleChange("institution")}
-              options={institutionOptions}
+              label="Campus"
+              placeholder="Select Campus"
+              value={formData.campus}
+              onChange={handleChange("campus")}
+              options={campusOptions}
               size="md"
             />
             <Input
               type="dropdown"
               label="Department"
-              placeholder="Civil Engineering"
+              placeholder="Select Department"
               value={formData.department}
               onChange={handleChange("department")}
-              options={designationOptions}
+              options={departmentOptions}
               size="md"
             />
             <Input
               type="dropdown"
               label="Designation"
-              placeholder="Your Designation"
+              placeholder="Select Designation"
               value={formData.designation}
               onChange={handleChange("designation")}
               options={designationOptions}
               size="md"
             />
-
-            {/* Row 3 */}
-            {/* <Input
-              type="text"
-              label="Enrollment Number"
-              placeholder="ABC123456789"
-              value={formData.enrollmentNumber}
-              onChange={handleChange("enrollmentNumber")}
-              size="md"
-            />
-            <Input
-              type="dropdown"
-              label="Section"
-              placeholder="Section A"
-              value={formData.section}
-              onChange={handleChange("section")}
-              options={sectionOptions}
-              size="md"
-            />
-            <Input
-              type="text"
-              label="Roll Number"
-              placeholder="12345"
-              value={formData.rollNumber}
-              onChange={handleChange("rollNumber")}
-              size="md"
-            /> */}
           </div>
 
           {/* Submit Button */}
           <div className="flex justify-center mt-6 sm:mt-8">
             <Button
-              text="Submit"
+              text={
+                submitting
+                  ? "Submitting..."
+                  : isProfileComplete
+                    ? "Update"
+                    : "Submit"
+              }
               color="[#631891]"
               padding="py-3 sm:py-4"
               width="w-32 sm:w-40"
               icon={<ArrowRight size={18} />}
               iconPosition="right"
               onClick={handleSubmit}
+              disabled={submitting}
             />
           </div>
         </div>
 
-        {/* Unlock Tests Card */}
-        {!isProfileComplete && (
+        {/* Unlock Features Card or Unlocked Message */}
+        {!isProfileComplete ? (
           <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mt-8 sm:mt-10 lg:mt-12 px-12 bottom-0">
             <div
-              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl "
+              className="relative p-6 sm:p-8 lg:p-12 text-center w-full rounded-t-3xl sm:rounded-t-4xl"
               style={{
                 background: "linear-gradient(to bottom, #631891, #1D072B)",
               }}
@@ -183,7 +257,7 @@ const FacultyDashboard = () => {
                 <span
                   className="font-extrabold text-transparent bg-clip-text select-none translate-y-0"
                   style={{
-                    fontSize: "15vw", // scales with screen width
+                    fontSize: "15vw",
                     lineHeight: 1,
                     backgroundImage: "linear-gradient(to bottom, #59158100, #6D209A)",
                     backgroundSize: "100% 100%",
@@ -191,7 +265,6 @@ const FacultyDashboard = () => {
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     whiteSpace: "nowrap",
-                    
                   }}
                 >
                   IntelliTest
@@ -199,12 +272,12 @@ const FacultyDashboard = () => {
               </div>
 
               {/* Foreground content */}
-              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-5 lg:top-20 md:top-10  justify-center z-10">
+              <div className="absolute flex-col left-1/2 transform -translate-x-1/2 top-5 lg:top-20 md:top-10 justify-center z-10">
                 <p className="text-[#DEA7FF] text-base sm:text-xl lg:text-2xl font-semibold mb-2">
                   Complete Your Profile to
                 </p>
                 <h3 className="text-white text-lg sm:text-xl lg:text-2xl font-bold tracking-wide">
-                  Unlock Tests
+                  Unlock All Features
                 </h3>
               </div>
 
@@ -216,36 +289,21 @@ const FacultyDashboard = () => {
               </div>
             </div>
           </div>
-        )}
-
-
-
-
-        {/* Success Message */}
-        {isProfileComplete && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6 text-center mt-6 sm:mt-8">
-            <div className="flex justify-center mb-3">
-              <div className="bg-green-100 rounded-full p-2 sm:p-3">
-                <svg
-                  className="w-6 h-6 sm:w-8 sm:h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+        ) : (
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg p-6 sm:p-8 text-center mt-6 sm:mt-8 shadow-lg">
+            <div className="flex justify-center mb-4">
+              <div className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-full p-3 sm:p-4 shadow-lg">
+                <Unlock className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
               </div>
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold text-green-800 mb-2">
+            <h3 className="text-xl sm:text-2xl font-bold text-green-800 mb-2">
               Profile Complete!
             </h3>
-            <p className="text-sm sm:text-base text-green-700">
-              You can now access all available tests
+            <p className="text-base sm:text-lg text-green-700 font-medium">
+              All features are now unlocked
+            </p>
+            <p className="text-sm sm:text-base text-green-600 mt-2">
+              You can now access all faculty features and tools
             </p>
           </div>
         )}
