@@ -56,8 +56,8 @@ const GeneratedQA = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-6 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 sm:p-6 md:p-8">
+      <div className="mx-auto">
         
         <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
           <div className="text-2xl sm:text-3xl font-semibold pb-5">
