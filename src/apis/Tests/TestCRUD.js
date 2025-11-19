@@ -2,6 +2,71 @@
 import { API_ENDPOINTS } from "../../Config/config";
 
 export const TestAPI = {
+
+  fetchTests: async (httpHook, token, queryParams = {}) => {
+    try {
+      // Build query string from params
+      const params = new URLSearchParams();
+      
+      if (queryParams.page) params.append('page', queryParams.page);
+      if (queryParams.limit) params.append('limit', queryParams.limit);
+      if (queryParams.id) params.append('id', queryParams.id);
+      if (queryParams.status) params.append('status', queryParams.status);
+      if (queryParams.search) params.append('search', queryParams.search);
+      
+      const queryString = params.toString();
+      const endpoint = queryString 
+        ? `${API_ENDPOINTS.GET_TESTS}?${queryString}`
+        : API_ENDPOINTS.GET_TESTS;
+      
+      const response = await httpHook.getReq(
+        endpoint,
+        'GET',
+        null,
+        { Authorization: `Bearer ${token}` }
+      );
+      
+      return {
+        success: true,
+        data: response.data,
+        total: response.total,
+        page: response.page,
+        limit: response.limit,
+      };
+    } catch (error) {
+      console.error('Error fetching tests:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to fetch tests',
+        data: [],
+      };
+    }
+  },
+
+  // Fetch single test by ID
+  fetchTestById: async (httpHook, testId, token) => {
+    try {
+      const response = await httpHook.getReq(
+        `${API_ENDPOINTS.GET_TESTS}?id=${testId}`,
+        'GET',
+        null,
+        { Authorization: `Bearer ${token}` }
+      );
+      
+      return {
+        success: true,
+        data: response.data,
+      };
+    } catch (error) {
+      console.error('Error fetching test by ID:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to fetch test',
+        data: null,
+      };
+    }
+  },
+
   // 1️⃣ Create Test Step #1 → Add Test Details
   addTest: async (httpHook, testData, token) => {
     try {

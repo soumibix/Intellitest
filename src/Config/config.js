@@ -35,9 +35,17 @@ export const API_ENDPOINTS = {
   TEST_GET: "test/testData",
   TEST_GET_BY_ID: (id) => `test/testData?id=${id}`,
   TEST_UPDATE: (id) => `test/updateTestData/${id}`,
-  TEST_UPDATE_QUESTION: (testId, questionId) => 
+  TEST_UPDATE_QUESTION: (testId, questionId) =>
     `test/updateTestData/${testId}?action=update&questionId=${questionId}`,
   TEST_DELETE: (id) => `test/deleteTest/${id}`,
+  GET_TESTS: 'test/testData',
+
+  // With query parameters (these will be constructed dynamically)
+  // GET /test/testData?page=1&limit=10
+  // GET /test/testData?id=691c29b0588288e4044b78af
+  // GET /test/testData?status=upcoming
+  // GET /test/testData?search=CSE
+  // GET /test/testData?status=upcoming&search=CSE&page=2&limit=5
 };
 
 export default {

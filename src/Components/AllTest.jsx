@@ -1,232 +1,106 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, SlidersHorizontal, X, ArrowRight } from "lucide-react";
 import TestCard from "../Components/TestCard";
+import { TestAPI } from "../apis/Tests/TestCRUD";
+import { useHttp } from "../Hooks/useHttps";
+import { useAuth } from "../AppRouter";
 
-function AllTest({ heading="All Tests", userType='user', allTests = 
-  [
-  {
-    id: 1,
-    status: "ongoing",
-    testData: {
-      timeRemaining: "58:07 mins remaining",
-      title: "Machine Learning Mid-Sem Test",
-      questions: 30,
-      marks: 60,
-      duration: "1 hour",
-      department: "CST",
-      semester: "05",
-      createdBy: "Saurabh Kumbhar",
-      createdDate: "Sept 5 04:25",
-      avatarSeed: "Saurabh",
-    },
-    month: "September",
-  },
-  {
-    id: 2,
-    status: "upcoming",
-    testData: {
-      dateTime: "Nov 15 • 2:00 PM",
-      title: "Data Structures Final Exam",
-      questions: 50,
-      marks: 100,
-      duration: "2 hours",
-      department: "CST",
-      semester: "03",
-      createdBy: "Priya Sharma",
-      createdDate: "Oct 20 10:15",
-      avatarSeed: "Priya",
-    },
-    month: "November",
-  },
-  {
-    id: 3,
-    status: "completed",
-    testData: {
-      dateTime: "Oct 10 • 10:00 AM",
-      title: "Database Management Systems Quiz",
-      questions: 20,
-      marks: 40,
-      duration: "45 mins",
-      department: "CST",
-      semester: "04",
-      createdBy: "Rahul Verma",
-      createdDate: "Sept 30 14:20",
-      avatarSeed: "Rahul",
-      marksObtained: 52,
-      totalMarks: 60,
-      timeTaken: "54 minutes",
-      accuracy: "87%",
-    },
-    month: "October",
-  },
-  {
-    id: 4,
-    status: "upcoming",
-    testData: {
-      dateTime: "Nov 20 • 11:00 AM",
-      title: "Computer Networks Test",
-      questions: 40,
-      marks: 80,
-      duration: "1.5 hours",
-      department: "CST",
-      semester: "05",
-      createdBy: "Anjali Singh",
-      createdDate: "Nov 1 09:00",
-      avatarSeed: "Anjali",
-    },
-    month: "November",
-  },
-  {
-    id: 5,
-    status: "upcoming",
-    testData: {
-      dateTime: "Nov 20 • 11:00 AM",
-      title: "Computer Networks Test",
-      questions: 40,
-      marks: 80,
-      duration: "1.5 hours",
-      department: "CST",
-      semester: "05",
-      createdBy: "Anjali Singh",
-      createdDate: "Nov 1 09:00",
-      avatarSeed: "Anjali",
-    },
-    month: "November",
-  },
-  {
-    id: 6,
-    status: "completed",
-    testData: {
-      dateTime: "Oct 25 • 3:00 PM",
-      title: "Operating Systems Mid-Term",
-      questions: 35,
-      marks: 70,
-      duration: "1.5 hours",
-      department: "CST",
-      semester: "05",
-      createdBy: "Saurabh Kumbhar",
-      createdDate: "Oct 15 11:30",
-      avatarSeed: "Saurabh",
-      marksObtained: 45,
-      totalMarks: 70,
-      timeTaken: "1 hour 20 mins",
-      accuracy: "64%",
-    },
-    month: "October",
-  },
-  {
-    id: 7,
-    status: "completed",
-    testData: {
-      dateTime: "Oct 25 • 3:00 PM",
-      title: "Operating Systems Mid-Term",
-      questions: 35,
-      marks: 70,
-      duration: "1.5 hours",
-      department: "CST",
-      semester: "05",
-      createdBy: "Saurabh Kumbhar",
-      createdDate: "Oct 15 11:30",
-      avatarSeed: "Saurabh",
-      marksObtained: 45,
-      totalMarks: 70,
-      timeTaken: "1 hour 20 mins",
-      accuracy: "64%",
-    },
-    month: "October",
-  },
-], filter = true, showWrap = false }) {
+function AllTest({ 
+  heading = "All Tests", 
+  userType = 'user', 
+  allTests = [], 
+  filter = true, 
+  showWrap = false 
+}) {
   const navigate = useNavigate();
+  const httpHook = useHttp();
+  const { token } = useAuth();
+  
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("All");
+  const [tests, setTests] = useState(allTests);
+  const [loading, setLoading] = useState(false);
+  
   const dropdownRef = useRef(null);
+  const debounceTimerRef = useRef(null);
 
-  console.log("AllTest-userType: ",userType)
+  // Fetch tests from API
+  const fetchTests = useCallback(async (searchTerm = "", status = "all") => {
+    setLoading(true);
+    try {
+      const queryParams = {
+        page: 1,
+        limit: showWrap ? 5 : 100,
+        ...(status !== "all" && { status }),
+        ...(searchTerm.trim() && { search: searchTerm.trim() })
+      };
 
-  // Close dropdown when clicking outside
+      const response = await TestAPI.fetchTests(httpHook, token, queryParams);
+      setTests(response.success ? response.data || [] : []);
+    } catch (error) {
+      console.error('Error fetching tests:', error);
+      setTests([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [httpHook, token, showWrap]);
+
+  // Initial fetch
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    if (allTests?.length > 0) {
+      setTests(allTests);
+    } else {
+      fetchTests(searchQuery, activeFilter);
+    }
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (allTests?.length > 0) return;
+
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    
+    debounceTimerRef.current = setTimeout(() => {
+      fetchTests(searchQuery, activeFilter);
+    }, 500);
+
+    return () => clearTimeout(debounceTimerRef.current);
+  }, [searchQuery, activeFilter, fetchTests, allTests]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowMonthDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const months = ["All", "January", "February", "March", "April", "May", "June", 
+                  "July", "August", "September", "October", "November", "December"];
 
+  // Filter tests by month
+  const filteredTests = tests.filter(test => 
+    selectedMonth === "All" || test.month === selectedMonth
+  );
 
-  const months = [
-    "All",
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  // Filter tests based on active filter
-  const filteredTests = allTests.filter((test) => {
-    const matchesStatus =
-      activeFilter === "all" || test.status === activeFilter;
-    const matchesSearch = test.testData.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesMonth =
-      selectedMonth === "All" || test.month === selectedMonth;
-    return matchesStatus && matchesSearch && matchesMonth;
-  });
-
-  // Limit to 5 tests when "View All" is active
+  // Display limited tests if showWrap is true
   const displayTests = showWrap ? filteredTests.slice(0, 5) : filteredTests;
-  const hasMoreTests = activeFilter === "all" && filteredTests.length > 5;
+  const hasMoreTests = showWrap && filteredTests.length > 5;
 
-  // Get suggestions for search
-  const suggestions =
-    searchQuery.length > 0
-      ? allTests
-        .filter((test) =>
-          test.testData.title
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase())
-        )
-        .map((test) => test.testData.title)
+  // Search suggestions
+  const suggestions = searchQuery.length > 0
+    ? tests
+        .filter(test => test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase()))
+        .map(test => test.subjectName)
+        .filter(Boolean)
         .slice(0, 5)
-      : [];
-
-  // Handler functions
-  const handleStartTest = (testId) => {
-    console.log("Starting test:", testId);
-    // Add your start test logic here
-  };
-
-  const handleViewReport = (testId) => {
-    console.log("Viewing report for test:", testId);
-    // Add your view report logic here
-  };
-
-  const handleEditTest = (testId) => {
-    console.log("Editing test:", testId);
-    // Add your edit test logic here
-  };
-
-  const handleViewMore = () => {
-    // Navigate to StudentPerformance page
-    navigate('/admin/student-performance');
-  };
+    : [];
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -247,7 +121,6 @@ function AllTest({ heading="All Tests", userType='user', allTests =
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-2.5 sm:py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
             />
-            {/* Search Suggestions */}
             {suggestions.length > 0 && (
               <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-10">
                 {suggestions.map((suggestion, index) => (
@@ -264,130 +137,110 @@ function AllTest({ heading="All Tests", userType='user', allTests =
           </div>
         </div>
 
-        {/* Filter Buttons and Filters */}
-        {filter && <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
-            <button
-              onClick={() => setActiveFilter("ongoing")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all flex items-center gap-2 whitespace-nowrap ${activeFilter === "ongoing"
-                  ? "bg-[#1A0B2E] text-white"
-                  : "bg-[#E9D5FF] text-[#6B21A8]"
-                }`}
-            >
-              Ongoing
-              {activeFilter === "ongoing" && (
-                <X className="w-3 h-3 sm:w-4 sm:h-4" />
-              )}
-            </button>
+        {/* Filter Buttons */}
+        {filter && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+              {["ongoing", "completed", "upcoming", "all"].map(filterType => (
+                <button
+                  key={filterType}
+                  onClick={() => setActiveFilter(filterType)}
+                  className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
+                    activeFilter === filterType
+                      ? "bg-[#1A0B2E] text-white"
+                      : "bg-[#E9D5FF] text-[#6B21A8]"
+                  }`}
+                >
+                  {filterType === "all" ? "View All" : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
+                  {activeFilter === filterType && filterType === "ongoing" && (
+                    <X className="inline-block w-3 h-3 sm:w-4 sm:h-4 ml-2" />
+                  )}
+                </button>
+              ))}
+            </div>
 
-            <button
-              onClick={() => setActiveFilter("completed")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${activeFilter === "completed"
-                  ? "bg-[#1A0B2E] text-white"
-                  : "bg-[#E9D5FF] text-[#6B21A8]"
-                }`}
-            >
-              Completed
-            </button>
+            {/* Filters Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowMonthDropdown(!showMonthDropdown)}
+                className="bg-[#1A0B2E] text-white px-4 sm:px-6 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2"
+              >
+                <SlidersHorizontal className="w-3 h-3 sm:w-4 sm:h-4" />
+                Filters
+              </button>
 
-            <button
-              onClick={() => setActiveFilter("upcoming")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${activeFilter === "upcoming"
-                  ? "bg-[#1A0B2E] text-white"
-                  : "bg-[#E9D5FF] text-[#6B21A8]"
-                }`}
-            >
-              Upcoming
-            </button>
-
-            <button
-              onClick={() => setActiveFilter("all")}
-              className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${activeFilter === "all"
-                  ? "bg-[#1A0B2E] text-white"
-                  : "bg-[#E9D5FF] text-[#6B21A8]"
-                }`}
-            >
-              View All
-            </button>
-          </div>
-
-          {/* Filters Dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button 
-              onClick={() => setShowMonthDropdown(!showMonthDropdown)}
-              className="bg-[#1A0B2E] text-white px-4 sm:px-6 py-2 rounded-full font-medium text-xs sm:text-sm flex items-center gap-2"
-            >
-              <SlidersHorizontal className="w-3 h-3 sm:w-4 sm:h-4" />
-              Filters
-            </button>
-
-            {showMonthDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-10 max-h-64 overflow-y-auto">
-                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
-                  Filter by Month
-                </div>
-                {months.map((month) => (
-                  <div
-                    key={month}
-                    onClick={() => setSelectedMonth(month)}
-                    className={`px-4 py-2 cursor-pointer text-sm ${selectedMonth === month
-                        ? "bg-purple-50 text-purple-700 font-medium"
-                        : "text-gray-700 hover:bg-gray-50"
-                      }`}
-                  >
-                    {month}
+              {showMonthDropdown && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-10 max-h-64 overflow-y-auto">
+                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">
+                    Filter by Month
                   </div>
+                  {months.map((month) => (
+                    <div
+                      key={month}
+                      onClick={() => setSelectedMonth(month)}
+                      className={`px-4 py-2 cursor-pointer text-sm ${
+                        selectedMonth === month
+                          ? "bg-purple-50 text-purple-700 font-medium"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {month}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Tests Grid */}
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="text-purple-600 text-lg">Loading tests...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+            {displayTests.length > 0 ? (
+              <>
+                {displayTests.map((test) => (
+                  <TestCard
+                    key={test._id}
+                    data={test}
+                    userType={userType}
+                    status={test.status}
+                    testData={test}
+                    onStartTest={() => console.log("Starting test:", test._id)}
+                    onViewReport={() => console.log("Viewing report:", test._id)}
+                    onEdit={() => console.log("Editing test:", test._id)}
+                  />
                 ))}
+
+                {/* View More Card */}
+                {hasMoreTests && (
+                  <button
+                    onClick={() => navigate('/admin/student-performance')}
+                    className="bg-[#000000d8] text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4 min-h-[280px] group relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-40"></div>
+                    <div className="relative z-10 text-center backdrop-blur-2xl">
+                      <h3 className="text-3xl font-bold mb-2">View More Tests</h3>
+                      <p className="text-[#fff] text-xl">
+                        {filteredTests.length - 5} more tests available
+                      </p>
+                    </div>
+                    <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">
+                      <ArrowRight className="w-6 h-6 cursor-pointer" />
+                    </div>
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="col-span-full text-center py-12 text-gray-500">
+                No tests found matching your filters
               </div>
             )}
           </div>
-        </div>}
-
-        {/* Tests Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-          {displayTests.length > 0 ? (
-            <>
-              {displayTests.map((test) => (
-                <TestCard
-                  key={test.id}
-                  data={test}
-                  userType={userType}
-                  status={test.status}
-                  testData={test.testData}
-                  onStartTest={() => handleStartTest(test.id)}
-                  onViewReport={() => handleViewReport(test.id)}
-                  onEdit={() => handleEditTest(test.id)}
-                />
-              ))}
-              
-              {/* View More Card */}
-              {hasMoreTests && showWrap && (
-                <button
-                  onClick={handleViewMore}
-                  className="bg-[#000000d8]  text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4 min-h-[280px] group relative overflow-hidden"
-                >
-                  {/* Matte sunlight effect overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-40"></div>
-                  
-                  <div className="relative z-10 text-center backdrop-blur-2xl">
-                    <h3 className="text-3xl font-bold mb-2">View More Tests</h3>
-                    <p className="text-[#fff] text-xl ">
-                      {filteredTests.length - 5} more tests available
-                    </p>
-                  </div>
-                  
-                  <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">
-                    <ArrowRight className="w-6 h-6 cursor-pointer" />
-                  </div>
-                </button>
-              )}
-            </>
-          ) : (
-            <div className="col-span-full text-center py-12 text-gray-500">
-              No tests found matching your filters
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
