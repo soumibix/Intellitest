@@ -5,7 +5,7 @@ import SignInImg from "../../assets/Authentication3.jpg";
 import { useNotification } from "../../Context/NotificationContext";
 import { adminAuthAPI } from "../../apis/auth/adminAuth";
 import { useAuth } from "../../Context/AuthContext";
-import { useHttp } from "../../hooks/useHttps";
+import { useHttp } from "../../Hooks/useHttps";
 
 export const AdminSignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
