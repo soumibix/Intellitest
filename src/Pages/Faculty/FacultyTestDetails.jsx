@@ -14,7 +14,6 @@ import { TestAPI } from "../../apis/Tests/TestCRUD";
 const STORAGE_KEY = "facultyTestProgress";
 
 const FacultyTestDetails = () => {
-  // Initialize state from localStorage if available
   const getInitialState = () => {
     try {
       const savedState = localStorage.getItem(STORAGE_KEY);
@@ -259,6 +258,7 @@ const FacultyTestDetails = () => {
 
         response = await TestAPI.saveQA(httpHook, testId, payload, token);
         if (response.success) {
+          setActiveStep(nextStep);
           console.log("Question and Answer PDFs saved successfully");
           alert("Question and Answer files saved successfully!");
         } else {
@@ -268,15 +268,15 @@ const FacultyTestDetails = () => {
       } else if (questionFileUrl) {
         // Only question file uploaded
         const payload = {
-          questionPdfUrl: questionFileUrl,
-          answerPdfUrl: ""
+          pdfUrl: questionFileUrl
         };
 
-        response = await TestAPI.saveQA(httpHook, testId, payload, token);
+        response = await TestAPI.generateAnswer(httpHook, testId, payload, token);
         if (response.success) {
-          console.log("Question PDF saved successfully");
+          console.log("answer generated and saved successfully");
+          setActiveStep(nextStep);
         } else {
-          console.error("Failed to save question:", response.message);
+          console.error("Failed to generated answers:", response.message);
         }
       }
       
@@ -286,11 +286,11 @@ const FacultyTestDetails = () => {
         "Answer:",
         answerFileUrl
       );
-      setActiveStep(nextStep);
     }
     // Other steps
     else {
-      setActiveStep(nextStep);
+      // setActiveStep(nextStep);
+      alert("submit questions and answers");
     }
   };
 
@@ -396,6 +396,8 @@ const FacultyTestDetails = () => {
             setAnswerFile={setAnswerFile}
             questionFileUrl={questionFileUrl}
             answerFileUrl={answerFileUrl}
+            setQuestionFileUrl={setQuestionFileUrl}
+            setAnswerFileUrl={setAnswerFileUrl}
             testId={testId}
           />
         );

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, X, Check, Trash2 } from 'lucide-react';
 
 // FileUploader Component
-export default function  FileUploader ({ onFileSelect, uploadedFileUrl }) {
+export default function  FileUploader ({ onFileSelect, uploadedFileUrl, setFileUrl }) {
     const [file, setFile] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -66,6 +66,7 @@ export default function  FileUploader ({ onFileSelect, uploadedFileUrl }) {
 
     const handleDelete = () => {
         setFile(null);
+        setFileUrl('');
         setUploadProgress(0);
         if (fileInputRef.current) fileInputRef.current.value = '';
         // Notify parent that file is removed
@@ -212,7 +213,7 @@ export default function  FileUploader ({ onFileSelect, uploadedFileUrl }) {
 
             </div>
             <p className="text-sm text-gray-500 pt-2">
-                Only support .jpg, .png and .svg and zip files. (Upto 25mb)
+                Only support .pdf files. (Upto 25mb)
             </p>
         </div>
     );

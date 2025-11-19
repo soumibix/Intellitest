@@ -12,6 +12,8 @@ export function FacultyUploadQuestions({
   setAnswerFile,
   questionFileUrl,
   answerFileUrl,
+  setQuestionFileUrl,
+  setAnswerFileUrl,
   testId
 }) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -76,28 +78,29 @@ export function FacultyUploadQuestions({
         <FileUploader
           onFileSelect={setQuestionFile}
           uploadedFileUrl={questionFileUrl}
+          setFileUrl={setQuestionFileUrl}
         />
       </div>
 
       {/* Answer Paper Section - Split Layout */}
       <div>
         <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-          Upload Exam Answer Paper (Optional)
+          Upload Exam Answer Paper (Optional) OR, Click Save & Continue to Generate AI answers
         </h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="w-full gap-6">
           {/* Left Side - File Uploader */}
-          <div className="flex flex-col">
             <FileUploader
               onFileSelect={setAnswerFile}
               uploadedFileUrl={answerFileUrl}
+              setFileUrl={setAnswerFileUrl}
             />
-          </div>
-
+          {/* <div className="flex flex-col">
+          </div> */}
+            {/* <div>OR,</div> */}
           {/* Right Side - Generate Button */}
-          <div className="flex flex-col justify-center items-center p-8 bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50 rounded-lg border-2 border-dashed border-purple-200 hover:border-purple-400 transition-all duration-300">
+          {/* <div className="flex flex-col justify-center items-center p-8 bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50 rounded-lg border-2 border-dashed border-purple-200 hover:border-purple-400 transition-all duration-300">
             <div className="text-center space-y-6">
-              {/* Icon */}
               <div className="relative inline-block">
                 <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl shadow-lg">
                   <Wand2 className="w-10 h-10 text-white" strokeWidth={2} />
@@ -107,7 +110,6 @@ export function FacultyUploadQuestions({
                 </div>
               </div>
 
-              {/* Text */}
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-gray-800">
                   AI Answer Generation
@@ -117,7 +119,6 @@ export function FacultyUploadQuestions({
                 </p>
               </div>
 
-              {/* Generate Button */}
               <button
                 onClick={handleGenerateAnswers}
                 disabled={!questionFileUrl || isGenerating}
@@ -146,28 +147,27 @@ export function FacultyUploadQuestions({
                 )}
               </button>
 
-              {/* Helper Text */}
               {!questionFileUrl && (
                 <p className="text-xs text-gray-500 italic">
                   Upload a question paper first to enable AI generation
                 </p>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Info Box */}
-        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        {/* <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-800">
             <span className="font-semibold">💡 Tip:</span> You can either upload
             your own answer key or use our AI to generate one automatically. The
             AI-generated answers will be saved and can be reviewed later.
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* Generated Questions Display */}
-      {generatedQuestions.length > 0 && (
+      {/* {generatedQuestions.length > 0 && (
         <div className="mt-8">
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 rounded-t-lg">
             <h3 className="text-xl font-bold flex items-center gap-2">
@@ -183,7 +183,6 @@ export function FacultyUploadQuestions({
                   key={q._id || index} 
                   className="border-b border-gray-200 last:border-b-0"
                 >
-                  {/* Question Header */}
                   <div 
                     className="flex items-start justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
                     onClick={() => toggleQuestion(index)}
@@ -208,7 +207,6 @@ export function FacultyUploadQuestions({
                     </button>
                   </div>
 
-                  {/* Answer Content (Expandable) */}
                   {expandedQuestions[index] && (
                     <div className="px-4 pb-4 bg-gray-50">
                       <div className="ml-11 p-4 bg-white rounded-lg border border-gray-200">
@@ -231,7 +229,6 @@ export function FacultyUploadQuestions({
             </div>
           </div>
 
-          {/* Summary Footer */}
           <div className="bg-gray-50 border border-gray-200 border-t-0 rounded-b-lg p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-600">
@@ -243,7 +240,7 @@ export function FacultyUploadQuestions({
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

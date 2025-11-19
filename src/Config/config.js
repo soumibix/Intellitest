@@ -44,7 +44,7 @@ export const API_ENDPOINTS = {
   TEST_SAVE_QA: (id) => `test/saveQA/${id}`, // POST - Save question & answer PDFs
   TEST_GET: "test/testData", // GET - Get list of tests with filters
   TEST_GET_BY_ID: (id) => `test/testData?id=${id}`, // GET - Get single test by ID
-  TEST_UPDATE: (id) => `test/updateTest/${id}`, // PATCH - Update test details
+  TEST_UPDATE: (id) => `test/updateTestData/${id}`, // PATCH - Update test details
   TEST_UPDATE_SCORE: (tid, qid) =>
     `test/update/${tid}/question/${qid}/score`, // PATCH - Update question score
   TEST_DELETE: (id) => `test/deleteTest/${id}`, // DELETE - Delete test

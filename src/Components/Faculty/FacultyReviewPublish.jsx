@@ -9,7 +9,6 @@ const FacultyReviewPublish = () => {
       {/* <ReviewPublishCard /> */}
       <FinalPreviewPublish />
       <GeneratedQA />
-
     </div>
   );
 };
