@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
-import { useHttp } from "../../Hooks/useHttps"; 
+import { useHttp } from "../../hooks/useHttps"; 
 import { studentAuthAPI } from "../../apis/auth/studentAuth";
 import { useAuth } from "../../AppRouter";
 

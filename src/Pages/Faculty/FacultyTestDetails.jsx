@@ -6,7 +6,7 @@ import { FacultyProgressiveStepper } from "../../Components/Faculty/FacultyProgr
 import { FacultyAddTestData } from "../../Components/Faculty/FacultyAddTestData";
 import AllTest from "../../Components/AllTest";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useHttp } from "../../Hooks/useHttps";
+import { useHttp } from "../../hooks/useHttps";
 import { useAuth } from "../../AppRouter";
 import ConfirmationModal from "../../utils/ConfirmationModal";
 import { TestAPI } from "../../apis/Tests/TestCRUD";

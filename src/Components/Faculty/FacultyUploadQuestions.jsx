@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import FileUploader from "../common/FileUploader";
 import { Sparkles, Loader2, Wand2, ChevronDown, ChevronUp } from "lucide-react";
 import { TestAPI } from "../../apis/Tests/TestCRUD";
-import { useHttp } from "../../Hooks/useHttps";
+import { useHttp } from "../../hooks/useHttps";
 import { useAuth } from "../../AppRouter";
 
 export function FacultyUploadQuestions({

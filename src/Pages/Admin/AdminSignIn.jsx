@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
-import { useNotification } from "../../Context/NotificationContext";
+import { useNotification } from "../../context/NotificationContext";
 import { adminAuthAPI } from "../../apis/auth/adminAuth";
 import { useAuth } from "../../context/AuthContext";
-import { useHttp } from "../../Hooks/useHttps";
+import { useHttp } from "../../hooks/useHttps";
 
 export const AdminSignIn = () => {
   const [isLoading, setIsLoading] = useState(false);

@@ -37,11 +37,11 @@ import UserOTPVerification from "./Pages/User/UserOTPVerification";
 import UserResetNewPassword from "./Pages/User/UserResetNewPassword";
 
 // Context Providers
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { NotificationProvider } from "./Context/NotificationContext";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import { NotificationProvider } from "./context/NotificationContext";
 
 // Profile Completion Guard
-import ProfileCompletionGuard from "./components/ProfileCompletionGuard";
+import ProfileCompletionGuard from "./Components/ProfileCompletionGuard.jsx";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production

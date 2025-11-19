@@ -4,7 +4,7 @@ import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 import Button from "../../Components/common/Button";
 import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
-import { useHttp } from "../../Hooks/useHttps";
+import { useHttp } from "../../hooks/useHttps";
 
 function OTPVerification() {
   const navigate = useNavigate();
