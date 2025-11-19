@@ -155,11 +155,11 @@ export const FacultySignIn = () => {
       </div>
       
       {/* General error message */}
-      {errors.general && (
+      {/* {errors.general && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{errors.general}</p>
         </div>
-      )}
+      )} */}
     </>
   );
 
