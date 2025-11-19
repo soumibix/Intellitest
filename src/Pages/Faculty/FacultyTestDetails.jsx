@@ -163,7 +163,7 @@ const FacultyTestDetails = () => {
       }
       console.log("Files uploaded - Question:", questionFileUrl, "Answer:", answerFileUrl);
     } else {
-      alert("submit questions and answers");
+      setActiveStep(nextStep);
     }
   };
 
