@@ -105,7 +105,7 @@ export const TestAPI = {
     }
   },
 
-  // 8️⃣ Update Test
+  // 8️⃣ Update Test (Normal update - title, description, etc.)
   updateTest: async (httpHook, id, updateData, token) => {
     try {
       const res = await httpHook.patchReq(
@@ -120,17 +120,17 @@ export const TestAPI = {
     }
   },
 
-  // 9️⃣ Update Score of One Question
-  updateQuestionScore: async (httpHook, testId, questionId, body, token) => {
+  // 9️⃣ Update Specific Question (answer, score, or both)
+  updateQuestion: async (httpHook, testId, questionId, updateData, token) => {
     try {
       const res = await httpHook.patchReq(
-        API_ENDPOINTS.TEST_UPDATE_SCORE(testId, questionId),
+        API_ENDPOINTS.TEST_UPDATE_QUESTION(testId, questionId),
         token,
-        body
+        updateData
       );
       return res;
     } catch (err) {
-      console.log("Update question score error:", err);
+      console.log("Update question error:", err);
       return { success: false, message: err.message };
     }
   },

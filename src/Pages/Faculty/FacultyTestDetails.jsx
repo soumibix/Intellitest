@@ -62,6 +62,7 @@ const FacultyTestDetails = () => {
   const [answerFile, setAnswerFile] = useState(null);
   const [questionFileUrl, setQuestionFileUrl] = useState(initialState.questionFileUrl);
   const [answerFileUrl, setAnswerFileUrl] = useState(initialState.answerFileUrl);
+  const [testData, setTestData] = useState(null);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
@@ -259,6 +260,7 @@ const FacultyTestDetails = () => {
         response = await TestAPI.saveQA(httpHook, testId, payload, token);
         if (response.success) {
           setActiveStep(nextStep);
+          setTestData(response.updated);
           console.log("Question and Answer PDFs saved successfully");
           alert("Question and Answer files saved successfully!");
         } else {
@@ -273,6 +275,7 @@ const FacultyTestDetails = () => {
 
         response = await TestAPI.generateAnswer(httpHook, testId, payload, token);
         if (response.success) {
+          setTestData(response.updated);
           console.log("answer generated and saved successfully");
           setActiveStep(nextStep);
         } else {
@@ -343,6 +346,7 @@ const FacultyTestDetails = () => {
     setAnswerFile(null);
     setQuestionFileUrl("");
     setAnswerFileUrl("");
+    setTestData(null);
   };
 
   const handlePublish = async () => {
@@ -402,7 +406,11 @@ const FacultyTestDetails = () => {
           />
         );
       case 4:
-        return <FacultyReviewPublish />;
+        return <FacultyReviewPublish testData={testData}
+            testId={testId}
+            httpHook={httpHook}
+            token={token}
+            setTestData={setTestData}/>;
       default:
         return null;
     }
