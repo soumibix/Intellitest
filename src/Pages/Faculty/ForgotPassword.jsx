@@ -3,7 +3,7 @@ import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.jpg";
 import { useNavigate } from "react-router-dom";
 import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
-import { useHttp } from "../../hooks/useHttps";
+import { useHttp } from "../../Hooks/useHttps";
 
 export const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
