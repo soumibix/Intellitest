@@ -1,7 +1,7 @@
 // src/Hooks/useHttp.jsx
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useNotification } from "../context/NotificationContext";
+import { useNotification } from "../Context/NotificationContext";
 import { BASE_URL } from "../Config/config";
 
 export const useHttp = () => {
