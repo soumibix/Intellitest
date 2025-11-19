@@ -19,14 +19,14 @@ export const FacultyProgressiveStepper = ({ activeStep, onSaveAndContinue }) => 
     {
       id: 3,
       icon: Upload,
-      title: 'Upload Questions',
-      description: 'Import questions from your files.',
+      title: 'Upload Questions & Publish',
+      description: 'Import questions from your files & generate answers.',
     },
     {
       id: 4,
       icon: Send,
-      title: 'Review & Publish',
-      description: 'Final validation before publishing.',
+      title: 'Review & Update',
+      description: 'Review answers, and assign marks.',
     },
   ];
 
