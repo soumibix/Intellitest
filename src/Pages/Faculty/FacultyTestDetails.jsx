@@ -166,6 +166,7 @@ const FacultyTestDetails = () => {
       return testDate && startTime && endTime && duration;
     }
     if (step === 3) {
+      // Only require question file for step 3
       return questionFile && questionFileUrl;
     }
     return true;
@@ -236,12 +237,49 @@ const FacultyTestDetails = () => {
         alert("Failed to update schedule: " + response.message);
       }
     }
-    // Step 3: Upload Questions - Files already uploaded, just validate and move
+    // Step 3: Upload Questions - Files already uploaded, save Q&A if both exist
     else if (activeStep === 3) {
+      // Check if testId exists
+      if (!testId) {
+        alert("Test ID is missing. Please complete previous steps first.");
+        return;
+      }
+
       if (!validateStep(3)) {
         alert("Please upload the question paper");
         return;
       }
+
+      // If user has uploaded both question and answer files, save them
+      if (questionFileUrl && answerFileUrl) {
+        const payload = {
+          questionPdfUrl: questionFileUrl,
+          answerPdfUrl: answerFileUrl
+        };
+
+        response = await TestAPI.saveQA(httpHook, testId, payload, token);
+        if (response.success) {
+          console.log("Question and Answer PDFs saved successfully");
+          alert("Question and Answer files saved successfully!");
+        } else {
+          console.error("Failed to save Q&A:", response.message);
+          alert("Failed to save files: " + response.message);
+        }
+      } else if (questionFileUrl) {
+        // Only question file uploaded
+        const payload = {
+          questionPdfUrl: questionFileUrl,
+          answerPdfUrl: ""
+        };
+
+        response = await TestAPI.saveQA(httpHook, testId, payload, token);
+        if (response.success) {
+          console.log("Question PDF saved successfully");
+        } else {
+          console.error("Failed to save question:", response.message);
+        }
+      }
+      
       console.log(
         "Files uploaded - Question:",
         questionFileUrl,
@@ -308,16 +346,22 @@ const FacultyTestDetails = () => {
   };
 
   const handlePublish = async () => {
-    // Save Question & Answer URLs before publishing
-    if (testId && questionFileUrl) {
+    // Check if testId exists
+    if (!testId) {
+      alert("Test ID is missing. Please complete all previous steps.");
+      return;
+    }
+
+    // Save Question & Answer URLs before publishing (if not already saved)
+    if (questionFileUrl) {
       const payload = {
-        questionPaper: questionFileUrl,
-        answerKey: answerFileUrl || "", // Optional
+        questionPdfUrl: questionFileUrl,
+        answerPdfUrl: answerFileUrl || "", // Optional
       };
 
       const response = await TestAPI.saveQA(httpHook, testId, payload, token);
       if (response.success) {
-        alert("Test published successfully!");
+        alert("Test published successfully! 🎉");
         handleReset();
       } else {
         alert("Failed to publish test: " + response.message);
@@ -352,6 +396,7 @@ const FacultyTestDetails = () => {
             setAnswerFile={setAnswerFile}
             questionFileUrl={questionFileUrl}
             answerFileUrl={answerFileUrl}
+            testId={testId}
           />
         );
       case 4:

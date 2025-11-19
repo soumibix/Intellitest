@@ -1,4 +1,4 @@
-// src/apis/test/TestCRUD.js
+// src/apis/Tests/TestCRUD.js
 import { API_ENDPOINTS } from "../../Config/config";
 
 export const TestAPI = {
@@ -38,7 +38,8 @@ export const TestAPI = {
       const res = await httpHook.postReq(
         API_ENDPOINTS.FILE_UPLOAD,
         token,
-        formData, true
+        formData,
+        true // isFormData flag
       );
       return res;
     } catch (err) {
