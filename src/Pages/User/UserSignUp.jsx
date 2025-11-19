@@ -3,7 +3,7 @@ import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import { useNavigate } from "react-router-dom";
 import SignInImg from "../../assets/Authentication3.jpg";
 import { studentAuthAPI } from "../../apis/auth/studentAuth";
-import { useHttp } from "../../Hooks/useHttps";
+import { useHttp } from "../../hooks/useHttps";
 
 export const UserSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);

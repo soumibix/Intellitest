@@ -3,7 +3,7 @@ import { User, ArrowRight, LockKeyhole, Unlock } from "lucide-react";
 import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
 import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
-import { useHttp } from "../../Hooks/useHttps";
+import { useHttp } from "../../hooks/useHttps";
 
 const FacultyDashboard = () => {
   const httpHook = useHttp();

@@ -5,7 +5,7 @@ import { EditFacultyModal } from "../../utils/EditFacultyModal";
 import { ConfirmationModal } from "../../utils/ConfirmationModal";
 import Button from "../../Components/common/Button";
 import FacultySearchFilter from "../../Components/common/FacultySearchFilter";
-import { useHttp } from "../../Hooks/useHttps";
+import { useHttp } from "../../hooks/useHttps";
 import { useAuth } from "../../AppRouter";
 import { adminFacultyAPI } from "../../apis/auth/adminAuth";
 
