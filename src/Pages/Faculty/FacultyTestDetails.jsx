@@ -43,7 +43,6 @@ const FacultyTestDetails = () => {
   const httpHook = useHttp();
   const { loading } = httpHook;
 
-  // Fetch all tests when returning to step 0
   useEffect(() => {
     if (state.activeStep === 0) fetchAllTests();
   }, [state.activeStep]);
@@ -62,16 +61,17 @@ const FacultyTestDetails = () => {
     }
   };
 
-  // Save state to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      // Only save to localStorage if we're past step 0
+      if (state.activeStep > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
     } catch (error) {
       console.error("Error saving state:", error);
     }
   }, [state]);
 
-  // Upload files to server
   const handleUploadToServer = async (file, type) => {
     if (!file) return;
     const formData = new FormData();
@@ -91,24 +91,61 @@ const FacultyTestDetails = () => {
   useEffect(() => { if (files.question) handleUploadToServer(files.question, "question"); }, [files.question]);
   useEffect(() => { if (files.answer) handleUploadToServer(files.answer, "answer"); }, [files.answer]);
 
-  // Validation
   const validateStep = (step) => {
     if (step === 1) {
       const { department, semester, subjectName, subjectCode, testCategory, numberOfQuestions } = state.testFormData;
-      return department && semester && subjectName && subjectCode && testCategory && numberOfQuestions;
+      
+      return (
+        department?.trim() !== "" && 
+        semester?.trim() !== "" && 
+        subjectName?.trim() !== "" && 
+        subjectCode?.trim() !== "" && 
+        testCategory?.trim() !== "" && 
+        numberOfQuestions?.toString().trim() !== "" &&
+        parseInt(numberOfQuestions) > 0
+      );
     }
+    
     if (step === 2) {
       const { testDate, startTime, endTime, duration } = state.scheduleFormData;
-      return testDate && startTime && endTime && duration;
+      
+      return (
+        testDate?.trim() !== "" && 
+        startTime?.trim() !== "" && 
+        endTime?.trim() !== "" && 
+        duration?.toString().trim() !== "" &&
+        parseInt(duration) > 0
+      );
     }
-    if (step === 3) return files.question && state.questionFileUrl;
+    
+    if (step === 3) {
+      return files.question && state.questionFileUrl;
+    }
+    
     return true;
   };
 
-  // Save and continue
   const handleSaveAndContinue = async (nextStep) => {
     if (!validateStep(state.activeStep)) {
-      alert("Please fill all required fields");
+      let errorMsg = "Please fill all required fields";
+      
+      if (state.activeStep === 1) {
+        const missingFields = [];
+        const { department, semester, subjectName, subjectCode, testCategory, numberOfQuestions } = state.testFormData;
+        
+        if (!department?.trim()) missingFields.push("Department");
+        if (!semester?.trim()) missingFields.push("Semester");
+        if (!subjectName?.trim()) missingFields.push("Subject Name");
+        if (!subjectCode?.trim()) missingFields.push("Subject Code");
+        if (!testCategory?.trim()) missingFields.push("Test Category");
+        if (!numberOfQuestions || parseInt(numberOfQuestions) <= 0) missingFields.push("Number of Questions");
+        
+        if (missingFields.length > 0) {
+          errorMsg = `Please fill the following fields:\n${missingFields.join(", ")}`;
+        }
+      }
+      
+      alert(errorMsg);
       return;
     }
 
@@ -116,7 +153,10 @@ const FacultyTestDetails = () => {
     const { activeStep, testId, testFormData, scheduleFormData, questionFileUrl, answerFileUrl } = state;
 
     if (activeStep === 1) {
-      const payload = { ...testFormData, numberOfQuestions: testFormData.numberOfQuestions };
+      const payload = { 
+        ...testFormData, 
+        numberOfQuestions: parseInt(testFormData.numberOfQuestions) 
+      };
       
       if (!testId) {
         response = await TestAPI.addTest(httpHook, payload, token);
@@ -236,12 +276,22 @@ const FacultyTestDetails = () => {
       case 1: 
         return <FacultyAddTestData 
           formData={state.testFormData} 
-          setFormData={(data) => setState(prev => ({ ...prev, testFormData: data }))} 
+          setFormData={(updatedData) => {
+            setState(prev => ({ 
+              ...prev, 
+              testFormData: updatedData
+            }));
+          }} 
         />;
       case 2: 
         return <FacultyScheduleTest 
           formData={state.scheduleFormData} 
-          setFormData={(data) => setState(prev => ({ ...prev, scheduleFormData: data }))} 
+          setFormData={(updatedData) => {
+            setState(prev => ({ 
+              ...prev, 
+              scheduleFormData: updatedData
+            }));
+          }} 
         />;
       case 3: 
         return <FacultyUploadQuestions 

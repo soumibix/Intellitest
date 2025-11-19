@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 import BorderLabelInput from "../common/BorderLabelInput";
 
 export const FacultyAddTestData = ({ formData, setFormData }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Create new object with updated field
+    const updatedFormData = { 
+      ...formData, 
+      [name]: value 
+    };
+    // Pass the complete updated object
+    setFormData(updatedFormData);
   };
 
   return (
@@ -14,7 +20,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         name="department"
         type="select"
         required
-        value={formData.department}
+        value={formData.department || ""}
         onChange={handleChange}
         options={[
           { label: "Computer Science and Technology", value: "CSE" },
@@ -27,7 +33,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         name="testCategory"
         type="select"
         required
-        value={formData.testCategory}
+        value={formData.testCategory || ""}
         onChange={handleChange}
         options={[
           { label: "Midterm Examination", value: "Midterm Examination" },
@@ -40,7 +46,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         name="semester"
         type="select"
         required
-        value={formData.semester}
+        value={formData.semester || ""}
         onChange={handleChange}
         options={[
           { label: "1st Semester", value: "1st Semester" },
@@ -58,7 +64,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         name="subjectName"
         type="select"
         required
-        value={formData.subjectName}
+        value={formData.subjectName || ""}
         onChange={handleChange}
         options={[
           { label: "Machine Learning", value: "Machine Learning" },
@@ -73,7 +79,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         name="numberOfQuestions"
         type="number"
         required
-        value={formData.numberOfQuestions}
+        value={formData.numberOfQuestions || ""}
         onChange={handleChange}
         placeholder="Enter number of questions"
       />
@@ -82,7 +88,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         name="subjectCode"
         type="select"
         required
-        value={formData.subjectCode}
+        value={formData.subjectCode || ""}
         onChange={handleChange}
         options={[
           { label: "PCCS572", value: "PCCS572" },
