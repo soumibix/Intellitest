@@ -41,7 +41,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
 
 // Profile Completion Guard
-import ProfileCompletionGuard from "./Components/ProfileCompletionGuard";
+import ProfileCompletionGuard from "./Components/ProfileCompletionGuard.jsx";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production

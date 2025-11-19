@@ -1,4 +1,3 @@
-// src/components/ProfileCompletionGuard.jsx
 import React, { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
 
