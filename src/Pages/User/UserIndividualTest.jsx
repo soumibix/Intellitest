@@ -2,41 +2,161 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { CheckCircle, Flag, Clock, FileText, AlertCircle, Timer } from 'lucide-react';
 import QuestionCard from '../../Components/User/QuestionCard';
 import FileUploader from '../../Components/common/FileUploader';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ExitConfirmationModal from '../../utils/ExitConfirmationModal';
 import SubmitPdf from '../../Components/SubmitPdf';
+import { useHttp } from '../../Hooks/useHttps';
 
 const UserIndividualTest = () => {
-    const [questions, setQuestions] = useState(
-        Array(5).fill(null).map((_, i) => ({
-            id: i + 1,
-            questionText: 'Explain the working principle of the k-Nearest Neighbors (k-NN) algorithm with an example.',
-            marks: 10,
-            markedAsDone: false,
-            markedForReview: false
-        }))
-    );
+    const [questions, setQuestions] = useState([]);
     const navigate = useNavigate();
+    const { id: testId } = useParams();
     const [submitModal, setSubmitModal] = useState(false);
-    const [timeRemaining, setTimeRemaining] = useState(3600);
+    const [timeRemaining, setTimeRemaining] = useState(0);
     const [showExitModal, setShowExitModal] = useState(false);
+    const [testData, setTestData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [testSessionData, setTestSessionData] = useState(null);
 
+    // File upload states
+    const [uploadedFile, setUploadedFile] = useState(null);
+    const [uploadedFileUrl, setUploadedFileUrl] = useState('');
+    const [uploadedFileName, setUploadedFileName] = useState('');
+    const [isUploadingFile, setIsUploadingFile] = useState(false);
 
+    const { getReq, postReq, patchReq } = useHttp();
+    const token = sessionStorage.getItem('token');
 
+    // Fetch test data and start test
     useEffect(() => {
+        const fetchTestData = async () => {
+            try {
+                setLoading(true);
+
+                // Fetch test details
+                const testResponse = await getReq(`student/test/getTest/${testId}`, token);
+                console.log('Test Response:', testResponse);
+
+                if (testResponse?.success && testResponse?.test) {
+                    setTestData(testResponse.test);
+
+                    // Map questions with initial status
+                    const mappedQuestions = testResponse.test.questions?.map((q, index) => ({
+                        id: q._id,
+                        number: index + 1,
+                        question: q.question,
+                        score: q.score,
+                        markedAsDone: false,
+                        markedForReview: false
+                    })) || [];
+
+                    console.log('Mapped Questions:', mappedQuestions);
+                    setQuestions(mappedQuestions);
+                }
+
+                // Start test and get timer
+                const startTestResponse = await postReq(`student/test/startTest/${testId}`, token);
+                console.log('Start Test Response:', startTestResponse);
+                try {
+                    if (startTestResponse?.data || startTestResponse?.success) {
+                    setTestSessionData(startTestResponse.data);
+                    const { starttime, endtime, uploadedAnswerSheet } = startTestResponse.data;
+
+                    // Restore uploaded file if exists
+                    if (uploadedAnswerSheet) {
+                        setUploadedFileUrl(uploadedAnswerSheet.url || uploadedAnswerSheet);
+                        setUploadedFileName(uploadedAnswerSheet.fileName || 'answer-sheet.pdf');
+                    }
+
+                    // Calculate remaining time
+                    const currentTime = new Date();
+                    const endTime = new Date(endtime);
+                    const remainingSeconds = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+
+                    console.log('Time Remaining (seconds):', remainingSeconds);
+                    // if(remainingSeconds <=0){
+                        // }
+                        setTimeRemaining(remainingSeconds);
+                    }
+                } catch (error) {
+                    // alert('Test time has already expired. You will be redirected to the test reports page.');
+                    navigate('/user/tests');
+                    console.log(error)
+                }
+                
+
+                setLoading(false);
+            } catch (error) {
+                console.error('Error fetching test data:', error);
+                alert('Failed to load test. Please try again.');
+                navigate('/user/test-reports');
+                setLoading(false);
+            }
+        };
+
+        if (testId) {
+            fetchTestData();
+        }
+    }, [testId]);
+
+    // Handle test submission
+    const handleSubmitTest = async (testId) => {
+        try {
+            setSubmitModal(false);
+
+            // Show loading state
+            setLoading(true);
+
+            // Call end test API
+            // const endTestResponseSub = await fetch(
+            //     `https://intellitest-backend.iem.edu.in/api/v1/student/test/endTest/${testId}`,
+            //     {
+            //         method: "PATCH",
+            //         headers: {
+            //             "Content-Type": "application/json",
+            //             Authorization: `Bearer ${token}`,
+            //         }
+            //     }
+            // );
+
+            const endTestResponse = await patchReq(`student/test/endTest/${testId}`, token);
+
+
+            console.log('End Test Response:', endTestResponse);
+
+            if (endTestResponse?.data || endTestResponse?.message === 'Test ended successfully') {
+                alert('Test submitted successfully!');
+                navigate('/user/test-reports');
+            } else {
+                throw new Error(endTestResponse?.message || 'Failed to submit test');
+            }
+        } catch (error) {
+            console.error('Error submitting test:', error);
+            alert('Failed to submit test. Please try again.');
+            setLoading(false);
+        }
+    };
+
+    // Timer countdown
+    useEffect(() => {
+        if (timeRemaining <= 0) return;
+
         const timer = setInterval(() => {
             setTimeRemaining(prev => {
-                if (prev <= 0) {
+                if (prev <= 1) {
                     clearInterval(timer);
                     alert('Time is up! Your test will be submitted automatically.');
+                    handleSubmitTest(testId);
                     return 0;
                 }
                 return prev - 1;
             });
         }, 1000);
-        return () => clearInterval(timer);
-    }, []);
 
+        return () => clearInterval(timer);
+    }, [timeRemaining]);
+
+    // Prevent page refresh/close during test
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             e.preventDefault();
@@ -46,12 +166,71 @@ const UserIndividualTest = () => {
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, []);
 
+    // Handle file selection and upload
+    const handleFileSelect = async (file) => {
+        if (!file) {
+            setUploadedFile(null);
+            return;
+        }
+
+        try {
+            setIsUploadingFile(true);
+            setUploadedFile(file);
+
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Upload file to server
+            const uploadResponse = await postReq('upload/uploadFile', token, formData, true);
+            console.log('File Upload Response:', uploadResponse);
+
+            if (uploadResponse?.success) {
+                setUploadedFileUrl(uploadResponse.fileUrl || uploadResponse.data?.fileUrl || uploadResponse.url);
+                setUploadedFileName(file.name);
+                alert('Answer sheet uploaded successfully!');
+            } else {
+                throw new Error(uploadResponse?.message || 'Upload failed');
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            alert('Failed to upload answer sheet. Please try again.');
+            setUploadedFile(null);
+        } finally {
+            setIsUploadingFile(false);
+        }
+    };
+
+    // Handle file deletion
+    const handleFileDelete = async () => {
+        try {
+            const deleteResponse = await postReq(
+                `student/test/deleteAnswerSheet/${testId}`,
+                token
+            );
+
+            if (deleteResponse?.success) {
+                setUploadedFile(null);
+                setUploadedFileUrl('');
+                setUploadedFileName('');
+                alert('Answer sheet deleted successfully!');
+            } else {
+                throw new Error(deleteResponse?.message || 'Delete failed');
+            }
+        } catch (error) {
+            console.error('Error deleting file:', error);
+            alert('Failed to delete answer sheet. Please try again.');
+        }
+    };
+
     const handleStatusChange = useCallback((questionId, field, value) => {
         setQuestions(prev => prev.map(q => q.id === questionId ? { ...q, [field]: value } : q));
     }, []);
 
     const formatTime = (s) => {
-        const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const sec = s % 60;
         return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
     };
 
@@ -62,11 +241,42 @@ const UserIndividualTest = () => {
         total: questions.length
     };
 
-    const getTimerColor = () => timeRemaining < 300 ? 'text-red-[#f00]' : timeRemaining < 600 ? 'text-[#f00]' : 'text-white';
+    const getTimerColor = () => {
+        if (timeRemaining < 300) return 'text-red-600';
+        if (timeRemaining < 600) return 'text-yellow-500';
+        return 'text-white';
+    };
+
+    const formatDeadline = () => {
+        if (!testSessionData?.endtime) return 'N/A';
+        const endDate = new Date(testSessionData.endtime);
+        return endDate.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading test...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 flex-col justify-between items-center">
-            <ExitConfirmationModal isOpen={showExitModal} onConfirm={() => navigate('/user/test-reports')} onCancel={() => setShowExitModal(false)} />
+            <ExitConfirmationModal
+                isOpen={showExitModal}
+                onConfirm={() => navigate('/user/test-reports')}
+                onCancel={() => setShowExitModal(false)}
+            />
 
             <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-4">
                 <div className="mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
@@ -80,8 +290,18 @@ const UserIndividualTest = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto">
-                        <button onClick={() => setShowExitModal(true)} className="flex-1 md:flex-none px-6 cursor-pointer text-red-600 text-sm font-medium hover:bg-red-50 rounded border border-red-600 py-2">Exit Test</button>
-                        <button onClick={()=> setSubmitModal(true)} className="flex-1 md:flex-none px-4 cursor-pointer py-1.5 bg-purple-600 text-white text-sm font-medium rounded hover:bg-purple-700 flex items-center justify-center gap-2">Submit<span className="text-lg">→</span></button>
+                        <button
+                            onClick={() => setShowExitModal(true)}
+                            className="flex-1 md:flex-none px-6 cursor-pointer text-red-600 text-sm font-medium hover:bg-red-50 rounded border border-red-600 py-2"
+                        >
+                            Exit Test
+                        </button>
+                        <button
+                            onClick={() => setSubmitModal(true)}
+                            className="flex-1 md:flex-none px-4 cursor-pointer py-1.5 bg-purple-600 text-white text-sm font-medium rounded hover:bg-purple-700 flex items-center justify-center gap-2"
+                        >
+                            Submit<span className="text-lg">→</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -90,22 +310,37 @@ const UserIndividualTest = () => {
                 <div className="text-white px-4 md:px-6 py-6 md:py-8 my-4 mt-8 rounded-2xl" style={{ background: "linear-gradient(to right, #6A1B7E, #6A1B7EE5)" }}>
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold mb-2">Machine Learning Test</h1>
-                            <div className="flex items-center gap-4 text-sm">
-                                <span className="flex items-center gap-1.5"><FileText size={16} />50 Questions</span>
-                                <span className="flex items-center gap-1.5"><CheckCircle size={16} />50 Marks</span>
+                            <h1 className="text-2xl md:text-3xl font-bold mb-2">
+                                {testData?.subjectName || 'Test'} {testData?.subjectCode ? `(${testData.subjectCode})` : ''}
+                            </h1>
+                            <div className="flex items-center gap-4 text-sm flex-wrap">
+                                <span className="flex items-center gap-1.5">
+                                    <FileText size={16} />{testData?.numberOfQuestions || 0} Questions
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                    <CheckCircle size={16} />{testData?.totalMarks || questions.reduce((sum, q) => sum + q.score, 0)} Marks
+                                </span>
+                                <span className="bg-white/20 px-2 py-0.5 rounded text-xs">
+                                    {testData?.testCategory || 'Test'}
+                                </span>
                             </div>
                         </div>
                         <div className="text-left md:text-right bg-[#ffffff48] py-2 px-4 rounded-lg w-full md:w-auto">
-                            <div className="text-sm font-normal mb-1 opacity-90 flex items-center md:justify-end gap-1.5"><Timer size={20} />Time Remaining</div>
-                            <div className={`text-3xl md:text-4xl font-bold ${getTimerColor()}`}>{formatTime(timeRemaining)}</div>
+                            <div className="text-sm font-normal mb-1 opacity-90 flex items-center md:justify-end gap-1.5">
+                                <Timer size={20} />Time Remaining
+                            </div>
+                            <div className={`text-3xl md:text-4xl font-bold ${getTimerColor()}`}>
+                                {formatTime(timeRemaining)}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="bg-[#F7EAFB] rounded-xl border border-[#6A1B7E33]">
                     <div className="mx-auto px-4 md:px-6 py-4">
-                        <p className="text-sm text-[#000]"><span className="font-semibold text-[#6A1B7E]">Instructions:</span> Write your answers on paper, number them clearly as per the questions below, and upload a single PDF containing all your answers. Ensure your handwriting is legible and all pages are included in the correct order.</p>
+                        <p className="text-sm text-[#000]">
+                            <span className="font-semibold text-[#6A1B7E]">Instructions:</span> Write your answers on paper, number them clearly as per the questions below, and upload a single PDF containing all your answers. Ensure your handwriting is legible and all pages are included in the correct order.
+                        </p>
                     </div>
                 </div>
 
@@ -118,31 +353,81 @@ const UserIndividualTest = () => {
                                     <span className="text-sm text-gray-600">{stats.done} / {stats.total} answered</span>
                                 </div>
                                 <div className="relative h-3 bg-gray-200 rounded-full overflow-hidden mb-4">
-                                    <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 transition-all duration-500" style={{ width: `${((stats.done / stats.total) * 100).toFixed(0)}%` }} />
+                                    <div
+                                        className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 transition-all duration-500"
+                                        style={{ width: `${stats.total > 0 ? ((stats.done / stats.total) * 100).toFixed(0) : 0}%` }}
+                                    />
                                 </div>
                                 <div className="flex flex-wrap gap-4 text-sm">
-                                    <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green-500" /><span className="text-gray-700">Done {stats.done}</span></div>
-                                    <div className="flex items-center gap-2"><Flag size={16} className="text-yellow-500" /><span className="text-gray-700">Review {stats.review}</span></div>
-                                    <div className="flex items-center gap-2"><Clock size={16} className="text-orange-500" /><span className="text-gray-700">Pending {stats.pending}</span></div>
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle size={16} className="text-green-500" />
+                                        <span className="text-gray-700">Done {stats.done}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Flag size={16} className="text-yellow-500" />
+                                        <span className="text-gray-700">Review {stats.review}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={16} className="text-orange-500" />
+                                        <span className="text-gray-700">Pending {stats.pending}</span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div className="bg-gray-50 rounded-lg p-4 md:p-5">
                                 <h3 className="font-semibold text-gray-900 mb-4">Questions</h3>
-                                {questions.map(q => <QuestionCard key={q.id} question={q} onStatusChange={handleStatusChange} />)}
+                                {questions.length > 0 ? (
+                                    questions.map(q => (
+                                        <QuestionCard
+                                            key={q.id}
+                                            question={q}
+                                            onStatusChange={handleStatusChange}
+                                        />
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-center py-8">No questions available</p>
+                                )}
                             </div>
                         </div>
 
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-lg p-4 md:p-5 mb-4 lg:sticky lg:top-6">
                                 <h3 className="font-semibold text-gray-900 mb-4">Upload Your Answer Sheet</h3>
-                                <div className='mb-8 md:mb-12'><FileUploader /></div>
+                                <div className='mb-8 md:mb-12'>
+                                    <FileUploader
+                                        onFileSelect={handleFileSelect}
+                                        uploadedFileUrl={uploadedFileUrl}
+                                        setFileUrl={setUploadedFileUrl}
+                                        fileName={uploadedFileName}
+                                        onDelete={handleFileDelete}
+                                    />
+                                </div>
                                 <div className="border border-gray-200 rounded-lg p-4">
                                     <h4 className="font-semibold text-gray-900 text-sm mb-3">Upload Checklist</h4>
                                     <div className="space-y-3">
-                                        <div className="flex items-start gap-2"><CheckCircle className="text-green-500 flex-shrink-0 mt-0.5" size={16} /><span className="text-sm text-gray-700">Upload Status</span></div>
-                                        <div className="flex items-start gap-2"><AlertCircle className="text-orange-500 flex-shrink-0 mt-0.5" size={16} /><div><p className="text-sm text-gray-700 font-medium">Deadline Reminder</p><p className="text-xs text-gray-500">Upload by: Dec 10, 2025, 11:59 PM</p></div></div>
-                                        <div className="flex items-start gap-2"><FileText className="text-gray-400 flex-shrink-0 mt-0.5" size={16} /><div><p className="text-sm text-gray-700 font-medium">File Size Limit</p><p className="text-xs text-gray-500">Maximum 10 MB</p></div></div>
+                                        <div className="flex items-start gap-2">
+                                            <CheckCircle
+                                                className={`flex-shrink-0 mt-0.5 ${uploadedFileUrl ? 'text-green-500' : 'text-gray-300'}`}
+                                                size={16}
+                                            />
+                                            <span className="text-sm text-gray-700">
+                                                {uploadedFileUrl ? 'Answer sheet uploaded' : 'Upload pending'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <AlertCircle className="text-orange-500 flex-shrink-0 mt-0.5" size={16} />
+                                            <div>
+                                                <p className="text-sm text-gray-700 font-medium">Deadline Reminder</p>
+                                                <p className="text-xs text-gray-500">Upload by: {formatDeadline()}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-2">
+                                            <FileText className="text-gray-400 flex-shrink-0 mt-0.5" size={16} />
+                                            <div>
+                                                <p className="text-sm text-gray-700 font-medium">File Size Limit</p>
+                                                <p className="text-xs text-gray-500">Maximum 25 MB</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -150,9 +435,7 @@ const UserIndividualTest = () => {
                     </div>
                 </div>
             </div>
-            {
-                submitModal && <SubmitPdf isOpen={submitModal} setIsOpen={setSubmitModal}/>
-            }
+            {submitModal && <SubmitPdf isOpen={submitModal} setIsOpen={setSubmitModal} handleSubmitTest={handleSubmitTest} testId={testId} />}
         </div>
     );
 };

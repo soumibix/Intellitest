@@ -1,65 +1,66 @@
-import React, { useState, useCallback, memo } from 'react';
-import { CheckCircle, Flag, Clock, Upload, FileText, Calendar, AlertCircle } from 'lucide-react';
+import React from 'react';
+import { CheckCircle, Flag } from 'lucide-react';
 
-// Memoized Question Card Component
-const QuestionCard = memo(({ question, onStatusChange }) => {
-  const { id, questionText, marks, markedAsDone, markedForReview } = question;
+const QuestionCard = ({ question, onStatusChange }) => {
+    const handleMarkAsDone = () => {
+        onStatusChange(question.id, 'markedAsDone', !question.markedAsDone);
+        if (!question.markedAsDone && question.markedForReview) {
+            onStatusChange(question.id, 'markedForReview', false);
+        }
+    };
 
-  const handleMarkAsDone = useCallback(() => {
-    onStatusChange(id, 'markedAsDone', !markedAsDone);
-  }, [id, markedAsDone, onStatusChange]);
+    const handleMarkForReview = () => {
+        onStatusChange(question.id, 'markedForReview', !question.markedForReview);
+        if (!question.markedForReview && question.markedAsDone) {
+            onStatusChange(question.id, 'markedAsDone', false);
+        }
+    };
 
-  const handleMarkForReview = useCallback(() => {
-    onStatusChange(id, 'markedForReview', !markedForReview);
-  }, [id, markedForReview, onStatusChange]);
+    return (
+        <div className="bg-white rounded-lg p-4 mb-4 border border-gray-200 hover:border-purple-300 transition-colors">
+            <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs font-semibold">
+                            Q{question.number}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                            {question.score} {question.score === 1 ? 'Mark' : 'Marks'}
+                        </span>
+                    </div>
+                    <p className="text-gray-800 text-sm leading-relaxed">
+                        {question.question}
+                    </p>
+                </div>
+            </div>
 
-  return (
-    <div className="bg-white rounded-lg p-4 mb-3 flex items-start gap-4">
-      <div className="flex-shrink-0 w-8 h-8 rounded bg-gray-100 flex items-center justify-center text-gray-600 font-medium text-sm">
-        {id}
-      </div>
-      
-      <div className="flex-1">
-        <p className="text-gray-800 text-sm mb-3">{questionText}</p>
-        
-        <div className="flex gap-2">
-          <button
-            onClick={handleMarkAsDone}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${
-              markedAsDone
-                ? 'bg-green-500 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            <CheckCircle size={14} />
-            Mark as Done
-          </button>
+            <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                <button
+                    onClick={handleMarkAsDone}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                        question.markedAsDone
+                            ? 'bg-green-100 text-green-700 border border-green-300'
+                            : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-green-50'
+                    }`}
+                >
+                    <CheckCircle size={14} />
+                    {question.markedAsDone ? 'Done' : 'Mark as Done'}
+                </button>
 
-          <button
-            onClick={handleMarkForReview}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${
-              markedForReview
-                ? 'bg-yellow-400 text-gray-800'
-                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-            }`}
-          >
-            <Flag size={14} />
-            Mark for Review
-          </button>
+                <button
+                    onClick={handleMarkForReview}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                        question.markedForReview
+                            ? 'bg-yellow-100 text-yellow-700 border border-yellow-300'
+                            : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-yellow-50'
+                    }`}
+                >
+                    <Flag size={14} />
+                    {question.markedForReview ? 'Marked for Review' : 'Mark for Review'}
+                </button>
+            </div>
         </div>
-      </div>
+    );
+};
 
-      <span className="flex-shrink-0 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-        {marks} marks
-      </span>
-    </div>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.question.id === nextProps.question.id &&
-    prevProps.question.markedAsDone === nextProps.question.markedAsDone &&
-    prevProps.question.markedForReview === nextProps.question.markedForReview
-  );
-});
-
-export default QuestionCard
+export default QuestionCard;
