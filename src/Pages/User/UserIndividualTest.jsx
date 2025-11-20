@@ -57,8 +57,8 @@ const UserIndividualTest = () => {
                 // Start test and get timer
                 const startTestResponse = await postReq(`student/test/startTest/${testId}`, token);
                 console.log('Start Test Response:', startTestResponse);
-
-                if (startTestResponse?.data) {
+                try {
+                    if (startTestResponse?.data || startTestResponse?.success) {
                     setTestSessionData(startTestResponse.data);
                     const { starttime, endtime, uploadedAnswerSheet } = startTestResponse.data;
 
@@ -74,8 +74,16 @@ const UserIndividualTest = () => {
                     const remainingSeconds = Math.max(0, Math.floor((endTime - currentTime) / 1000));
 
                     console.log('Time Remaining (seconds):', remainingSeconds);
-                    setTimeRemaining(remainingSeconds);
+                    // if(remainingSeconds <=0){
+                        // }
+                        setTimeRemaining(remainingSeconds);
+                    }
+                } catch (error) {
+                    // alert('Test time has already expired. You will be redirected to the test reports page.');
+                    navigate('/user/tests');
+                    console.log(error)
                 }
+                
 
                 setLoading(false);
             } catch (error) {
@@ -100,18 +108,18 @@ const UserIndividualTest = () => {
             setLoading(true);
 
             // Call end test API
-            const endTestResponseSub = await fetch(
-                `https://intellitest-backend.iem.edu.in/api/v1/student/test/endTest/${testId}`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    }
-                }
-            );
+            // const endTestResponseSub = await fetch(
+            //     `https://intellitest-backend.iem.edu.in/api/v1/student/test/endTest/${testId}`,
+            //     {
+            //         method: "PATCH",
+            //         headers: {
+            //             "Content-Type": "application/json",
+            //             Authorization: `Bearer ${token}`,
+            //         }
+            //     }
+            // );
 
-            const endTestResponse = await endTestResponseSub.json();
+            const endTestResponse = await patchReq(`student/test/endTest/${testId}`, token);
 
 
             console.log('End Test Response:', endTestResponse);
@@ -131,7 +139,7 @@ const UserIndividualTest = () => {
 
     // Timer countdown
     useEffect(() => {
-        if (timeRemaining <= 0) navigate('/user/test-reports');
+        if (timeRemaining <= 0) return;
 
         const timer = setInterval(() => {
             setTimeRemaining(prev => {
