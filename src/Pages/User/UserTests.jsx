@@ -14,24 +14,29 @@ function UserTests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSemPopupOpen, setIsSemPopupOpen] = useState(false);
-  const {getReq}= useHttp()
   const [currentSemester, setCurrentSemester] = useState(
-    localStorage.getItem('userSemester') || 'Semester 1'
+    localStorage.getItem('userSemester')
   );
-  const [generateFunction, setGenerateFunction] = useState(false);
 
   // Fetch tests on component mount
-  useEffect(() => {
-    if(generateFunction===false){
-      fetchUserTests();
-      setGenerateFunction(true);
-    }
+  // useEffect(() => {
+  //   if(generateFunction===false){
+  //     fetchUserTests();
+  //     setGenerateFunction(true);
+  //   }
   //   setIsSemPopupOpen(true);
-  }, []);
+  // }, []);
 
-  // useEffect(()=>{
-    // fetchUserTests(currentSemester);
-  // },[currentSemester])
+  useEffect(()=>{
+    if(!localStorage.getItem('userSemester')){
+      setIsSemPopupOpen(true);
+    }
+    // fetchUserTests();
+  },[])
+
+  useEffect(()=>{
+    fetchUserTests();
+  },[currentSemester])
 
 
 
@@ -41,15 +46,15 @@ function UserTests() {
     
     try {
       // Fetch tests with filters for current tests (ongoing + upcoming)
-      // const response = await UserTestAPI.fetchUserTests(httpHook, token, {
-      //   page: 1,
-      //   limit: 100, // Fetch all current tests
-      //   // You can uncomment these to filter by department/semester
-      //   // department: 'IT',
-      //   // semester: '2nd Semester',
-      // });
+      const response = await UserTestAPI.fetchUserTests(httpHook, token, {
+        page: 1,
+        limit: 100, // Fetch all current tests
+        // You can uncomment these to filter by department/semester
+        department: sessionStorage.getItem('user').department,
+        semester: currentSemester || undefined,
+      });
 
-      const response= await getReq('student/test/allTest?page=1&limit=5&department=CSE', token)
+      console.log(response)
 
       if (response.success) {
         setAllTests(response.data);

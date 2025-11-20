@@ -20,6 +20,8 @@ export const UserTestAPI = {
       const endpoint = queryString 
         ? `${API_ENDPOINTS.USER_GET_ALL_TESTS}?${queryString}`
         : API_ENDPOINTS.USER_GET_ALL_TESTS;
+
+      console.log(endpoint)
       
       const response = await httpHook.getReq(
         endpoint,
