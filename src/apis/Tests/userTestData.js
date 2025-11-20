@@ -2,13 +2,7 @@
 import { API_ENDPOINTS } from "../../Config/config";
 
 export const UserTestAPI = {
-  /**
-   * Fetch all tests for a student with filters and pagination
-   * @param {Object} httpHook - HTTP hook instance
-   * @param {string} token - Authentication token
-   * @param {Object} queryParams - Query parameters
-   * @returns {Promise<Object>} Response with tests data
-   */
+
   fetchUserTests: async (httpHook, token, queryParams = {}) => {
     try {
       // Build query string from params
