@@ -133,7 +133,7 @@ const UserDashboard = () => {
   // ];
 
   const batchOptions = [
-    { value: "", label: "Your Designation" },
+    { value: "", label: "Your Batch" },
     { value: "2021-2025", label: "2021-2025" },
     { value: "2022-2026", label: "2022-2026" },
     { value: "2023-2027", label: "2023-2027" },
@@ -219,7 +219,7 @@ const UserDashboard = () => {
             <Input
               type="tel"
               label="Mobile Number"
-              placeholder="+91 9876543210"
+              placeholder="9876543210"
               value={formData.mobileNumber}
               onChange={handleChange("mobileNumber")}
               size="md"
@@ -247,7 +247,7 @@ const UserDashboard = () => {
             <Input
               type="dropdown"
               label="Batch"
-              placeholder="Your Designation"
+              placeholder="Your Batch"
               value={formData.batch}
               onChange={handleChange("batch")}
               options={batchOptions}

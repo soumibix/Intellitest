@@ -28,9 +28,9 @@ export const UserSignUp = () => {
       // Send OTP to email (no OTP parameter, so it will send OTP)
       const response = await studentAuthAPI.verifyEmail(httpHook, formData.email);
 
+      setEmail(formData.email);
+      setStep(2); // Move to OTP verification step
       if (response.success) {
-        setEmail(formData.email);
-        setStep(2); // Move to OTP verification step
         // You can show a success message here
       } else {
         setErrors({ email: response.message || "Failed to send OTP" });
@@ -52,13 +52,13 @@ export const UserSignUp = () => {
     setIsLoading(true);
     setErrors({});
 
+    setIsEmailVerified(true);
+    setStep(3); // Move to full registration form
     try {
       // Verify OTP (both email and OTP provided, so it will verify)
       const response = await studentAuthAPI.verifyOTP(httpHook, email, formData.otp);
 
       if (response.success) {
-        setIsEmailVerified(true);
-        setStep(3); // Move to full registration form
         // You can show a success message here
       } else {
         setErrors({ otp: response.message || "Invalid OTP" });
