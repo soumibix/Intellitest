@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AllTest from '../../Components/AllTest';
-import { UserTestAPI } from '../../apis/tests/userTestData';
+import { UserTestAPI } from '../../apis/Tests/userTestData';
 import { useHttp } from '../../hooks/useHttps'; 
 
 function UserTests() {
