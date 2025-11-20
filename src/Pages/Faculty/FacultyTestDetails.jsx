@@ -27,6 +27,8 @@ const getInitialState = () => {
     scheduleFormData: { testDate: "", startTime: "", endTime: "", duration: "" },
     questionFileUrl: "",
     answerFileUrl: "",
+    questionFileName: "",
+    answerFileName: "",
   };
 };
 
@@ -81,7 +83,8 @@ const FacultyTestDetails = () => {
     if (response.success) {
       setState(prev => ({
         ...prev,
-        [type === "question" ? "questionFileUrl" : "answerFileUrl"]: response.fileUrl
+        [type === "question" ? "questionFileUrl" : "answerFileUrl"]: response.fileUrl,
+        [type === "question" ? "questionFileName" : "answerFileName"]: file.name
       }));
     } else {
       alert(`Failed to upload ${type} file. Please try again.`);
@@ -119,7 +122,7 @@ const FacultyTestDetails = () => {
     }
     
     if (step === 3) {
-      return files.question && state.questionFileUrl;
+      return state.questionFileUrl;
     }
     
     return true;
@@ -262,12 +265,32 @@ const FacultyTestDetails = () => {
       
       if (response.success) {
         alert("Test published successfully! 🎉");
+        // Clear localStorage after successful publish
+        localStorage.removeItem(STORAGE_KEY);
         handleReset();
       } else {
         alert("Failed to publish test: " + response.message);
       }
     } else {
       alert("Please complete all steps before publishing");
+    }
+  };
+
+  const handleDeleteFile = (type) => {
+    if (type === "question") {
+      setState(prev => ({
+        ...prev,
+        questionFileUrl: "",
+        questionFileName: ""
+      }));
+      setFiles(prev => ({ ...prev, question: null }));
+    } else {
+      setState(prev => ({
+        ...prev,
+        answerFileUrl: "",
+        answerFileName: ""
+      }));
+      setFiles(prev => ({ ...prev, answer: null }));
     }
   };
 
@@ -301,8 +324,11 @@ const FacultyTestDetails = () => {
           setAnswerFile={(file) => setFiles(prev => ({ ...prev, answer: file }))} 
           questionFileUrl={state.questionFileUrl} 
           answerFileUrl={state.answerFileUrl} 
+          questionFileName={state.questionFileName}
+          answerFileName={state.answerFileName}
           setQuestionFileUrl={(url) => setState(prev => ({ ...prev, questionFileUrl: url }))}
           setAnswerFileUrl={(url) => setState(prev => ({ ...prev, answerFileUrl: url }))}
+          onDeleteFile={handleDeleteFile}
           testId={state.testId} 
         />;
       case 4: 

@@ -3,28 +3,29 @@ import { Edit2, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import Button from "../Components/common/Button";
 import Input from "../Components/common/Input";
+import { campusOptions, departmentOptions } from "../Config/dummyData";
 
 // Institution options
-const INSTITUTIONS = [
-  { value: "IEM Saltlake", label: "IEM, Salt Lake" },
-  { value: "IEM Newtown", label: "IEM, Newtown" },
-  { value: "UEM Jaipur", label: "IEM, Jaipur" },
-];
+// const INSTITUTIONS = [
+//   { value: "IEM Saltlake", label: "IEM, Salt Lake" },
+//   { value: "IEM Newtown", label: "IEM, Newtown" },
+//   { value: "UEM Jaipur", label: "IEM, Jaipur" },
+// ];
 
 // Department options
-const DEPARTMENTS = [
-  { value: "computer_science", label: "Computer Science & Engineering" },
-  { value: "electronics", label: "Electronics & Communication Engineering" },
-  { value: "electrical", label: "Electrical Engineering" },
-  { value: "mechanical", label: "Mechanical Engineering" },
-  { value: "civil", label: "Civil Engineering" },
-  { value: "information_technology", label: "Information Technology" },
-  { value: "mathematics", label: "Mathematics" },
-  { value: "physics", label: "Physics" },
-  { value: "chemistry", label: "Chemistry" },
-  { value: "management", label: "Management Studies" },
-  { value: "other", label: "Other" },
-];
+// const DEPARTMENTS = [
+//   { value: "computer_science", label: "Computer Science & Engineering" },
+//   { value: "electronics", label: "Electronics & Communication Engineering" },
+//   { value: "electrical", label: "Electrical Engineering" },
+//   { value: "mechanical", label: "Mechanical Engineering" },
+//   { value: "civil", label: "Civil Engineering" },
+//   { value: "information_technology", label: "Information Technology" },
+//   { value: "mathematics", label: "Mathematics" },
+//   { value: "physics", label: "Physics" },
+//   { value: "chemistry", label: "Chemistry" },
+//   { value: "management", label: "Management Studies" },
+//   { value: "other", label: "Other" },
+// ];
 
 export const EditFacultyModal = ({
   isOpen,
@@ -194,7 +195,7 @@ export const EditFacultyModal = ({
                   target: { name: "department", value: e.target.value },
                 })
               }
-              options={DEPARTMENTS}
+              options={departmentOptions}
               error={errors.department}
               disabled={isSubmitting}
             />
@@ -210,7 +211,7 @@ export const EditFacultyModal = ({
               onChange={(e) =>
                 handleChange({ target: { name: "campus", value: e.target.value } })
               }
-              options={INSTITUTIONS}
+              options={campusOptions}
               error={errors.campus}
               disabled={isSubmitting}
             />

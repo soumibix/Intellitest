@@ -4,6 +4,7 @@ import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
 import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
 import { useHttp } from "../../Hooks/useHttps";
+import { departmentOptions } from "../../Config/dummyData";
 
 const FacultyDashboard = () => {
   const httpHook = useHttp();
@@ -128,14 +129,14 @@ const FacultyDashboard = () => {
     { value: "UEM Jaipur", label: "UEM Jaipur" },
   ];
 
-  const departmentOptions = [
-    { value: "", label: "Select Department" },
-    { value: "Civil Engineering", label: "Civil Engineering" },
-    { value: "Mechanical Engineering", label: "Mechanical Engineering" },
-    { value: "Electrical Engineering", label: "Electrical Engineering" },
-    { value: "Computer Science", label: "Computer Science" },
-    { value: "CSE", label: "CSE" },
-  ];
+  // const departmentOptions = [
+  //   { value: "", label: "Select Department" },
+  //   { value: "Civil Engineering", label: "Civil Engineering" },
+  //   { value: "Mechanical Engineering", label: "Mechanical Engineering" },
+  //   { value: "Electrical Engineering", label: "Electrical Engineering" },
+  //   { value: "Computer Science", label: "Computer Science" },
+  //   { value: "CSE", label: "CSE" },
+  // ];
 
   const designationOptions = [
     { value: "", label: "Select Designation" },
