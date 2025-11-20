@@ -4,6 +4,7 @@ import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
 import { studentAuthAPI } from "../../apis/auth/studentAuth";
 import { useHttp } from "../../Hooks/useHttps";
+import { campusOptions, departmentOptions } from "../../Config/dummyData";
 
 const UserDashboard = () => {
   const httpHook = useHttp();
@@ -115,21 +116,21 @@ const UserDashboard = () => {
     }
   };
 
-  const institutionOptions = [
-    { value: "", label: "College Campus" },
-    { value: "'IEM Saltlake", label: "IEM, Salt Lake" },
-    { value: "IEM Newtown", label: "IEM, Newtown" },
-    { value: "UEM Jaipur", label: "UEM, Jaipur" },
-  ];
+  // const institutionOptions = [
+  //   { value: "", label: "College Campus" },
+  //   { value: "IEM, Salt Lake", label: "IEM, Salt Lake" },
+  //   { value: "IEM, Newtown", label: "IEM, Newtown" },
+  //   { value: "IEM, Jaipur", label: "IEM, Jaipur" },
+  // ];
 
-  const departmentOptions = [
-    { value: "", label: "Civil Engineering" },
-    { value: "Civil Engineering", label: "Civil Engineering" },
-    { value: "Mechanical Engineering", label: "Mechanical Engineering" },
-    { value: "Electrical Engineering", label: "Electrical Engineering" },
-    { value: "Computer Science", label: "Computer Science" },
-    { value: "CSE", label: "CSE" },
-  ];
+  // const departmentOptions = [
+  //   { value: "", label: "Civil Engineering" },
+  //   { value: "Civil Engineering", label: "Civil Engineering" },
+  //   { value: "Mechanical Engineering", label: "Mechanical Engineering" },
+  //   { value: "Electrical Engineering", label: "Electrical Engineering" },
+  //   { value: "Computer Science", label: "Computer Science" },
+  //   { value: "CSE", label: "CSE" },
+  // ];
 
   const batchOptions = [
     { value: "", label: "Your Batch" },
@@ -231,7 +232,7 @@ const UserDashboard = () => {
               placeholder="College Name"
               value={formData.institutionName}
               onChange={handleChange("institutionName")}
-              options={institutionOptions}
+              options={campusOptions}
               size="md"
             />
             <Input

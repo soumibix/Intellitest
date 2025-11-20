@@ -104,7 +104,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
         <span className="text-gray-400">•</span>
         <span>{numberOfQuestions * 2 || questions.length * 2 || 0} Marks</span>
         <span className="text-gray-400">•</span>
-        <span>Duration: {duration} {typeof duration === 'number' ? 'hours' : ''}</span>
+        <span>Duration: {duration} {typeof duration === 'number' ? 'minutes' : ''}</span>
       </div>
 
       <div className="text-gray-600 mb-2 text-sm sm:text-base">
@@ -127,7 +127,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
               <div className="text-purple-700 font-medium mb-1 text-sm sm:text-base">Marks Obtained:</div>
               <div className="text-3xl sm:text-4xl font-bold text-purple-800">
                 45<span className="text-lg sm:text-xl text-gray-500"> / {numberOfQuestions * 2}</span>
-              </div>
+              </div>  
             </div>
             <div className="text-xs sm:text-sm text-gray-800 space-y-1">
               <div><span className="font-medium text-gray-700">Time Taken:</span> 45 mins</div>
@@ -138,7 +138,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
         </div>
       )}
 
-      <div className="flex-grow"></div>
+      {/* <div className="flex-grow"></div> */}
 
       {userType === "user" && (
         <div className="border-t border-gray-200 pt-4 mt-4">
@@ -173,14 +173,12 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
         <div className="border-t border-gray-200 pt-4 mt-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
-              <img 
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${createdBy}`} 
-                alt={createdBy} 
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full" 
-              />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                <span className="text-purple-600 font-bold text-lg sm:text-xl">{createdBy.name ? createdBy.name.charAt(0) : 'F'}</span>
+              </div>
               <div className="flex flex-col">
-                <span className="text-sm sm:text-base font-medium text-gray-900">{createdBy}</span>
-                <span className="text-gray-500 text-xs sm:text-sm font-bold">{createdDate}</span>
+                <span className="text-sm sm:text-base font-medium text-gray-900">{createdBy.name}</span>
+                <span className="text-gray-500 text-xs sm:text-sm font-bold">{createdBy.designation}</span>
               </div>
             </div>
 
@@ -204,7 +202,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
           title: subjectName, 
           questions: numberOfQuestions || questions.length, 
           marks: (numberOfQuestions || questions.length) * 2, 
-          duration: `${duration} ${typeof duration === 'number' ? 'hours' : ''}` 
+          duration: `${duration} minutes`, 
         }} 
       />
     </div>

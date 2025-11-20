@@ -1,13 +1,59 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, X, Check, Trash2 } from 'lucide-react';
 
 // FileUploader Component
-export default function  FileUploader ({ onFileSelect, uploadedFileUrl, setFileUrl }) {
+export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl, fileName, onDelete }) {
     const [file, setFile] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef(null);
+
+    console.log({uploadedFileUrl});
+    console.log({fileName});
+    
+    // Effect to restore file from S3 URL when component mounts or uploadedFileUrl changes
+    useEffect(() => {
+        const fetchFileFromS3 = async () => {
+            if (uploadedFileUrl && fileName && !file) {
+                try {
+                    // Fetch the file from S3 URL
+                    const response = uploadedFileUrl;
+                    const blob = await response.blob();
+                    
+                    // Create a real File object from the blob
+                    const restoredFile = new File([blob], fileName, {
+                        type: blob.type || 'application/pdf'
+                    });
+                    
+                    setFile(restoredFile);
+                    setUploadProgress(100);
+                    
+                    // Notify parent about the restored file
+                    if (onFileSelect) {
+                        onFileSelect(restoredFile);
+                    }
+                } catch (error) {
+                    console.error('Error fetching file from S3:', error);
+                    // Fallback to showing file info without actual file
+                    const virtualFile = {
+                        name: fileName,
+                        size: 0,
+                        type: 'application/pdf',
+                        isVirtual: true
+                    };
+                    setFile(virtualFile);
+                    setUploadProgress(100);
+                }
+            } else if (!uploadedFileUrl && file) {
+                // Clear file state if URL is removed
+                setFile(null);
+                setUploadProgress(0);
+            }
+        };
+
+        fetchFileFromS3();
+    }, [uploadedFileUrl, fileName]);
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -66,9 +112,19 @@ export default function  FileUploader ({ onFileSelect, uploadedFileUrl, setFileU
 
     const handleDelete = () => {
         setFile(null);
-        setFileUrl('');
         setUploadProgress(0);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        
+        // Call the parent's delete handler to clear from localStorage
+        if (onDelete) {
+            onDelete();
+        }
+        
+        // Clear the file URL
+        if (setFileUrl) {
+            setFileUrl('');
+        }
+        
         // Notify parent that file is removed
         if (onFileSelect) {
             onFileSelect(null);
@@ -82,6 +138,7 @@ export default function  FileUploader ({ onFileSelect, uploadedFileUrl, setFileU
     };
 
     const formatFileSize = (bytes) => {
+        if (bytes === 0) return 'Uploaded';
         return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
     };
 
@@ -189,7 +246,14 @@ export default function  FileUploader ({ onFileSelect, uploadedFileUrl, setFileU
 
                                 <div className="text-left">
                                     <p className="text-gray-800 font-medium">{file.name}</p>
-                                    <p className="text-sm text-gray-500">{formatFileSize(file.size)} - uploaded</p>
+                                    <p className="text-sm text-gray-500">
+                                        {file.isVirtual 
+                                            ? 'Previously uploaded' 
+                                            : file.size === 0 
+                                            ? 'Restored from server' 
+                                            : `${formatFileSize(file.size)} - uploaded`
+                                        }
+                                    </p>
                                     {uploadedFileUrl && (
                                         <p className="text-xs text-green-600 mt-1">✓ Saved to server</p>
                                     )}
