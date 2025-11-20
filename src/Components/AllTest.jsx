@@ -1,74 +1,34 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, SlidersHorizontal, X, ArrowRight } from "lucide-react";
+import { Search, SlidersHorizontal, X, ArrowRight, Loader2 } from "lucide-react";
 import TestCard from "../Components/TestCard";
-import { TestAPI } from "../apis/Tests/TestCRUD";
-import { useHttp } from "../Hooks/useHttps";
-import { useAuth } from "../AppRouter";
 
 function AllTest({ 
   heading = "All Tests", 
   userType = 'user', 
   allTests = [], 
   filter = true, 
-  showWrap = false 
+  showWrap = false,
+  onFilterChange = null,
+  onViewMore = null,
+  hasMoreTests = false,
+  isLoadingMore = false,
+  totalTests = 0
 }) {
   const navigate = useNavigate();
-  const httpHook = useHttp();
-  const { token } = useAuth();
   
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showMonthDropdown, setShowMonthDropdown] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("All");
   const [tests, setTests] = useState(allTests);
-  const [loading, setLoading] = useState(false);
   
   const dropdownRef = useRef(null);
-  const debounceTimerRef = useRef(null);
 
-  // Fetch tests from API
-  // const fetchTests = useCallback(async (searchTerm = "", status = "all") => {
-  //   setLoading(true);
-  //   try {
-  //     const queryParams = {
-  //       page: 1,
-  //       limit: showWrap ? 5 : 100,
-  //       ...(status !== "all" && { status }),
-  //       ...(searchTerm.trim() && { search: searchTerm.trim() })
-  //     };
-
-  //     const response = await TestAPI.fetchTests(httpHook, token, queryParams);
-  //     setTests(response.success ? response.data || [] : []);
-  //   } catch (error) {
-  //     console.error('Error fetching tests:', error);
-  //     setTests([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, [httpHook, token, showWrap]);
-
-  // Initial fetch
-  // useEffect(() => {
-  //   if (allTests?.length > 0) {
-  //     setTests(allTests);
-  //   } else {
-  //     // fetchTests(searchQuery, activeFilter);
-  //   }
-  // }, []);
-
-  // Debounced search
+  // Update tests when allTests prop changes
   useEffect(() => {
-    if (allTests?.length > 0) return;
-
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    
-    debounceTimerRef.current = setTimeout(() => {
-      // fetchTests(searchQuery, activeFilter);
-    }, 500);
-
-    return () => clearTimeout(debounceTimerRef.current);
-  }, [searchQuery, activeFilter, allTests]);
+    setTests(allTests);
+  }, [allTests]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -84,21 +44,31 @@ function AllTest({
   const months = ["All", "January", "February", "March", "April", "May", "June", 
                   "July", "August", "September", "October", "November", "December"];
 
-  // Filter tests by month
-  const filteredTests = tests.filter(test => 
-    selectedMonth === "All" || test.month === selectedMonth
-  );
+  // Handle filter change
+  const handleFilterClick = (filterType) => {
+    setActiveFilter(filterType);
+    if (onFilterChange) {
+      onFilterChange(filterType);
+    }
+  };
 
-  // Display limited tests if showWrap is true
-  const displayTests = showWrap ? filteredTests.slice(0, 5) : filteredTests;
-  const hasMoreTests = showWrap && filteredTests.length > 5;
+  // Filter tests by search and month
+  const filteredTests = tests.filter(test => {
+    const matchesSearch = searchQuery.length === 0 || 
+      test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesMonth = selectedMonth === "All" || test.month === selectedMonth;
+    return matchesSearch && matchesMonth;
+  });
+
+  // Display limited tests if showWrap is true (but show all loaded tests)
+  const displayTests = filteredTests;
 
   // Search suggestions
   const suggestions = searchQuery.length > 0
     ? tests
         .filter(test => test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase()))
         .map(test => test.subjectName)
-        .filter(Boolean)
+        .filter((value, index, self) => value && self.indexOf(value) === index) // Remove duplicates
         .slice(0, 5)
     : [];
 
@@ -144,7 +114,7 @@ function AllTest({
               {["ongoing", "completed", "upcoming", "all"].map(filterType => (
                 <button
                   key={filterType}
-                  onClick={() => setActiveFilter(filterType)}
+                  onClick={() => handleFilterClick(filterType)}
                   className={`px-4 sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
                     activeFilter === filterType
                       ? "bg-[#1A0B2E] text-white"
@@ -152,8 +122,14 @@ function AllTest({
                   }`}
                 >
                   {filterType === "all" ? "View All" : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-                  {activeFilter === filterType && filterType === "ongoing" && (
-                    <X className="inline-block w-3 h-3 sm:w-4 sm:h-4 ml-2" />
+                  {activeFilter === filterType && filterType !== "all" && (
+                    <X 
+                      className="inline-block w-3 h-3 sm:w-4 sm:h-4 ml-2" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFilterClick("all");
+                      }}
+                    />
                   )}
                 </button>
               ))}
@@ -194,53 +170,59 @@ function AllTest({
         )}
 
         {/* Tests Grid */}
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="text-purple-600 text-lg">Loading tests...</div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-            {displayTests.length > 0 ? (
-              <>
-                {displayTests.map((test) => (
-                  <TestCard
-                    key={test._id}
-                    data={test}
-                    userType={userType}
-                    status={test.status}
-                    testData={test}
-                    onStartTest={() => console.log("Starting test:", test._id)}
-                    onViewReport={() => console.log("Viewing report:", test._id)}
-                    onEdit={() => console.log("Editing test:", test._id)}
-                  />
-                ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+          {displayTests.length > 0 ? (
+            <>
+              {displayTests.map((test) => (
+                <TestCard
+                  key={test._id}
+                  data={test}
+                  userType={userType}
+                  status={test.status}
+                  testData={test}
+                  onStartTest={() => console.log("Starting test:", test._id)}
+                  onViewReport={() => console.log("Viewing report:", test._id)}
+                  onEdit={() => console.log("Editing test:", test._id)}
+                />
+              ))}
 
-                {/* View More Card */}
-                {hasMoreTests && (
-                  <button
-                    onClick={() => navigate('/admin/student-performance')}
-                    className="bg-[#000000d8] text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4 min-h-[280px] group relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-40"></div>
-                    <div className="relative z-10 text-center backdrop-blur-2xl">
-                      <h3 className="text-3xl font-bold mb-2">View More Tests</h3>
-                      <p className="text-[#fff] text-xl">
-                        {filteredTests.length - 5} more tests available
-                      </p>
-                    </div>
+              {/* View More Card - Only show if there are more tests to load */}
+              {showWrap && hasMoreTests && onViewMore && (
+                <button
+                  onClick={onViewMore}
+                  disabled={isLoadingMore}
+                  className="bg-[#000000d8] text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4 min-h-[280px] group relative overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-40"></div>
+                  <div className="relative z-10 text-center backdrop-blur-2xl">
+                    {isLoadingMore ? (
+                      <>
+                        <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" />
+                        <h3 className="text-2xl font-bold">Loading...</h3>
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="text-3xl font-bold mb-2">View More Tests</h3>
+                        <p className="text-[#fff] text-xl">
+                          Load next 5 tests
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  {!isLoadingMore && (
                     <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">
                       <ArrowRight className="w-6 h-6 cursor-pointer" />
                     </div>
-                  </button>
-                )}
-              </>
-            ) : (
-              <div className="col-span-full text-center py-12 text-gray-500">
-                No tests found matching your filters
-              </div>
-            )}
-          </div>
-        )}
+                  )}
+                </button>
+              )}
+            </>
+          ) : (
+            <div className="col-span-full text-center py-12 text-gray-500">
+              No tests found matching your filters
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

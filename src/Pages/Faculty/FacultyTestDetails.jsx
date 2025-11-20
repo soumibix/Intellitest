@@ -50,32 +50,87 @@ const FacultyTestDetails = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [files, setFiles] = useState({ question: null, answer: null });
   const [testData, setTestData] = useState(null);
+  
+  // New state for filtering and pagination
   const [allTests, setAllTests] = useState([]);
   const [testsLoading, setTestsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTests, setTotalTests] = useState(0);
+  const [currentFilter, setCurrentFilter] = useState("all");
+  const [hasMoreTests, setHasMoreTests] = useState(false);
 
   const { token } = useAuth();
   const httpHook = useHttp();
   const { loading } = httpHook;
 
-  useEffect(() => {
-    if (state.activeStep === 0) fetchAllTests();
-  }, [state.activeStep]);
+  const TESTS_PER_PAGE = 5;
 
-  const fetchAllTests = async () => {
+  // Fetch tests based on filter and page
+  const fetchAllTests = async (status = "all", page = 1, append = false) => {
     setTestsLoading(true);
     try {
-      const response = await TestAPI.fetchTests(httpHook, token, {
-        page: 1,
-        limit: 100,
-      });
+      const queryParams = {
+        page: page,
+        limit: TESTS_PER_PAGE,
+      };
+
+      // Only add status if it's not "all"
+      if (status !== "all") {
+        queryParams.status = status;
+      }
+
+      const response = await TestAPI.fetchTests(httpHook, token, queryParams);
+      
       if (response.success && response.data) {
-        setAllTests(response.data);
+        const newTests = response.data;
+        
+        // Get total from pagination object
+        const total = response.pagination?.total || response.total || 0;
+        setTotalTests(total);
+        
+        // Append or replace tests based on append flag
+        if (append) {
+          const updatedTests = [...allTests, ...newTests];
+          setAllTests(updatedTests);
+          // Check if there are more tests to load after appending
+          setHasMoreTests(updatedTests.length < total);
+        } else {
+          setAllTests(newTests);
+          // Check if there are more tests to load
+          setHasMoreTests(newTests.length < total);
+        }
       }
     } catch (error) {
       console.error("Error fetching tests:", error);
+      setAllTests(append ? allTests : []);
+      setHasMoreTests(false);
     } finally {
       setTestsLoading(false);
     }
+  };
+
+  // Initial fetch when component mounts or activeStep changes to 0
+  useEffect(() => {
+    if (state.activeStep === 0) {
+      setCurrentPage(1);
+      setCurrentFilter("all");
+      fetchAllTests("all", 1, false);
+    }
+  }, [state.activeStep]);
+
+  // Handle filter change from AllTest component
+  const handleFilterChange = (newFilter) => {
+    setCurrentFilter(newFilter);
+    setCurrentPage(1);
+    setAllTests([]); // Clear existing tests
+    fetchAllTests(newFilter, 1, false);
+  };
+
+  // Handle "View More" click
+  const handleViewMore = () => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchAllTests(currentFilter, nextPage, true); // Append to existing tests
   };
 
   useEffect(() => {
@@ -111,6 +166,7 @@ const FacultyTestDetails = () => {
   useEffect(() => {
     if (files.question) handleUploadToServer(files.question, "question");
   }, [files.question]);
+  
   useEffect(() => {
     if (files.answer) handleUploadToServer(files.answer, "answer");
   }, [files.answer]);
@@ -295,7 +351,9 @@ const FacultyTestDetails = () => {
     setState(getInitialState());
     setFiles({ question: null, answer: null });
     setTestData(null);
-    fetchAllTests();
+    setCurrentPage(1);
+    setCurrentFilter("all");
+    fetchAllTests("all", 1, false);
   };
 
   const handleConfirmCancel = async () => {
@@ -321,28 +379,6 @@ const FacultyTestDetails = () => {
     alert("Test published successfully! 🎉");
     localStorage.removeItem(STORAGE_KEY);
     handleReset();
-
-    // if (state.questionFileUrl) {
-    //   const response = await TestAPI.saveQA(
-    //     httpHook,
-    //     state.testId,
-    //     {
-    //       questionPdfUrl: state.questionFileUrl,
-    //       answerPdfUrl: state.answerFileUrl || "",
-    //     },
-    //     token
-    //   );
-
-    //   if (response.success) {
-    //     alert("Test published successfully! 🎉");
-    //     localStorage.removeItem(STORAGE_KEY);
-    //     handleReset();
-    //   } else {
-    //     alert("Failed to publish test: " + response.message);
-    //   }
-    // } else {
-    //   alert("Please complete all steps before publishing");
-    // }
   };
 
   const handleDeleteFile = (type) => {
@@ -482,12 +518,21 @@ const FacultyTestDetails = () => {
 
       {state.activeStep === 0 && (
         <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
-          {testsLoading ? (
+          {testsLoading && currentPage === 1 ? (
             <div className="flex justify-center items-center py-12">
               <div className="text-purple-600">Loading tests...</div>
             </div>
           ) : (
-            <AllTest userType="faculty" allTests={allTests} showWrap={true} />
+            <AllTest 
+              userType="faculty" 
+              allTests={allTests} 
+              showWrap={true}
+              onFilterChange={handleFilterChange}
+              onViewMore={handleViewMore}
+              hasMoreTests={hasMoreTests}
+              isLoadingMore={testsLoading && currentPage > 1}
+              totalTests={totalTests}
+            />
           )}
         </div>
       )}

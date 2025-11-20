@@ -26,12 +26,21 @@ export const TestAPI = {
         { Authorization: `Bearer ${token}` }
       );
       
+      // Handle both response structures
+      // Response structure: { success: true, pagination: {...}, data: [...] }
       return {
-        success: true,
-        data: response.data,
-        total: response.total,
-        page: response.page,
-        limit: response.limit,
+        success: response.success !== false,
+        data: response.data || [],
+        pagination: response.pagination || {
+          total: response.total || 0,
+          page: response.page || 1,
+          limit: response.limit || 10,
+          totalPages: response.totalPages || 1,
+        },
+        // Keep backward compatibility
+        total: response.pagination?.total || response.total || 0,
+        page: response.pagination?.page || response.page || 1,
+        limit: response.pagination?.limit || response.limit || 10,
       };
     } catch (error) {
       console.error('Error fetching tests:', error);
@@ -39,6 +48,15 @@ export const TestAPI = {
         success: false,
         message: error.message || 'Failed to fetch tests',
         data: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          limit: 10,
+          totalPages: 0,
+        },
+        total: 0,
+        page: 1,
+        limit: 10,
       };
     }
   },
