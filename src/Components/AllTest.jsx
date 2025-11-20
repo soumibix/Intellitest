@@ -28,34 +28,34 @@ function AllTest({
   const debounceTimerRef = useRef(null);
 
   // Fetch tests from API
-  const fetchTests = useCallback(async (searchTerm = "", status = "all") => {
-    setLoading(true);
-    try {
-      const queryParams = {
-        page: 1,
-        limit: showWrap ? 5 : 100,
-        ...(status !== "all" && { status }),
-        ...(searchTerm.trim() && { search: searchTerm.trim() })
-      };
+  // const fetchTests = useCallback(async (searchTerm = "", status = "all") => {
+  //   setLoading(true);
+  //   try {
+  //     const queryParams = {
+  //       page: 1,
+  //       limit: showWrap ? 5 : 100,
+  //       ...(status !== "all" && { status }),
+  //       ...(searchTerm.trim() && { search: searchTerm.trim() })
+  //     };
 
-      const response = await TestAPI.fetchTests(httpHook, token, queryParams);
-      setTests(response.success ? response.data || [] : []);
-    } catch (error) {
-      console.error('Error fetching tests:', error);
-      setTests([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [httpHook, token, showWrap]);
+  //     const response = await TestAPI.fetchTests(httpHook, token, queryParams);
+  //     setTests(response.success ? response.data || [] : []);
+  //   } catch (error) {
+  //     console.error('Error fetching tests:', error);
+  //     setTests([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [httpHook, token, showWrap]);
 
   // Initial fetch
-  useEffect(() => {
-    if (allTests?.length > 0) {
-      setTests(allTests);
-    } else {
-      fetchTests(searchQuery, activeFilter);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (allTests?.length > 0) {
+  //     setTests(allTests);
+  //   } else {
+  //     // fetchTests(searchQuery, activeFilter);
+  //   }
+  // }, []);
 
   // Debounced search
   useEffect(() => {
@@ -64,11 +64,11 @@ function AllTest({
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     
     debounceTimerRef.current = setTimeout(() => {
-      fetchTests(searchQuery, activeFilter);
+      // fetchTests(searchQuery, activeFilter);
     }, 500);
 
     return () => clearTimeout(debounceTimerRef.current);
-  }, [searchQuery, activeFilter, fetchTests, allTests]);
+  }, [searchQuery, activeFilter, allTests]);
 
   // Close dropdown on outside click
   useEffect(() => {

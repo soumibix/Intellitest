@@ -14,14 +14,19 @@ function UserTests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSemPopupOpen, setIsSemPopupOpen] = useState(false);
+  const {getReq}= useHttp()
   const [currentSemester, setCurrentSemester] = useState(
-    localStorage.getItem('userSemester') || 1
+    localStorage.getItem('userSemester') || 'Semester 1'
   );
+  const [generateFunction, setGenerateFunction] = useState(false);
 
   // Fetch tests on component mount
   useEffect(() => {
-    fetchUserTests();
-    setIsSemPopupOpen(true);
+    if(generateFunction===false){
+      fetchUserTests();
+      setGenerateFunction(true);
+    }
+  //   setIsSemPopupOpen(true);
   }, []);
 
   // useEffect(()=>{
@@ -36,13 +41,15 @@ function UserTests() {
     
     try {
       // Fetch tests with filters for current tests (ongoing + upcoming)
-      const response = await UserTestAPI.fetchUserTests(httpHook, token, {
-        page: 1,
-        limit: 100, // Fetch all current tests
-        // You can uncomment these to filter by department/semester
-        // department: 'IT',
-        // semester: '2nd Semester',
-      });
+      // const response = await UserTestAPI.fetchUserTests(httpHook, token, {
+      //   page: 1,
+      //   limit: 100, // Fetch all current tests
+      //   // You can uncomment these to filter by department/semester
+      //   // department: 'IT',
+      //   // semester: '2nd Semester',
+      // });
+
+      const response= await getReq('student/test/allTest?page=1&limit=5&department=CSE', token)
 
       if (response.success) {
         setAllTests(response.data);
@@ -168,9 +175,9 @@ function UserTests() {
         isOpen={isSemPopupOpen}
         onClose={() => setIsSemPopupOpen(false)}
         onSubmit={(selectedSemester) => {
-          console.log('Selected Semester:', selectedSemester.charAt(selectedSemester.length - 1));
-          setCurrentSemester(selectedSemester.charAt(selectedSemester.length - 1));
-          localStorage.setItem('userSemester', selectedSemester.charAt(selectedSemester.length - 1));
+          console.log('Selected Semester:', selectedSemester);
+          setCurrentSemester(selectedSemester);
+          localStorage.setItem('userSemester', selectedSemester);
           setIsSemPopupOpen(false);
         }}
       />
