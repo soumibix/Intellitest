@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AllTest from '../../Components/AllTest';
 import { UserTestAPI } from '../../apis/Tests/userTestData';
 import { useHttp } from '../../hooks/useHttps'; 
+import ChooseSemPopup from '../../utils/ChooseSemPopup';
 
 function UserTests() {
   const navigate = useNavigate();
@@ -12,11 +13,22 @@ function UserTests() {
   const [allTests, setAllTests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSemPopupOpen, setIsSemPopupOpen] = useState(false);
+  const [currentSemester, setCurrentSemester] = useState(
+    localStorage.getItem('userSemester') || 1
+  );
 
   // Fetch tests on component mount
   useEffect(() => {
     fetchUserTests();
+    setIsSemPopupOpen(true);
   }, []);
+
+  // useEffect(()=>{
+    // fetchUserTests(currentSemester);
+  // },[currentSemester])
+
+
 
   const fetchUserTests = async () => {
     setLoading(true);
@@ -143,12 +155,27 @@ function UserTests() {
   }
 
   return (
+    <>
     <AllTest 
       allTests={allTests} 
       filter={false}
       heading="My Tests"
       userType="user"
     />
+    {
+      isSemPopupOpen && 
+      <ChooseSemPopup 
+        isOpen={isSemPopupOpen}
+        onClose={() => setIsSemPopupOpen(false)}
+        onSubmit={(selectedSemester) => {
+          console.log('Selected Semester:', selectedSemester.charAt(selectedSemester.length - 1));
+          setCurrentSemester(selectedSemester.charAt(selectedSemester.length - 1));
+          localStorage.setItem('userSemester', selectedSemester.charAt(selectedSemester.length - 1));
+          setIsSemPopupOpen(false);
+        }}
+      />
+    }
+    </>
   );
 }
 
