@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("role");
     localStorage.removeItem("user");
     localStorage.removeItem("userData");
+    localStorage.removeItem("facultyTestProgress");
   };
 
   // Login function

@@ -36,7 +36,7 @@ const FinalPreviewPublish = ({ testData }) => {
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-lg sm:text-xl">
               <span>{testData.numberOfQuestions} Questions</span>
               <span>•</span>
-              <span>Duration: {testData.duration} {testData.duration === 1 ? 'hour' : 'hours'}</span>
+              <span>Duration: {testData.duration} minutes</span>
             </div>
 
             <div className="pt-1 text-lg sm:text-xl">

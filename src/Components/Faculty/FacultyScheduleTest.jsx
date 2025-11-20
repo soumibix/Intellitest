@@ -4,26 +4,24 @@ import BorderLabelInput from "../common/BorderLabelInput";
 const FacultyScheduleTest = ({ formData, setFormData }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Create updated object with all previous fields
-    const updated = { 
-      ...formData, 
-      [name]: value 
+
+    const updated = {
+      ...formData,
+      [name]: value,
     };
-    
-    // Auto-calculate duration when both start and end time are present
+
+    // Auto-calculate duration in minutes
     if (updated.startTime && updated.endTime) {
       const start = convertToMinutes(updated.startTime);
       const end = convertToMinutes(updated.endTime);
+
       if (end > start) {
-        const diff = end - start;
-        updated.duration = formatDuration(diff);
-      } else if (end <= start) {
-        updated.duration = ""; // Clear duration if end time is before start time
+        updated.duration = end - start; // ← store plain minutes
+      } else {
+        updated.duration = ""; // invalid time range
       }
     }
-    
-    // Pass the complete updated object
+
     setFormData(updated);
   };
 
@@ -31,14 +29,6 @@ const FacultyScheduleTest = ({ formData, setFormData }) => {
     if (!time) return 0;
     const [h, m] = time.split(":").map(Number);
     return h * 60 + m;
-  };
-
-  const formatDuration = (minutes) => {
-    const hrs = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hrs > 0 && mins > 0) return `${hrs} hr ${mins} min`;
-    if (hrs > 0) return `${hrs} hr`;
-    return `${mins} min`;
   };
 
   return (
@@ -51,6 +41,7 @@ const FacultyScheduleTest = ({ formData, setFormData }) => {
         value={formData.testDate || ""}
         onChange={handleChange}
       />
+
       <BorderLabelInput
         label="Start Time"
         name="startTime"
@@ -59,6 +50,7 @@ const FacultyScheduleTest = ({ formData, setFormData }) => {
         value={formData.startTime || ""}
         onChange={handleChange}
       />
+
       <BorderLabelInput
         label="End Time"
         name="endTime"
@@ -67,10 +59,11 @@ const FacultyScheduleTest = ({ formData, setFormData }) => {
         value={formData.endTime || ""}
         onChange={handleChange}
       />
+
       <BorderLabelInput
-        label="Duration"
+        label="Duration (minutes)"
         name="duration"
-        type="text"
+        type="number"
         required
         value={formData.duration || ""}
         placeholder="Auto calculated"
