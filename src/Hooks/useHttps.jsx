@@ -215,6 +215,7 @@ export const useHttp = () => {
   };
 
   // PATCH request
+
   const patchReq = async (url, token = "", data, isFormData = false) => {
     setLoading(true);
     setError(null);

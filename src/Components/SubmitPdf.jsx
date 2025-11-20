@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Check, CircleX  } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-function SubmitPdf({isOpen, setIsOpen}) {
+function SubmitPdf({isOpen, setIsOpen, handleSubmitTest, testId}) {
   // const [isOpen, setIsOpen] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const navigate = useNavigate();
@@ -13,10 +13,7 @@ function SubmitPdf({isOpen, setIsOpen}) {
 
   const handleSubmit = () => {
     setIsSubmitted(true);
-    setTimeout(() => {
-      setIsOpen(false);
-      navigate('/user/test-reports');
-    }, 2000);
+    handleSubmitTest(testId);
   };
 
 
