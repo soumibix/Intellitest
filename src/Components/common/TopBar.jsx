@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Search, Bell, ChevronDown, Menu } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
+import userIcon from "../../assets/purpleUser.png";
 
 export const TopBar = ({
   userName = "User",
@@ -12,6 +13,7 @@ export const TopBar = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const role = sessionStorage.getItem("role") || localStorage.getItem("role");
   const navigate = useNavigate();
+  const user = JSON.parse(sessionStorage.getItem("user") || localStorage.getItem("user"));
 
   return (
     <div className="w-full bg-white border-b border-gray-200 px-4 lg:px-6 py-3">
@@ -31,7 +33,7 @@ export const TopBar = ({
           <div className="flex items-center gap-2">
             <span className="text-2xl hidden sm:block">👋</span>
             <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
-              Hello {userName}!
+              Hey! {user.name}
             </h1>
           </div>
         </div>
@@ -39,7 +41,7 @@ export const TopBar = ({
         {/* Right side - Search, Notifications, Profile */}
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Search Bar - Hidden on small screens */}
-          {showSearch && (
+          {/* {showSearch && (
             <div className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -48,13 +50,13 @@ export const TopBar = ({
                 className="pl-10 pr-4 py-2 w-60 lg:w-80 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-          )}
+          )} */}
 
           {/* Notification Bell */}
-          <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+          {/* <button className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
             <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
-          </button>
+          </button> */}
 
           {/* Profile Dropdown */}
           <div className="relative">
@@ -63,9 +65,9 @@ export const TopBar = ({
               className="flex items-center gap-2 hover:bg-gray-50 rounded-full p-1 pr-2 sm:pr-3 transition-colors"
             >
               <img
-                src={profileImage}
+                src={userIcon}
                 alt="Profile"
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200"
+                className="w-10 h-10 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-gray-200"
               />
               <ChevronDown
                 className={`w-4 h-4 text-gray-600 transition-transform hidden sm:block ${

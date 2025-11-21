@@ -3,6 +3,7 @@ import { SquarePen, LockKeyhole } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from '../assets/iem.jpg';
 import TestPopup from "../utils/TestPopup";
+import userIcon from "../assets/purpleUser.png";
 
 function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }) {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
   const calculateTimeRemaining = () => {
     if (status !== "ongoing" || !endTime) return null;
     // This is a placeholder - implement actual time calculation based on your needs
-    return "58:07 mins remaining";
+    return `Exam ends at ${endTime}`;
   };
 
   const statusStyles = {
@@ -88,7 +89,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
           </div>
         </div>
 
-        {(userType === "admin" || userType === "faculty") && (status === "ongoing" || status === "upcoming") && (
+        {(userType === "admin" || userType === "faculty") && ( status === "upcoming") && (
           <button onClick={onEdit} className="p-2 hover:bg-gray-50 rounded-lg">
             <SquarePen className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
           </button>
@@ -104,7 +105,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
         <span className="text-gray-400">•</span>
         <span>{numberOfQuestions * 2 || questions.length * 2 || 0} Marks</span>
         <span className="text-gray-400">•</span>
-        <span>Duration: {duration} {typeof duration === 'number' ? 'minutes' : ''}</span>
+        <span>Duration: {duration} minutes</span>
       </div>
 
       <div className="text-gray-600 mb-2 text-sm sm:text-base">
@@ -173,9 +174,13 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
         <div className="border-t border-gray-200 pt-4 mt-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-100 flex items-center justify-center">
+              {/* <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-100 flex items-center justify-center">
                 <span className="text-purple-600 font-bold text-lg sm:text-xl">{createdBy.name ? createdBy.name.charAt(0) : 'F'}</span>
-              </div>
+              </div> */}
+              {/* <div className="w-10 h-10 sm:w-10 sm:h-10 rounded-full bg-purple-100 flex items-center justify-center"> */}
+
+              <img src={userIcon} alt="" className="w-10 h-10 sm:w-10 sm:h-10 rounded-full border-2 border-[#444444]"/>
+              {/* </div> */}
               <div className="flex flex-col">
                 <span className="text-sm sm:text-base font-medium text-gray-900">{createdBy.name}</span>
                 <span className="text-gray-500 text-xs sm:text-sm font-bold">{createdBy.designation}</span>
@@ -185,7 +190,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
             {status === "completed" && (
               <button 
                 onClick={handleViewReport} 
-                className="bg-purple-600 hover:bg-purple-700 cursor-pointer text-white px-4 sm:px-6 py-2 rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base whitespace-nowrap"
+                className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white px-4 sm:px-6 py-2 rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base whitespace-nowrap"
               >
                 View Report
               </button>

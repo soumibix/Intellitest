@@ -214,7 +214,7 @@ const TestDetails = () => {
               {activeStep < 4 ? (
                 <Button
                   onClick={() => handleSaveAndContinue(activeStep + 1)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
+                  className="bg-[#6B21A8] hover:bg-[#410d6b] text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
                   text="Save & Continue"
                   padding="px-5 py-3"
                   icon={<ArrowRight />}
@@ -225,7 +225,7 @@ const TestDetails = () => {
               ) : (
                 <Button
                   onClick={handleReset}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
+                  className="bg-[#6B21A8] hover:bg-[#410d6b] text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
                   text="Publish Test"
                   padding="px-5 py-3"
                   color="#631891"

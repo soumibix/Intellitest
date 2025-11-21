@@ -483,7 +483,7 @@ const FacultyTestDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-10">
+    <div className="min-h-screen py-10 px-10">
       <FacultyProgressiveStepper
         activeStep={state.activeStep}
         onSaveAndContinue={handleSaveAndContinue}
@@ -505,7 +505,7 @@ const FacultyTestDetails = () => {
             <div className="ml-auto flex gap-3">
               <button
                 onClick={() => setShowCancelModal(true)}
-                className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-2 rounded transition-all duration-300"
+                className="border border-gray-300 text-gray-700 hover:bg-red-600 hover:text-white cursor-pointer font-medium px-8 py-2 rounded transition-all duration-300"
                 disabled={loading}
               >
                 Cancel
@@ -513,7 +513,7 @@ const FacultyTestDetails = () => {
               {state.activeStep < 4 ? (
                 <button
                   onClick={() => handleSaveAndContinue(state.activeStep + 1)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2"
+                  className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2"
                   disabled={loading}
                 >
                   {loading ? "Saving..." : "Save & Continue"}{" "}
@@ -522,7 +522,7 @@ const FacultyTestDetails = () => {
               ) : (
                 <button
                   onClick={handlePublish}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded transition-all duration-300"
+                  className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white font-medium px-6 py-3 rounded transition-all duration-300"
                   disabled={loading}
                 >
                   Publish Test
@@ -536,6 +536,7 @@ const FacultyTestDetails = () => {
       {state.activeStep === 0 && (
         <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
           <AllTest
+            heading="Explore All Tests"
             userType="faculty"
             allTests={allTests}
             showWrap={true}

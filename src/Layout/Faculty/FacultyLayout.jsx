@@ -54,7 +54,17 @@ function FacultyLayout({ children }) {
 
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar userName="Faculty" onMenuClick={handleMenuClick} onLogout={handleFacultyLogout}/>
-        <main className="flex-1 overflow-auto">{children}</main>
+        {/* MAIN CONTENT + FOOTER WRAPPER */}
+  {/* <div className="flex flex-col flex-1 overflow-hidden"> */}
+    <main className="flex-1 overflow-auto p-4">
+      {children}
+    </main>
+
+    {/* FOOTER */}
+    {/* <footer className="bg-white text-gray-600 text-center py-3 border-gray-600-t">
+      © {new Date().getFullYear()} IEM | All Rights Reserved
+    </footer>
+  </div> */}
       </div>
     </div>
   );

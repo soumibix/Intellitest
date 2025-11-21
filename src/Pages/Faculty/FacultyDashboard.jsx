@@ -5,7 +5,8 @@ import Button from "../../Components/common/Button";
 import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
 import { useHttp } from "../../Hooks/useHttps";
 import { departmentOptions } from "../../Config/dummyData";
-
+import Lottie from "lottie-react";
+import handLoading from "../../Lottie/handLoading.json"
 const FacultyDashboard = () => {
   const httpHook = useHttp();
   const [loading, setLoading] = useState(true);
@@ -150,10 +151,11 @@ const FacultyDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading profile...</p>
-        </div>
+        <Lottie 
+            animationData={handLoading} 
+            loop={true}
+            style={{ width: 500, height: 500 }}
+          />
       </div>
     );
   }
