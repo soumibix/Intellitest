@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import { useNavigate } from "react-router-dom";
-import SignInImg from "../../assets/Authentication3.jpg";
+import SignInImg from "../../assets/Authentication3.webp";
 import { studentAuthAPI } from "../../apis/auth/studentAuth";
 import { useHttp } from "../../Hooks/useHttps";
 

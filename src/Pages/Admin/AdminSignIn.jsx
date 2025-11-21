@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
-import SignInImg from "../../assets/Authentication3.jpg";
+import SignInImg from "../../assets/Authentication3.webp"
 import { useNotification } from "../../Context/NotificationContext";
 import { adminAuthAPI } from "../../apis/auth/adminAuth";
 import { useAuth } from "../../Context/AuthContext";
