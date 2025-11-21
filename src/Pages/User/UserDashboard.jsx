@@ -33,13 +33,6 @@ const UserDashboard = () => {
     fetchProfileData();
   }, []);
 
-/*************  ✨ Windsurf Command ⭐  *************/
-/**
- * Fetches user profile data from server and updates form data with fetched profile.
- * Also sets profile completion status based on server response.
- * @returns {Promise<void>} - Promise that resolves when profile data is fetched and form data is updated.
- */
-/*******  4bdcd95d-b663-4a07-8fb3-055d03bd2d56  *******/
   const fetchProfileData = async () => {
     setLoading(true);
     try {
