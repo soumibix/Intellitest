@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
-import SignInImg from "../../assets/Authentication3.jpg";
+import SignInImg from "../../assets/Authentication3.webp";
 import { useNavigate } from "react-router-dom";
 
 const UserForgotPassword = () => {

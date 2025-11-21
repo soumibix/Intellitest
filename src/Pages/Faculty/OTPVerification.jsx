@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
-import SignInImg from "../../assets/Authentication3.jpg";
+import SignInImg from "../../assets/Authentication3.webp";
 import Button from "../../Components/common/Button";
 import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
 import { useHttp } from "../../Hooks/useHttps";
