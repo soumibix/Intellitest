@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
+import React from "react";
+import { Menu, X, LogOut } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 export function Sidebar({
@@ -8,6 +8,7 @@ export function Sidebar({
   isCollapsed,
   onToggle,
   onClose,
+  onLogout,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,7 +38,7 @@ export function Sidebar({
 
       {/* Sidebar */}
       <div
-        className={`fixed lg:static top-0 left-0 h-screen bg-[#1A0B2E] text-white transition-all duration-300 ease-in-out z-50 ${
+        className={`fixed lg:static top-0 left-0 h-screen bg-[#1A0B2E] text-white transition-all duration-300 ease-in-out z-50 flex flex-col ${
           isCollapsed ? "w-20" : "w-64"
         } ${isOpen || window.innerWidth >= 1024 ? "translate-x-0" : "-translate-x-full"}`}
       >
@@ -52,7 +53,7 @@ export function Sidebar({
           </h1>
           <button
             onClick={onToggle}
-            className="p-2 rounded-lg hover:bg-purple-800/30 transition-colors"
+            className="p-2 rounded-lg hover:bg-purple-800/30 transition-colors cursor-pointer"
             aria-label="Toggle Sidebar"
           >
             {isCollapsed ? (
@@ -64,7 +65,7 @@ export function Sidebar({
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -73,7 +74,7 @@ export function Sidebar({
                 <li key={item.id}>
                   <button
                     onClick={() => handleItemClick(item)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer ${
                       active
                         ? "bg-[#631891] text-white shadow-lg"
                         : "text-gray-300 hover:text-white hover:bg-purple-900/30"
@@ -96,6 +97,33 @@ export function Sidebar({
             })}
           </ul>
         </nav>
+
+        {/* Logout Button at Bottom */}
+        <div className="border-[#14061F] bg-[#14061F]">
+          <button
+            onClick={() => {
+              if (window.innerWidth < 1024) {
+                onClose?.();
+              }
+              onLogout?.();
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-5 transition-all duration-200 text-gray-300 hover:text-white hover:bg-red-600/80 cursor-pointer ${
+              isCollapsed ? "justify-center" : ""
+            }`}
+            title={isCollapsed ? "Logout" : ""}
+          >
+            <LogOut className="w-6 h-6 flex-shrink-0" />
+            <span
+              className={`text-lg font-medium whitespace-nowrap transition-all duration-300 ${
+                isCollapsed
+                  ? "opacity-0 w-0 overflow-hidden"
+                  : "opacity-100 w-auto"
+              }`}
+            >
+              Logout
+            </span>
+          </button>
+        </div>
       </div>
     </>
   );

@@ -164,12 +164,12 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
                         />
 
                         <div className="flex flex-col items-center gap-4">
-                            <div className={`relative cursor-pointer ${isDragging ? 'bg-purple-600' : 'bg-purple-600'} p-4 rounded-lg`}
+                            <div className={`relative cursor-pointer ${isDragging ? 'bg-[#4e884c]' : 'bg-[#631891]'} p-4 rounded-lg`}
                                 onClick={() => fileInputRef.current?.click()}
                             >
                                 <Upload className="w-8 h-8 text-white" strokeWidth={2.5} />
                                 <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
-                                    <div className="bg-purple-600 rounded-full p-0.5">
+                                    <div className="bg-[#631891] rounded-full p-0.5">
                                         <Upload className="w-3 h-3 text-white" strokeWidth={3} />
                                     </div>
                                 </div>

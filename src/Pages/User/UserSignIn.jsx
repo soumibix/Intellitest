@@ -90,8 +90,8 @@ const UserSignIn = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle="Welcome back, educator!"
-      leftDescription="Sign in to manage your assessments, monitor student progress, and continue your IntelliTest teaching journey."
+      leftTitle="Welcome back, student!"
+      leftDescription="Sign in to give your tests, monitor your progress, and continue your IntelliTest teaching journey."
       heading="Welcome"
       colorHeading="Back"
       fields={fields}

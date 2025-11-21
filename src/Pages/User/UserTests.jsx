@@ -4,6 +4,8 @@ import AllTest from '../../Components/AllTest';
 import { UserTestAPI } from '../../apis/Tests/userTestData';
 import { useHttp } from '../../Hooks/useHttps'; 
 import ChooseSemPopup from '../../utils/ChooseSemPopup';
+import Lottie from 'lottie-react';
+import handLoading from "../../Lottie/handLoading.json";
 
 function UserTests() {
   const navigate = useNavigate();
@@ -145,7 +147,11 @@ function UserTests() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-purple-600 text-xl">Loading tests...</div>
+        <Lottie 
+            animationData={handLoading} 
+            loop={true}
+            style={{ width: 500, height: 500 }}
+          />
       </div>
     );
   }
@@ -171,7 +177,7 @@ function UserTests() {
     <AllTest 
       allTests={allTests} 
       filter={false}
-      heading="My Tests"
+      heading="Your Test Collection"
       userType="user"
     />
     {

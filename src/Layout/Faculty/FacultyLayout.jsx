@@ -8,7 +8,7 @@ function FacultyLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
-  const {logout} = useAuth();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -50,21 +50,19 @@ function FacultyLayout({ children }) {
         isCollapsed={sidebarCollapsed}
         onToggle={handleMenuClick}
         onClose={closeSidebar}
+        onLogout={handleFacultyLogout}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar userName="Faculty" onMenuClick={handleMenuClick} onLogout={handleFacultyLogout}/>
+        <TopBar userName="Faculty" onMenuClick={handleMenuClick} />
         {/* MAIN CONTENT + FOOTER WRAPPER */}
-  {/* <div className="flex flex-col flex-1 overflow-hidden"> */}
-    <main className="flex-1 overflow-auto p-4">
-      {children}
-    </main>
+        {/* <div className="flex flex-col flex-1 overflow-hidden"> */}
+        <main className="flex-1 overflow-auto p-4">{children}</main>
 
-    {/* FOOTER */}
-    {/* <footer className="bg-white text-gray-600 text-center py-3 border-gray-600-t">
-      © {new Date().getFullYear()} IEM | All Rights Reserved
-    </footer>
-  </div> */}
+        {/* FOOTER */}
+        <footer className="bg-white text-gray-600 text-center py-5 border-t border-gray-200">
+          © {new Date().getFullYear()} Developed by IEMA R&D Pvt. Ltd. | All Rights Reserved
+        </footer>
       </div>
     </div>
   );

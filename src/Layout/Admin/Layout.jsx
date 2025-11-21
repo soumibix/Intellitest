@@ -51,11 +51,19 @@ function Layout({ children }) {
         isCollapsed={sidebarCollapsed}
         onToggle={handleMenuClick}
         onClose={closeSidebar}
+        onLogout={handleAdminLogout}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <TopBar userName="Admin" onMenuClick={handleMenuClick} onLogout={handleAdminLogout}/>
-        <main className="flex-1 overflow-auto">{children}</main>
+        <TopBar userName="Admin" onMenuClick={handleMenuClick}/>
+        <div className="flex flex-col flex-1 overflow-hidden">
+          <main className="flex-1 overflow-auto p-4">{children}</main>
+
+          {/* FOOTER */}
+          <footer className="bg-white text-gray-600 text-center py-5 border-t border-gray-200">
+            © {new Date().getFullYear()} Developed by IEMA R&D Pvt. Ltd. | All Rights Reserved
+          </footer>
+        </div>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import AllTest from "../../Components/AllTest";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useHttp } from "../../Hooks/useHttps";
 import { useAuth } from "../../AppRouter";
+import { useNotification } from "../../Context/NotificationContext";
 import ConfirmationModal from "../../utils/ConfirmationModal";
 import { TestAPI } from "../../apis/Tests/TestCRUD";
 
@@ -16,7 +17,15 @@ const STORAGE_KEY = "facultyTestProgress";
 const getInitialState = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // IMPORTANT: If activeStep is 4, reset to 3 on page reload
+      // because testData is not persisted and marks need to be verified
+      if (parsed.activeStep === 4) {
+        parsed.activeStep = 3;
+      }
+      return parsed;
+    }
   } catch (error) {
     console.error("Error loading saved state:", error);
   }
@@ -44,6 +53,12 @@ const getInitialState = () => {
   };
 };
 
+// Helper function to check if all marks are assigned
+const checkAllMarksAssigned = (testData) => {
+  if (!testData || !testData.questions) return false;
+  return testData.questions.every(q => q.score && q.score > 0);
+};
+
 const FacultyTestDetails = () => {
   const initialState = getInitialState();
   const [state, setState] = useState(initialState);
@@ -51,7 +66,6 @@ const FacultyTestDetails = () => {
   const [files, setFiles] = useState({ question: null, answer: null });
   const [testData, setTestData] = useState(null);
 
-  // New state for filtering and pagination
   const [allTests, setAllTests] = useState([]);
   const [testsLoading, setTestsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,51 +77,39 @@ const FacultyTestDetails = () => {
   const { token } = useAuth();
   const httpHook = useHttp();
   const { loading } = httpHook;
+  const { showError, showSuccess, showWarning } = useNotification();
 
   const TESTS_PER_PAGE = 5;
 
-  // Fetch tests based on filter and page
+  // Check if publish should be enabled
+  const canPublish = checkAllMarksAssigned(testData);
+
   const fetchAllTests = async (status = "all", page = 1, append = false, search = "") => {
     setTestsLoading(true);
     try {
-      const queryParams = {
-        page: page,
-        limit: TESTS_PER_PAGE,
-      };
-
-      // Only add status if it's not "all"
-      if (status !== "all") {
-        queryParams.status = status;
-      }
-
-      // Add search query if provided
-      if (search && search.trim() !== "") {
-        queryParams.search = search.trim();
-      }
+      const queryParams = { page, limit: TESTS_PER_PAGE };
+      if (status !== "all") queryParams.status = status;
+      if (search && search.trim() !== "") queryParams.search = search.trim();
 
       const response = await TestAPI.fetchTests(httpHook, token, queryParams);
 
       if (response.success && response.data) {
         const newTests = response.data;
-
-        // Get total from pagination object
         const total = response.pagination?.total || response.total || 0;
         setTotalTests(total);
 
-        // Append or replace tests based on append flag
         if (append) {
           const updatedTests = [...allTests, ...newTests];
           setAllTests(updatedTests);
-          // Check if there are more tests to load after appending
           setHasMoreTests(updatedTests.length < total);
         } else {
           setAllTests(newTests);
-          // Check if there are more tests to load
           setHasMoreTests(newTests.length < total);
         }
       }
     } catch (error) {
       console.error("Error fetching tests:", error);
+      showError("Failed to fetch tests. Please try again.");
       setAllTests(append ? allTests : []);
       setHasMoreTests(false);
     } finally {
@@ -115,7 +117,6 @@ const FacultyTestDetails = () => {
     }
   };
 
-  // Initial fetch when component mounts or activeStep changes to 0
   useEffect(() => {
     if (state.activeStep === 0) {
       setCurrentPage(1);
@@ -125,35 +126,37 @@ const FacultyTestDetails = () => {
     }
   }, [state.activeStep]);
 
-  // Handle filter change from AllTest component
   const handleFilterChange = (newFilter) => {
     setCurrentFilter(newFilter);
     setCurrentPage(1);
-    setAllTests([]); // Clear existing tests
+    setAllTests([]);
     fetchAllTests(newFilter, 1, false, searchQuery);
   };
 
-  // Handle search change from AllTest component
   const handleSearchChange = (search) => {
     setSearchQuery(search);
     setCurrentPage(1);
-    setCurrentFilter("all"); // Reset filter when searching
-    setAllTests([]); // Clear existing tests
+    setCurrentFilter("all");
+    setAllTests([]);
     fetchAllTests("all", 1, false, search);
   };
 
-  // Handle "View More" click
   const handleViewMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchAllTests(currentFilter, nextPage, true, searchQuery); // Append to existing tests
+    fetchAllTests(currentFilter, nextPage, true, searchQuery);
   };
 
   useEffect(() => {
     try {
       // Only save to localStorage if we're past step 0
+      // Never save step 4 - always save as step 3 max
       if (state.activeStep > 0) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const stateToSave = {
+          ...state,
+          activeStep: state.activeStep === 4 ? 3 : state.activeStep
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
       }
     } catch (error) {
       console.error("Error saving state:", error);
@@ -169,13 +172,11 @@ const FacultyTestDetails = () => {
     if (response.success) {
       setState((prev) => ({
         ...prev,
-        [type === "question" ? "questionFileUrl" : "answerFileUrl"]:
-          response.fileUrl,
-        [type === "question" ? "questionFileName" : "answerFileName"]:
-          file.name,
+        [type === "question" ? "questionFileUrl" : "answerFileUrl"]: response.fileUrl,
+        [type === "question" ? "questionFileName" : "answerFileName"]: file.name,
       }));
     } else {
-      alert(`Failed to upload ${type} file. Please try again.`);
+      showError(`Failed to upload ${type} file. Please try again.`);
     }
   };
 
@@ -189,166 +190,91 @@ const FacultyTestDetails = () => {
 
   const validateStep = (step) => {
     if (step === 1) {
-      const {
-        department,
-        semester,
-        subjectName,
-        subjectCode,
-        testCategory,
-        numberOfQuestions,
-      } = state.testFormData;
-
-      return (
-        department?.trim() !== "" &&
-        semester?.trim() !== "" &&
-        subjectName?.trim() !== "" &&
-        subjectCode?.trim() !== "" &&
-        testCategory?.trim() !== "" &&
-        numberOfQuestions?.toString().trim() !== "" &&
-        parseInt(numberOfQuestions) > 0
-      );
+      const { department, semester, subjectName, subjectCode, testCategory, numberOfQuestions } = state.testFormData;
+      return department?.trim() !== "" && semester?.trim() !== "" && subjectName?.trim() !== "" &&
+        subjectCode?.trim() !== "" && testCategory?.trim() !== "" &&
+        numberOfQuestions?.toString().trim() !== "" && parseInt(numberOfQuestions) > 0;
     }
-
     if (step === 2) {
       const { testDate, startTime, endTime, duration } = state.scheduleFormData;
-
-      return (
-        testDate?.trim() !== "" &&
-        startTime?.trim() !== "" &&
-        endTime?.trim() !== "" &&
-        duration?.toString().trim() !== "" &&
-        parseInt(duration) > 0
-      );
+      return testDate?.trim() !== "" && startTime?.trim() !== "" &&
+        endTime?.trim() !== "" && duration?.toString().trim() !== "" && parseInt(duration) > 0;
     }
-
     if (step === 3) {
       return state.questionFileUrl;
     }
-
     return true;
   };
 
   const handleSaveAndContinue = async (nextStep) => {
     if (!validateStep(state.activeStep)) {
       let errorMsg = "Please fill all required fields";
-
       if (state.activeStep === 1) {
         const missingFields = [];
-        const {
-          department,
-          semester,
-          subjectName,
-          subjectCode,
-          testCategory,
-          numberOfQuestions,
-        } = state.testFormData;
-
+        const { department, semester, subjectName, subjectCode, totalMarks, testCategory, numberOfQuestions } = state.testFormData;
         if (!department?.trim()) missingFields.push("Department");
         if (!semester?.trim()) missingFields.push("Semester");
         if (!subjectName?.trim()) missingFields.push("Subject Name");
         if (!subjectCode?.trim()) missingFields.push("Subject Code");
+        if (!totalMarks || parseInt(totalMarks) <= 0) missingFields.push("Total Marks");
         if (!testCategory?.trim()) missingFields.push("Test Category");
-        if (!numberOfQuestions || parseInt(numberOfQuestions) <= 0)
-          missingFields.push("Number of Questions");
-
-        if (missingFields.length > 0) {
-          errorMsg = `Please fill the following fields:\n${missingFields.join(
-            ", "
-          )}`;
-        }
+        if (!numberOfQuestions || parseInt(numberOfQuestions) <= 0) missingFields.push("Number of Questions");
+        if (missingFields.length > 0) errorMsg = `Please fill the following fields: ${missingFields.join(", ")}`;
       }
-
-      alert(errorMsg);
+      showError(errorMsg);
       return;
     }
 
     let response;
-    const {
-      activeStep,
-      testId,
-      testFormData,
-      scheduleFormData,
-      questionFileUrl,
-      answerFileUrl,
-    } = state;
+    const { activeStep, testId, testFormData, scheduleFormData, questionFileUrl, answerFileUrl } = state;
 
     if (activeStep === 1) {
-      const payload = {
-        ...testFormData,
-        numberOfQuestions: parseInt(testFormData.numberOfQuestions),
-      };
-
+      const payload = { ...testFormData, numberOfQuestions: parseInt(testFormData.numberOfQuestions), totalMarks: parseInt(testFormData.totalMarks) };
       if (!testId) {
         response = await TestAPI.addTest(httpHook, payload, token);
         if (response.success && response.data) {
-          setState((prev) => ({
-            ...prev,
-            testId: response.data._id || response.data.testId,
-            activeStep: nextStep,
-          }));
-          alert("Test created successfully!");
+          setState((prev) => ({ ...prev, testId: response.data._id || response.data.testId, activeStep: nextStep }));
+          showSuccess("Test created successfully!");
         } else {
-          alert("Failed to create test: " + response.message);
+          showError("Failed to create test: " + response.message);
         }
       } else {
         response = await TestAPI.updateTest(httpHook, testId, payload, token);
         if (response.success) {
           setState((prev) => ({ ...prev, activeStep: nextStep }));
-          alert("Test details updated successfully!");
+          showSuccess("Test details updated successfully!");
         } else {
-          alert("Failed to update test: " + response.message);
+          showError("Failed to update test: " + response.message);
         }
       }
     } else if (activeStep === 2) {
-      if (!testId) {
-        alert("Test ID is missing. Please complete step 1 first.");
-        return;
-      }
-
-      const payload = {
-        ...scheduleFormData,
-        duration: parseInt(scheduleFormData.duration),
-      };
+      if (!testId) { showError("Test ID is missing. Please complete step 1 first."); return; }
+      const payload = { ...scheduleFormData, duration: parseInt(scheduleFormData.duration) };
       response = await TestAPI.scheduleTest(httpHook, testId, payload, token);
-
       if (response.success) {
         setState((prev) => ({ ...prev, activeStep: nextStep }));
-        alert("Schedule updated successfully!");
+        showSuccess("Schedule updated successfully!");
       } else {
-        alert("Failed to update schedule: " + response.message);
+        showError("Failed to update schedule: " + response.message);
       }
     } else if (activeStep === 3) {
-      if (!testId) {
-        alert("Test ID is missing. Please complete previous steps first.");
-        return;
-      }
-
+      if (!testId) { showError("Test ID is missing. Please complete previous steps first."); return; }
       if (questionFileUrl && answerFileUrl) {
-        response = await TestAPI.saveQA(
-          httpHook,
-          testId,
-          { questionPdfUrl: questionFileUrl, answerPdfUrl: answerFileUrl },
-          token
-        );
+        response = await TestAPI.saveQA(httpHook, testId, { questionPdfUrl: questionFileUrl, answerPdfUrl: answerFileUrl }, token);
         if (response.success) {
           setState((prev) => ({ ...prev, activeStep: nextStep }));
           setTestData(response.updated);
-          alert("Question and Answer files saved successfully!");
+          showSuccess("Question and Answer files saved successfully!");
         } else {
-          alert("Failed to save files: " + response.message);
+          showError("Failed to save files: " + response.message);
         }
       } else if (questionFileUrl) {
-        response = await TestAPI.generateAnswer(
-          httpHook,
-          testId,
-          { pdfUrl: questionFileUrl },
-          token
-        );
+        response = await TestAPI.generateAnswer(httpHook, testId, { pdfUrl: questionFileUrl }, token);
         if (response.success) {
           setTestData(response.updated);
           setState((prev) => ({ ...prev, activeStep: nextStep }));
         } else {
-          console.error("Failed to generate answers:", response.message);
+          showError("Failed to generate answers: " + response.message);
         }
       }
     } else {
@@ -357,9 +283,7 @@ const FacultyTestDetails = () => {
   };
 
   const handleBack = () => {
-    if (state.activeStep > 0) {
-      setState((prev) => ({ ...prev, activeStep: prev.activeStep - 1 }));
-    }
+    if (state.activeStep > 0) setState((prev) => ({ ...prev, activeStep: prev.activeStep - 1 }));
   };
 
   const handleReset = () => {
@@ -376,198 +300,99 @@ const FacultyTestDetails = () => {
   const handleConfirmCancel = async () => {
     if (state.testId) {
       const response = await TestAPI.deleteTest(httpHook, state.testId, token);
-      if (response.success) {
-        alert("Test deleted successfully!");
-        handleReset();
-      } else {
-        alert("Failed to delete test: " + response.message);
-      }
-    } else {
-      handleReset();
-    }
+      if (response.success) { showSuccess("Test deleted successfully!"); handleReset(); }
+      else { showError("Failed to delete test: " + response.message); }
+    } else { handleReset(); }
     setShowCancelModal(false);
   };
 
   const handlePublish = async () => {
-    if (!state.testId) {
-      alert("Test ID is missing. Please complete all previous steps.");
+    if (!state.testId) { showError("Test ID is missing. Please complete all previous steps."); return; }
+    
+    // Check if all marks are assigned before publishing
+    if (!canPublish) {
+      const questionsWithoutMarks = testData?.questions?.filter(q => !q.score || q.score <= 0).length || 0;
+      showError(`Please assign marks to all questions before publishing. ${questionsWithoutMarks} question(s) still need marks.`);
       return;
     }
-    alert("Test published successfully! 🎉");
+    
+    showSuccess("Test published successfully! 🎉");
     localStorage.removeItem(STORAGE_KEY);
     handleReset();
   };
 
   const handleDeleteFile = (type) => {
     if (type === "question") {
-      setState((prev) => ({
-        ...prev,
-        questionFileUrl: "",
-        questionFileName: "",
-      }));
+      setState((prev) => ({ ...prev, questionFileUrl: "", questionFileName: "" }));
       setFiles((prev) => ({ ...prev, question: null }));
     } else {
-      setState((prev) => ({
-        ...prev,
-        answerFileUrl: "",
-        answerFileName: "",
-      }));
+      setState((prev) => ({ ...prev, answerFileUrl: "", answerFileName: "" }));
       setFiles((prev) => ({ ...prev, answer: null }));
     }
   };
 
   const renderStepContent = () => {
     switch (state.activeStep) {
-      case 1:
-        return (
-          <FacultyAddTestData
-            formData={state.testFormData}
-            setFormData={(updatedData) => {
-              setState((prev) => ({
-                ...prev,
-                testFormData: updatedData,
-              }));
-            }}
-          />
-        );
-      case 2:
-        return (
-          <FacultyScheduleTest
-            formData={state.scheduleFormData}
-            setFormData={(updatedData) => {
-              setState((prev) => ({
-                ...prev,
-                scheduleFormData: updatedData,
-              }));
-            }}
-          />
-        );
-      case 3:
-        return (
-          <FacultyUploadQuestions
-            questionFile={files.question}
-            setQuestionFile={(file) =>
-              setFiles((prev) => ({ ...prev, question: file }))
-            }
-            answerFile={files.answer}
-            setAnswerFile={(file) =>
-              setFiles((prev) => ({ ...prev, answer: file }))
-            }
-            questionFileUrl={state.questionFileUrl}
-            answerFileUrl={state.answerFileUrl}
-            questionFileName={state.questionFileName}
-            answerFileName={state.answerFileName}
-            setQuestionFileUrl={(url) =>
-              setState((prev) => ({ ...prev, questionFileUrl: url }))
-            }
-            setAnswerFileUrl={(url) =>
-              setState((prev) => ({ ...prev, answerFileUrl: url }))
-            }
-            onDeleteFile={handleDeleteFile}
-            testId={state.testId}
-          />
-        );
-      case 4:
-        return (
-          <FacultyReviewPublish
-            testData={testData}
-            testId={state.testId}
-            httpHook={httpHook}
-            token={token}
-            setTestData={setTestData}
-          />
-        );
-      default:
-        return null;
+      case 1: return <FacultyAddTestData formData={state.testFormData} setFormData={(data) => setState((prev) => ({ ...prev, testFormData: data }))} />;
+      case 2: return <FacultyScheduleTest formData={state.scheduleFormData} setFormData={(data) => setState((prev) => ({ ...prev, scheduleFormData: data }))} />;
+      case 3: return <FacultyUploadQuestions questionFile={files.question} setQuestionFile={(file) => setFiles((prev) => ({ ...prev, question: file }))} answerFile={files.answer} setAnswerFile={(file) => setFiles((prev) => ({ ...prev, answer: file }))} questionFileUrl={state.questionFileUrl} answerFileUrl={state.answerFileUrl} questionFileName={state.questionFileName} answerFileName={state.answerFileName} setQuestionFileUrl={(url) => setState((prev) => ({ ...prev, questionFileUrl: url }))} setAnswerFileUrl={(url) => setState((prev) => ({ ...prev, answerFileUrl: url }))} onDeleteFile={handleDeleteFile} testId={state.testId} />;
+      case 4: return <FacultyReviewPublish testData={testData} testId={state.testId} httpHook={httpHook} token={token} setTestData={setTestData} />;
+      default: return null;
     }
   };
 
   return (
-    <div className="min-h-screen py-10 px-10">
-      <FacultyProgressiveStepper
-        activeStep={state.activeStep}
-        onSaveAndContinue={handleSaveAndContinue}
-      />
+    <div className="min-h-screen md:py-10 md:px-10">
+      <FacultyProgressiveStepper activeStep={state.activeStep} onSaveAndContinue={handleSaveAndContinue} />
 
       {state.activeStep > 0 && (
         <div className="mx-auto bg-white rounded-lg shadow-md p-8 mt-0">
           <div className="mb-8">{renderStepContent()}</div>
-          <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+          <div className="flex md:flex-row flex-col gap-5 justify-between items-center pt-6 border-t border-gray-200">
             {state.activeStep > 1 && (
-              <button
-                onClick={handleBack}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2"
-                disabled={loading}
-              >
+              <button onClick={handleBack} className="bg-[#631891] hover:bg-[#410964] text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2 cursor-pointer" disabled={loading}>
                 <ArrowLeft size={18} /> Back
               </button>
             )}
             <div className="ml-auto flex gap-3">
-              <button
-                onClick={() => setShowCancelModal(true)}
-                className="border border-gray-300 text-gray-700 hover:bg-red-600 hover:text-white cursor-pointer font-medium px-8 py-2 rounded transition-all duration-300"
-                disabled={loading}
-              >
+              <button onClick={() => setShowCancelModal(true)} className="border border-gray-300 text-gray-700 hover:bg-red-600 hover:text-white cursor-pointer font-medium px-8 py-2 rounded transition-all duration-300" disabled={loading}>
                 Cancel
               </button>
               {state.activeStep < 4 ? (
-                <button
-                  onClick={() => handleSaveAndContinue(state.activeStep + 1)}
-                  className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2"
-                  disabled={loading}
-                >
-                  {loading ? "Saving..." : "Save & Continue"}{" "}
-                  {!loading && <ArrowRight size={18} />}
+                <button onClick={() => handleSaveAndContinue(state.activeStep + 1)} className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2" disabled={loading}>
+                  {loading ? "Saving..." : "Save & Continue"} {!loading && <ArrowRight size={18} />}
                 </button>
               ) : (
                 <button
                   onClick={handlePublish}
-                  className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white font-medium px-6 py-3 rounded transition-all duration-300"
-                  disabled={loading}
+                  disabled={loading || !canPublish}
+                  className={`
+                    font-medium px-6 py-3 rounded transition-all duration-300
+                    ${canPublish 
+                      ? 'bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white' 
+                      : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                    }
+                  `}
+                  title={!canPublish ? 'Please assign marks to all questions first' : 'Publish this test'}
                 >
-                  Publish Test
+                  {!canPublish ? '⚠️ Assign Marks First' : 'Publish Test'}
                 </button>
               )}
             </div>
           </div>
         </div>
       )}
+      
 
       {state.activeStep === 0 && (
         <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
-          <AllTest
-            heading="Explore All Tests"
-            userType="faculty"
-            allTests={allTests}
-            showWrap={true}
-            onFilterChange={handleFilterChange}
-            onSearchChange={handleSearchChange}
-            onViewMore={handleViewMore}
-            hasMoreTests={hasMoreTests}
-            isLoadingMore={testsLoading && currentPage > 1}
-            isLoading={testsLoading && currentPage === 1}
-            totalTests={totalTests}
-            displayedTestsCount={allTests.length}
-            activeFilterProp={currentFilter}
-          />
+          <AllTest heading="Explore All Tests" userType="faculty" allTests={allTests} showWrap={true} onFilterChange={handleFilterChange} onSearchChange={handleSearchChange} onViewMore={handleViewMore} hasMoreTests={hasMoreTests} isLoadingMore={testsLoading && currentPage > 1} isLoading={testsLoading && currentPage === 1} totalTests={totalTests} displayedTestsCount={allTests.length} activeFilterProp={currentFilter} />
         </div>
       )}
 
-      <ConfirmationModal
-        isOpen={showCancelModal}
-        onClose={() => setShowCancelModal(false)}
-        onConfirm={handleConfirmCancel}
-        title="Cancel Test Creation"
-        message={
-          state.testId
-            ? "Are you sure you want to cancel? This will delete the test you've created."
-            : "Are you sure you want to cancel? All progress will be lost."
-        }
-        confirmText="Delete Test"
-        cancelText="Keep Editing"
-        isLoading={loading}
-      />
+      <ConfirmationModal isOpen={showCancelModal} onClose={() => setShowCancelModal(false)} onConfirm={handleConfirmCancel} title="Cancel Test Creation" message={state.testId ? "Are you sure you want to cancel? This will delete the test you've created." : "Are you sure you want to cancel? All progress will be lost."} confirmText="Delete Test" cancelText="Keep Editing" isLoading={loading} />
     </div>
+    
   );
 };
 

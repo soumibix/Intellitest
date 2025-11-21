@@ -4,7 +4,9 @@ import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
 import { studentAuthAPI } from "../../apis/auth/studentAuth";
 import { useHttp } from "../../Hooks/useHttps";
-import { campusOptions, departmentOptions } from "../../Config/dummyData";
+import { batchOptions, campusOptions, departmentOptions, sectionOptions } from "../../Config/dummyData";
+import handLoading from "../../Lottie/handLoading.json";
+import Lottie from "lottie-react";
 
 const UserDashboard = () => {
   const httpHook = useHttp();
@@ -31,6 +33,13 @@ const UserDashboard = () => {
     fetchProfileData();
   }, []);
 
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Fetches user profile data from server and updates form data with fetched profile.
+ * Also sets profile completion status based on server response.
+ * @returns {Promise<void>} - Promise that resolves when profile data is fetched and form data is updated.
+ */
+/*******  4bdcd95d-b663-4a07-8fb3-055d03bd2d56  *******/
   const fetchProfileData = async () => {
     setLoading(true);
     try {
@@ -132,52 +141,53 @@ const UserDashboard = () => {
   //   { value: "CSE", label: "CSE" },
   // ];
 
-  const batchOptions = [
-    { value: "", label: "Your Batch" },
-    { value: "2021-2025", label: "2021-2025" },
-    { value: "2022-2026", label: "2022-2026" },
-    { value: "2023-2027", label: "2023-2027" },
-    { value: "2024-2028", label: "2024-2028" },
-    { value: "2020-2024", label: "2020-2024" },
-  ];
+  // const batchOptions = [
+  //   { value: "", label: "Your Batch" },
+  //   { value: "2021-2025", label: "2021-2025" },
+  //   { value: "2022-2026", label: "2022-2026" },
+  //   { value: "2023-2027", label: "2023-2027" },
+  //   { value: "2024-2028", label: "2024-2028" },
+  //   { value: "2020-2024", label: "2020-2024" },
+  // ];
 
-  const sectionOptions = [
-    { value: "", label: "Select Section" },
-    { value: "A", label: "Section A" },
-    { value: "B", label: "Section B" },
-    { value: "C", label: "Section C" },
-    { value: "D", label: "Section D" },
-    { value: "E", label: "Section E" },
-    { value: "F", label: "Section F" },
-    { value: "G", label: "Section G" },
-    { value: "H", label: "Section H" },
-    { value: "I", label: "Section I" },
-    { value: "J", label: "Section J" },
-    { value: "K", label: "Section K" },
-    { value: "L", label: "Section L" },
-    { value: "M", label: "Section M" },
-    { value: "N", label: "Section N" },
-    { value: "O", label: "Section O" },
-    { value: "P", label: "Section P" },
-    { value: "Q", label: "Section Q" },
-    { value: "R", label: "Section R" },
-    { value: "S", label: "Section S" },
-    { value: "T", label: "Section T" },
-    { value: "U", label: "Section U" },
-    { value: "V", label: "Section V" },
-    { value: "W", label: "Section W" },
-    { value: "X", label: "Section X" },
-    { value: "Y", label: "Section Y" },
-    { value: "Z", label: "Section Z" },
-  ];
+  // const sectionOptions = [
+  //   { value: "", label: "Select Section" },
+  //   { value: "A", label: "Section A" },
+  //   { value: "B", label: "Section B" },
+  //   { value: "C", label: "Section C" },
+  //   { value: "D", label: "Section D" },
+  //   { value: "E", label: "Section E" },
+  //   { value: "F", label: "Section F" },
+  //   { value: "G", label: "Section G" },
+  //   { value: "H", label: "Section H" },
+  //   { value: "I", label: "Section I" },
+  //   { value: "J", label: "Section J" },
+  //   { value: "K", label: "Section K" },
+  //   { value: "L", label: "Section L" },
+  //   { value: "M", label: "Section M" },
+  //   { value: "N", label: "Section N" },
+  //   { value: "O", label: "Section O" },
+  //   { value: "P", label: "Section P" },
+  //   { value: "Q", label: "Section Q" },
+  //   { value: "R", label: "Section R" },
+  //   { value: "S", label: "Section S" },
+  //   { value: "T", label: "Section T" },
+  //   { value: "U", label: "Section U" },
+  //   { value: "V", label: "Section V" },
+  //   { value: "W", label: "Section W" },
+  //   { value: "X", label: "Section X" },
+  //   { value: "Y", label: "Section Y" },
+  //   { value: "Z", label: "Section Z" },
+  // ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading profile...</p>
-        </div>
+        <Lottie 
+            animationData={handLoading} 
+            loop={true}
+            style={{ width: 500, height: 500 }}
+          />
       </div>
     );
   }

@@ -32,7 +32,7 @@ export const ErrorPopup = ({ takeData, setPopupShow, variant = "error" }) => {
   return (
     <div className="fixed top-4 right-4 z-50 animate-slide-in">
       <div className={`${bgColor} ${borderColor} border-l-4 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px] max-w-[500px] transition-all duration-300 hover:shadow-xl`}>
-        <span className="text-2xl">{icon}</span>
+        {/* <span className="text-2xl">{icon}</span> */}
         <div className="flex-1">
           <p className="font-medium">{takeData}</p>
         </div>

@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Search, Bell, ChevronDown, Menu } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import userIcon from "../../assets/purpleUser.png";
+import Lottie from "lottie-react";
+import wavingHand from "../../Lottie/hand wave.json";
 
 export const TopBar = ({
   userName = "User",
   showSearch = true,
-  onLogout = () => console.log("Logout clicked"),
   onMenuClick,
   profileImage = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
 }) => {
@@ -14,6 +15,17 @@ export const TopBar = ({
   const role = sessionStorage.getItem("role") || localStorage.getItem("role");
   const navigate = useNavigate();
   const user = JSON.parse(sessionStorage.getItem("user") || localStorage.getItem("user"));
+
+  const handleProfileClick = () => {
+    setDropdownOpen(false);
+    if (role === "superadmin") {
+      navigate("/admin/dashboard");
+    } else if (role === "faculty") {
+      navigate("/faculty/dashboard");
+    } else {
+      navigate("/user/dashboard");
+    }
+  };
 
   return (
     <div className="w-full bg-white border-b border-gray-200 px-4 lg:px-6 py-3">
@@ -31,7 +43,12 @@ export const TopBar = ({
 
           {/* Greeting */}
           <div className="flex items-center gap-2">
-            <span className="text-2xl hidden sm:block">👋</span>
+            {/* <span className="text-2xl hidden sm:block">👋</span> */}
+            <Lottie 
+            animationData={wavingHand} 
+            loop={true}
+            style={{ width: 50, height: 50 }}
+          />
             <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
               Hey! {user.name}
             </h1>
@@ -62,7 +79,7 @@ export const TopBar = ({
           <div className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 hover:bg-gray-50 rounded-full p-1 pr-2 sm:pr-3 transition-colors"
+              className="flex items-center gap-2 hover:bg-gray-50 rounded-full p-1 pr-2 sm:pr-3 transition-colors cursor-pointer"
             >
               <img
                 src={userIcon}
@@ -86,25 +103,13 @@ export const TopBar = ({
                 ></div>
 
                 {/* Dropdown Content */}
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
                   <button
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      onLogout();
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    onClick={handleProfileClick}
+                    className="w-full cursor-pointer text-left px-4 py-4 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                   >
-                    Logout
+                    Your Profile
                   </button>
-                  {role === "superadmin" && (
-                    <button
-                      onClick={() => {navigate("/admin/dashboard");
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      Your Profile
-                    </button>
-                  )}
                 </div>
               </>
             )}

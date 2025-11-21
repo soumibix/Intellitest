@@ -7,11 +7,13 @@ import { useHttp } from "../../Hooks/useHttps";
 import { departmentOptions } from "../../Config/dummyData";
 import Lottie from "lottie-react";
 import handLoading from "../../Lottie/handLoading.json"
+import { useNotification } from "../../Context/NotificationContext";
 const FacultyDashboard = () => {
   const httpHook = useHttp();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const token= sessionStorage.getItem('token');
+  const {showSuccess, showError} = useNotification ();
   
   // Get user data from sessionStorage
   const userDataStr = sessionStorage.getItem('user');
@@ -103,7 +105,8 @@ const FacultyDashboard = () => {
       );
 
       if (response.success) {
-        alert("Profile updated successfully!");
+        // alert("Profile updated successfully!");
+        showSuccess(response.message || "Profile updated successfully!");
         
         // Update profile completion status
         setIsProfileComplete(true);
@@ -113,7 +116,8 @@ const FacultyDashboard = () => {
           sessionStorage.setItem('user', JSON.stringify(response.data));
         }
       } else {
-        alert(response.message || "Failed to update profile");
+        showError(response.message || "Failed to update profile");
+        // alert(response.message || "Failed to update profile");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -162,12 +166,12 @@ const FacultyDashboard = () => {
 
   return (
     <div className="relative">
-      <div className="mx-4 sm:mx-6 lg:mx-8 flex flex-col justify-between min-h-screen">
+      <div className="mx-4 sm:mx-6 lg:mx-6 flex flex-col justify-between min-h-screen">
         {/* Faculty Details Card */}
-        <div className="p-4 sm:p-6 lg:p-8">
+        <div className="p-4 sm:p-6 lg:p-6">
           {/* Header */}
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
-            <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+            <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#6D28D9]" />
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
               Faculty Details
             </h2>
@@ -195,7 +199,6 @@ const FacultyDashboard = () => {
               disabled={true}
             />
 
-            {/* Row 2 - Campus, Department, Designation */}
             <Input
               type="dropdown"
               label="Campus"
@@ -242,6 +245,7 @@ const FacultyDashboard = () => {
               iconPosition="right"
               onClick={handleSubmit}
               disabled={submitting}
+              textSize="md:text-lg text-md"
             />
           </div>
         </div>
