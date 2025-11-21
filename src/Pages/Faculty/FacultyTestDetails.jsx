@@ -50,7 +50,7 @@ const FacultyTestDetails = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [files, setFiles] = useState({ question: null, answer: null });
   const [testData, setTestData] = useState(null);
-  
+
   // New state for filtering and pagination
   const [allTests, setAllTests] = useState([]);
   const [testsLoading, setTestsLoading] = useState(false);
@@ -58,6 +58,7 @@ const FacultyTestDetails = () => {
   const [totalTests, setTotalTests] = useState(0);
   const [currentFilter, setCurrentFilter] = useState("all");
   const [hasMoreTests, setHasMoreTests] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { token } = useAuth();
   const httpHook = useHttp();
@@ -66,7 +67,7 @@ const FacultyTestDetails = () => {
   const TESTS_PER_PAGE = 5;
 
   // Fetch tests based on filter and page
-  const fetchAllTests = async (status = "all", page = 1, append = false) => {
+  const fetchAllTests = async (status = "all", page = 1, append = false, search = "") => {
     setTestsLoading(true);
     try {
       const queryParams = {
@@ -79,15 +80,20 @@ const FacultyTestDetails = () => {
         queryParams.status = status;
       }
 
+      // Add search query if provided
+      if (search && search.trim() !== "") {
+        queryParams.search = search.trim();
+      }
+
       const response = await TestAPI.fetchTests(httpHook, token, queryParams);
-      
+
       if (response.success && response.data) {
         const newTests = response.data;
-        
+
         // Get total from pagination object
         const total = response.pagination?.total || response.total || 0;
         setTotalTests(total);
-        
+
         // Append or replace tests based on append flag
         if (append) {
           const updatedTests = [...allTests, ...newTests];
@@ -114,7 +120,8 @@ const FacultyTestDetails = () => {
     if (state.activeStep === 0) {
       setCurrentPage(1);
       setCurrentFilter("all");
-      fetchAllTests("all", 1, false);
+      setSearchQuery("");
+      fetchAllTests("all", 1, false, "");
     }
   }, [state.activeStep]);
 
@@ -123,14 +130,23 @@ const FacultyTestDetails = () => {
     setCurrentFilter(newFilter);
     setCurrentPage(1);
     setAllTests([]); // Clear existing tests
-    fetchAllTests(newFilter, 1, false);
+    fetchAllTests(newFilter, 1, false, searchQuery);
+  };
+
+  // Handle search change from AllTest component
+  const handleSearchChange = (search) => {
+    setSearchQuery(search);
+    setCurrentPage(1);
+    setCurrentFilter("all"); // Reset filter when searching
+    setAllTests([]); // Clear existing tests
+    fetchAllTests("all", 1, false, search);
   };
 
   // Handle "View More" click
   const handleViewMore = () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    fetchAllTests(currentFilter, nextPage, true); // Append to existing tests
+    fetchAllTests(currentFilter, nextPage, true, searchQuery); // Append to existing tests
   };
 
   useEffect(() => {
@@ -166,7 +182,7 @@ const FacultyTestDetails = () => {
   useEffect(() => {
     if (files.question) handleUploadToServer(files.question, "question");
   }, [files.question]);
-  
+
   useEffect(() => {
     if (files.answer) handleUploadToServer(files.answer, "answer");
   }, [files.answer]);
@@ -353,7 +369,8 @@ const FacultyTestDetails = () => {
     setTestData(null);
     setCurrentPage(1);
     setCurrentFilter("all");
-    fetchAllTests("all", 1, false);
+    setSearchQuery("");
+    fetchAllTests("all", 1, false, "");
   };
 
   const handleConfirmCancel = async () => {
@@ -518,22 +535,20 @@ const FacultyTestDetails = () => {
 
       {state.activeStep === 0 && (
         <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
-          {testsLoading && currentPage === 1 ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="text-purple-600">Loading tests...</div>
-            </div>
-          ) : (
-            <AllTest 
-              userType="faculty" 
-              allTests={allTests} 
-              showWrap={true}
-              onFilterChange={handleFilterChange}
-              onViewMore={handleViewMore}
-              hasMoreTests={hasMoreTests}
-              isLoadingMore={testsLoading && currentPage > 1}
-              totalTests={totalTests}
-            />
-          )}
+          <AllTest
+            userType="faculty"
+            allTests={allTests}
+            showWrap={true}
+            onFilterChange={handleFilterChange}
+            onSearchChange={handleSearchChange}
+            onViewMore={handleViewMore}
+            hasMoreTests={hasMoreTests}
+            isLoadingMore={testsLoading && currentPage > 1}
+            isLoading={testsLoading && currentPage === 1}
+            totalTests={totalTests}
+            displayedTestsCount={allTests.length}
+            activeFilterProp={currentFilter}
+          />
         </div>
       )}
 
