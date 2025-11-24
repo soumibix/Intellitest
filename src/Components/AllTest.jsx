@@ -28,6 +28,8 @@ function AllTest({
   displayedTestsCount = 0,
   onEdit = null, // Add onEdit callback
   onDelete = null, // Add onDelete callback
+  isShowSemPopUp = false,
+  setIsSemPopupOpen
 }) {
   const navigate = useNavigate();
 
@@ -157,6 +159,17 @@ function AllTest({
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6B21A8] border-l-4 border-[#6B21A8] pl-2">
             {heading}
           </h1>
+
+          {
+            isShowSemPopUp && (
+              <button
+                onClick={() => setIsSemPopupOpen(true)}
+                className="flex items-center gap-2 bg-[#4d1717] text-white px-4 py-2 rounded-md text-sm cursor-pointer hover:bg-[#4d1717d0] transition-colors"
+              >
+                Select Semester
+              </button>
+            )
+          }
 
           {/* Search Bar */}
           <div className="flex flex-col w-full sm:w-80 lg:w-96 gap-2">

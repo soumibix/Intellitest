@@ -160,6 +160,8 @@ function UserTests() {
         onFilterChange={handleFilterChange}
         activeFilterProp={activeFilter}
         isLoading={loading}
+        setIsSemPopupOpen={setIsSemPopupOpen}
+        isShowSemPopUp={true}
       />
       
       {isSemPopupOpen && 
