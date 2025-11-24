@@ -15,7 +15,6 @@ function TestReports() {
     });
 
     const httpHook = useHttp();
-    const isInitialMount = useRef(true);
     const abortControllerRef = useRef(null);
     
     // Get user data from localStorage
@@ -133,7 +132,6 @@ function TestReports() {
     useEffect(() => {
         console.log('🚀 Component mounted, fetching initial tests');
         fetchCompletedTests(1, '');
-        isInitialMount.current = false;
         
         // Cleanup
         return () => {
@@ -143,26 +141,6 @@ function TestReports() {
         };
     }, []); // Empty dependency array - runs only once on mount
 
-    // Handle search with debounce
-    useEffect(() => {
-        // Skip the initial mount since we already fetch in the first useEffect
-        if (isInitialMount.current) {
-            return;
-        }
-
-        console.log('🔍 Search query changed to:', `"${searchQuery}"`);
-        
-        const delayDebounce = setTimeout(() => {
-            console.log('⏱️ Debounce completed, executing search for:', `"${searchQuery}"`);
-            fetchCompletedTests(1, searchQuery);
-        }, 500);
-
-        return () => {
-            console.log('🧹 Cleaning up debounce timeout');
-            clearTimeout(delayDebounce);
-        };
-    }, [searchQuery]); // Only depends on searchQuery
-
     // Handle pagination
     const handlePageChange = (newPage) => {
         console.log('📄 Page changed to:', newPage);
@@ -170,9 +148,12 @@ function TestReports() {
     };
 
     // Handle search query change from AllTest component
+    // This will be called by AllTest's internal debounced search
     const handleSearchChange = (query) => {
-        console.log('🔤 Search input changed:', `"${query}"`);
+        console.log('🔤 Search received from AllTest:', `"${query}"`);
         setSearchQuery(query);
+        // Fetch with the new search query
+        fetchCompletedTests(1, query);
     };
 
     if (loading && allTests.length === 0) {
@@ -208,11 +189,10 @@ function TestReports() {
                 allTests={allTests} 
                 filter={false} 
                 userType='user'
-                onSearch={handleSearchChange}
-                searchQuery={searchQuery}
+                onSearchChange={handleSearchChange} // AllTest will handle debouncing internally
                 pagination={pagination}
                 onPageChange={handlePageChange}
-                loading={loading}
+                isLoading={loading} // Changed from 'loading' to 'isLoading' to match AllTest props
             />
 
             {allTests.length === 0 && !loading && !error && (
