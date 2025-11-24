@@ -50,7 +50,7 @@ export const TopBar = ({
             style={{ width: 50, height: 50 }}
           />
             <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
-              Hey! {user.name}
+              Hey! {user?.name}
             </h1>
           </div>
         </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '../Components/common/Button';
 
 function ChooseSemPopup({ isOpen, onClose, onSubmit }) {
-  const [selectedSemester, setSelectedSemester] = useState(localStorage.getItem('userSemester')||'Semester 7');
+  const [selectedSemester, setSelectedSemester] = useState(localStorage.getItem('userSemester')||'Semester 1');
 
   const semesters = [
     'Semester 1',
