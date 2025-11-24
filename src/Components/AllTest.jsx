@@ -6,7 +6,8 @@ import {
   X,
   ArrowRight,
   Loader2,
-  TextSelect
+  TextSelect,
+  MousePointer
 } from "lucide-react";
 import TestCard from "../Components/TestCard";
 import handLoading from "../Lottie/handLoading.json"
@@ -165,7 +166,7 @@ function AllTest({
 
             {
               isShowSemPopUp && (
-                <Button onClick={() => setIsSemPopupOpen(true)} variant="outline" textSize="text-md" text="Choose your semester" icon={<TextSelect/> }/>
+                <Button iconPosition={'right'} onClick={() => setIsSemPopupOpen(true)} variant="outline" textSize="text-md" text={`Choose Semester: ${localStorage.getItem('userSemester')? `${localStorage.getItem('userSemester')}`: "Choose your semester"}`} icon={<MousePointer /> }/>
               )
             }
           </div>
