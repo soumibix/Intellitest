@@ -6,10 +6,12 @@ import {
   X,
   ArrowRight,
   Loader2,
+  TextSelect
 } from "lucide-react";
 import TestCard from "../Components/TestCard";
 import handLoading from "../Lottie/handLoading.json"
 import Lottie from "lottie-react";
+import Button from "./common/Button";
 
 function AllTest({
   heading = "All Tests",
@@ -122,13 +124,13 @@ function AllTest({
   const filteredTests = onSearchChange
     ? tests // Use tests directly from API when using API search
     : tests.filter((test) => {
-        const matchesSearch =
-          searchQuery.length === 0 ||
-          test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesMonth =
-          selectedMonth === "All" || test.month === selectedMonth;
-        return matchesSearch && matchesMonth;
-      });
+      const matchesSearch =
+        searchQuery.length === 0 ||
+        test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesMonth =
+        selectedMonth === "All" || test.month === selectedMonth;
+      return matchesSearch && matchesMonth;
+    });
 
   // Display limited tests if showWrap is true (but show all loaded tests)
   const displayTests = filteredTests;
@@ -137,14 +139,14 @@ function AllTest({
   const suggestions =
     !onSearchChange && searchQuery.length > 0
       ? tests
-          .filter((test) =>
-            test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          .map((test) => test.subjectName)
-          .filter(
-            (value, index, self) => value && self.indexOf(value) === index
-          ) // Remove duplicates
-          .slice(0, 5)
+        .filter((test) =>
+          test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .map((test) => test.subjectName)
+        .filter(
+          (value, index, self) => value && self.indexOf(value) === index
+        ) // Remove duplicates
+        .slice(0, 5)
       : [];
 
   // Calculate remaining tests to load
@@ -156,20 +158,17 @@ function AllTest({
       <div className="w-full mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6B21A8] border-l-4 border-[#6B21A8] pl-2">
-            {heading}
-          </h1>
+          <div className="flex gap-10">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6B21A8] border-l-4 border-[#6B21A8] pl-2">
+              {heading}
+            </h1>
 
-          {
-            isShowSemPopUp && (
-              <button
-                onClick={() => setIsSemPopupOpen(true)}
-                className="flex items-center gap-2 bg-[#4d1717] text-white px-4 py-2 rounded-md text-sm cursor-pointer hover:bg-[#4d1717d0] transition-colors"
-              >
-                Select Semester
-              </button>
-            )
-          }
+            {
+              isShowSemPopUp && (
+                <Button onClick={() => setIsSemPopupOpen(true)} variant="outline" textSize="text-md" text="Choose your semester" icon={<TextSelect/> }/>
+              )
+            }
+          </div>
 
           {/* Search Bar */}
           <div className="flex flex-col w-full sm:w-80 lg:w-96 gap-2">
@@ -211,11 +210,10 @@ function AllTest({
                 <button
                   key={filterType}
                   onClick={() => handleFilterClick(filterType)}
-                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${
-                    activeFilter === filterType
+                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${activeFilter === filterType
                       ? "bg-[#1A0B2E] text-white"
                       : "bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#d4b3f3]"
-                  }`}
+                    }`}
                 >
                   {filterType === "all"
                     ? "View All"
@@ -238,8 +236,8 @@ function AllTest({
         {/* Tests Grid */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Lottie 
-              animationData={handLoading} 
+            <Lottie
+              animationData={handLoading}
               loop={true}
               style={{ width: '100%', maxWidth: 500, height: 'auto' }}
             />
