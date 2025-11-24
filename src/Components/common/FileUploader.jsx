@@ -9,8 +9,8 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef(null);
 
-    console.log({uploadedFileUrl});
-    console.log({fileName});
+    // console.log({uploadedFileUrl});
+    // console.log({fileName});
     
     // Effect to restore file from S3 URL when component mounts or uploadedFileUrl changes
     useEffect(() => {

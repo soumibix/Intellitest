@@ -209,6 +209,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data }
           marks: (numberOfQuestions || questions.length) * 2, 
           duration: `${duration} minutes`, 
         }} 
+        _id={_id}
       />
     </div>
   );

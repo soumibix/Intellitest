@@ -53,7 +53,7 @@ export function Sidebar({
           </h1>
           <button
             onClick={onToggle}
-            className="p-2 rounded-lg hover:bg-purple-800/30 transition-colors cursor-pointer"
+            className="p-2 z-10 rounded-lg hover:bg-purple-800/30 transition-colors cursor-pointer"
             aria-label="Toggle Sidebar"
           >
             {isCollapsed ? (
