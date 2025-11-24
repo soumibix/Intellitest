@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AllTest from '../../Components/AllTest';
 import { UserTestAPI } from '../../apis/Tests/userTestData';
@@ -10,7 +10,7 @@ import handLoading from "../../Lottie/handLoading.json";
 function UserTests() {
   const navigate = useNavigate();
   const httpHook = useHttp();
-  const token  = sessionStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   
   const [allTests, setAllTests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,44 +19,80 @@ function UserTests() {
   const [currentSemester, setCurrentSemester] = useState(
     localStorage.getItem('userSemester')
   );
+  
+  // New states for search and filtering
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [debounceTimer, setDebounceTimer] = useState(null);
 
-  // Fetch tests on component mount
-  // useEffect(() => {
-  //   if(generateFunction===false){
-  //     fetchUserTests();
-  //     setGenerateFunction(true);
-  //   }
-  //   setIsSemPopupOpen(true);
-  // }, []);
-
-  useEffect(()=>{
-    if(!localStorage.getItem('userSemester')){
+  // Check if semester is selected
+  useEffect(() => {
+    if (!localStorage.getItem('userSemester')) {
       setIsSemPopupOpen(true);
     }
-    // fetchUserTests();
-  },[])
+  }, []);
 
-  useEffect(()=>{
+  // Fetch tests when semester or filter changes
+  useEffect(() => {
     fetchUserTests();
-  },[currentSemester])
+  }, [currentSemester, activeFilter]);
 
+  // Debounced search effect
+  useEffect(() => {
+    // Clear existing timer
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
 
+    // Set new timer for search
+    const timer = setTimeout(() => {
+      if (searchQuery !== '') {
+        fetchUserTests();
+      } else if (searchQuery === '') {
+        // If search is cleared, fetch all tests
+        fetchUserTests();
+      }
+    }, 500); // 500ms debounce delay
+
+    setDebounceTimer(timer);
+
+    // Cleanup
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [searchQuery]);
 
   const fetchUserTests = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Fetch tests with filters for current tests (ongoing + upcoming)
-      const response = await UserTestAPI.fetchUserTests(httpHook, token, {
+      // Build query params
+      const queryParams = {
         page: 1,
-        limit: 100, // Fetch all current tests
-        // You can uncomment these to filter by department/semester
-        department: sessionStorage.getItem('user').department,
+        limit: 100,
+        department: sessionStorage.getItem('user')?.department,
         semester: currentSemester || undefined,
-      });
+      };
 
-      console.log(response)
+      // Add search query if exists
+      if (searchQuery && searchQuery.trim() !== '') {
+        queryParams.search = searchQuery.trim();
+      }
+
+      // Add status filter if not 'all'
+      if (activeFilter && activeFilter !== 'all') {
+        queryParams.status = activeFilter;
+      }
+
+      console.log('Fetching tests with params:', queryParams);
+
+      // Fetch tests with filters
+      const response = await UserTestAPI.fetchUserTests(httpHook, token, queryParams);
+
+      console.log('API Response:', response);
 
       if (response.success) {
         setAllTests(response.data);
@@ -73,85 +109,26 @@ function UserTests() {
     }
   };
 
-  // Helper function to get month from date
-  const getMonthFromDate = (dateString) => {
-    if (!dateString) return 'Unknown';
-    const date = new Date(dateString);
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[date.getMonth()];
-  };
+  // Handle search input change
+  const handleSearchChange = useCallback((query) => {
+    console.log('Search query changed:', query);
+    setSearchQuery(query);
+  }, []);
 
-  // Helper function to calculate time remaining
-  const calculateTimeRemaining = (endTime, testDate) => {
-    if (!endTime || !testDate) return 'N/A';
-    
-    try {
-      const [hours, minutes] = endTime.split(':').map(Number);
-      const testEndDate = new Date(testDate);
-      testEndDate.setHours(hours, minutes, 0, 0);
-      
-      const now = new Date();
-      const diffMs = testEndDate - now;
-      
-      if (diffMs <= 0) return 'Time expired';
-      
-      const diffMins = Math.floor(diffMs / 60000);
-      const hoursLeft = Math.floor(diffMins / 60);
-      const minsLeft = diffMins % 60;
-      
-      if (hoursLeft > 0) {
-        return `${hoursLeft}:${minsLeft.toString().padStart(2, '0')} hours remaining`;
-      }
-      return `${minsLeft} mins remaining`;
-    } catch (error) {
-      console.error('Error calculating time remaining:', error);
-      return 'N/A';
-    }
-  };
+  // Handle filter change
+  const handleFilterChange = useCallback((filter) => {
+    console.log('Filter changed:', filter);
+    setActiveFilter(filter);
+  }, []);
 
-  // Helper function to format date and time
-  const formatDateTime = (dateString, timeString) => {
-    if (!dateString) return 'N/A';
-    
-    try {
-      const date = new Date(dateString);
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      
-      const month = months[date.getMonth()];
-      const day = date.getDate();
-      
-      // Format time if available
-      if (timeString) {
-        const [hours, minutes] = timeString.split(':').map(Number);
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const formattedHours = hours % 12 || 12;
-        return `${month} ${day} • ${formattedHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
-      }
-      
-      return `${month} ${day}`;
-    } catch (error) {
-      console.error('Error formatting date time:', error);
-      return 'N/A';
-    }
-  };
-
-  // Helper function to calculate total marks (assuming 2 marks per question)
-  const calculateTotalMarks = (questionCount) => {
-    return questionCount ? questionCount * 2 : 0;
-  };
-
-  if (loading) {
+  if (loading && allTests.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Lottie 
-            animationData={handLoading} 
-            loop={true}
-            style={{ width: 500, height: 500 }}
-          />
+          animationData={handLoading} 
+          loop={true}
+          style={{ width: 500, height: 500 }}
+        />
       </div>
     );
   }
@@ -174,25 +151,31 @@ function UserTests() {
 
   return (
     <>
-    <AllTest 
-      allTests={allTests} 
-      filter={false}
-      heading="Your Test Collection"
-      userType="user"
-    />
-    {
-      isSemPopupOpen && 
-      <ChooseSemPopup 
-        isOpen={isSemPopupOpen}
-        onClose={() => setIsSemPopupOpen(false)}
-        onSubmit={(selectedSemester) => {
-          console.log('Selected Semester:', selectedSemester);
-          setCurrentSemester(selectedSemester);
-          localStorage.setItem('userSemester', selectedSemester);
-          setIsSemPopupOpen(false);
-        }}
+      <AllTest 
+        allTests={allTests} 
+        filter={true}
+        heading="Your Test Collection"
+        userType="user"
+        onSearchChange={handleSearchChange}
+        onFilterChange={handleFilterChange}
+        activeFilterProp={activeFilter}
+        isLoading={loading}
+        setIsSemPopupOpen={setIsSemPopupOpen}
+        isShowSemPopUp={true}
       />
-    }
+      
+      {isSemPopupOpen && 
+        <ChooseSemPopup 
+          isOpen={isSemPopupOpen}
+          onClose={() => setIsSemPopupOpen(false)}
+          onSubmit={(selectedSemester) => {
+            console.log('Selected Semester:', selectedSemester);
+            setCurrentSemester(selectedSemester);
+            localStorage.setItem('userSemester', selectedSemester);
+            setIsSemPopupOpen(false);
+          }}
+        />
+      }
     </>
   );
 }

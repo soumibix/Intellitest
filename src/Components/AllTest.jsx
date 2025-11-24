@@ -23,9 +23,13 @@ function AllTest({
   isLoadingMore = false,
   totalTests = 0,
   activeFilterProp = null,
-  isLoading = false, // Add loading prop
-  onSearchChange = null, // Add search callback prop
-  displayedTestsCount = 0, // Add displayed count prop
+  isLoading = false,
+  onSearchChange = null,
+  displayedTestsCount = 0,
+  onEdit = null, // Add onEdit callback
+  onDelete = null, // Add onDelete callback
+  isShowSemPopUp = false,
+  setIsSemPopupOpen
 }) {
   const navigate = useNavigate();
 
@@ -145,7 +149,7 @@ function AllTest({
 
   // Calculate remaining tests to load
   const remainingTests = totalTests - displayedTestsCount;
-  const nextBatchSize = Math.min(10, remainingTests); // Changed from 5 to 10
+  const nextBatchSize = Math.min(10, remainingTests);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -156,51 +160,61 @@ function AllTest({
             {heading}
           </h1>
 
+          {
+            isShowSemPopUp && (
+              <button
+                onClick={() => setIsSemPopupOpen(true)}
+                className="flex items-center gap-2 bg-[#4d1717] text-white px-4 py-2 rounded-md text-sm cursor-pointer hover:bg-[#4d1717d0] transition-colors"
+              >
+                Select Semester
+              </button>
+            )
+          }
+
           {/* Search Bar */}
           <div className="flex flex-col w-full sm:w-80 lg:w-96 gap-2">
-  {/* Search Input */}
-  <div className="flex items-center gap-3 bg-white border border-[#6B21A8] rounded-3xl px-4 py-2.5 sm:py-3">
-    <Search className="text-[#6B21A8] w-5 h-5" />
+            {/* Search Input */}
+            <div className="flex items-center gap-3 bg-white border border-[#6B21A8] rounded-3xl px-4 py-2.5 sm:py-3">
+              <Search className="text-[#6B21A8] w-5 h-5 flex-shrink-0" />
 
-    <input
-      type="text"
-      placeholder="Search by Test Name, Code, Department"
-      value={searchQuery}
-      onChange={(e) => handleSearchChange(e.target.value)}
-      className="flex-1 focus:outline-none text-sm sm:text-base"
-    />
-  </div>
+              <input
+                type="text"
+                placeholder="Search by Test Name, Code, Department"
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="flex-1 focus:outline-none text-sm sm:text-base min-w-0"
+              />
+            </div>
 
-  {/* Suggestions */}
-  {suggestions.length > 0 && (
-    <div className="flex flex-col bg-white border border-gray-200 rounded-xl shadow-lg py-2">
-      {suggestions.map((suggestion, index) => (
-        <div
-          key={index}
-          onClick={() => handleSearchChange(suggestion)}
-          className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-700 text-sm"
-        >
-          {suggestion}
-        </div>
-      ))}
-    </div>
-  )}
-</div>
-
+            {/* Suggestions */}
+            {suggestions.length > 0 && (
+              <div className="flex flex-col bg-white border border-gray-200 rounded-xl shadow-lg py-2 max-h-60 overflow-y-auto">
+                {suggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleSearchChange(suggestion)}
+                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-700 text-sm"
+                  >
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Filter Buttons */}
         {filter && (
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
+            <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 scrollbar-hide">
               {["ongoing", "completed", "upcoming", "all"].map((filterType) => (
                 <button
                   key={filterType}
                   onClick={() => handleFilterClick(filterType)}
-                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap ${
+                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${
                     activeFilter === filterType
                       ? "bg-[#1A0B2E] text-white"
-                      : "bg-[#E9D5FF] text-[#6B21A8]"
+                      : "bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#d4b3f3]"
                   }`}
                 >
                   {filterType === "all"
@@ -218,20 +232,18 @@ function AllTest({
                 </button>
               ))}
             </div>
-
-            
           </div>
         )}
 
         {/* Tests Grid */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
-          <Lottie 
-            animationData={handLoading} 
-            loop={true}
-            style={{ width: 500, height: 500 }}
-          />
-        </div>
+            <Lottie 
+              animationData={handLoading} 
+              loop={true}
+              style={{ width: '100%', maxWidth: 500, height: 'auto' }}
+            />
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
             {displayTests.length > 0 ? (
@@ -244,10 +256,9 @@ function AllTest({
                     status={test.status}
                     testData={test}
                     onStartTest={() => console.log("Starting test:", test._id)}
-                    onViewReport={() =>
-                      console.log("Viewing report:", test._id)
-                    }
-                    onEdit={() => console.log("Editing test:", test._id)}
+                    onViewReport={() => console.log("Viewing report:", test._id)}
+                    onEdit={() => onEdit && onEdit(test._id)}
+                    onDelete={(testId) => onDelete && onDelete(testId)}
                   />
                 ))}
 
@@ -263,19 +274,13 @@ function AllTest({
                       {isLoadingMore ? (
                         <>
                           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" />
-                          <h3 className="text-2xl font-bold">Loading...</h3>
+                          <h3 className="text-xl sm:text-2xl font-bold">Loading...</h3>
                         </>
                       ) : (
                         <>
-                          {/* <h3 className="text-3xl font-bold mb-2">View More Tests</h3>
-                          <p className="text-[#fff] text-xl">
-                            Load next {nextBatchSize} test{nextBatchSize !== 1 ? 's' : ''} ({remainingTests} remaining)
-                          </p> */}
-
-                          {/* <h3 className="text-3xl font-bold mb-2">View More Tests</h3> */}
                           <div className="flex flex-col items-center gap-4">
-                            <p className="text-[#fff] text-xl">
-                              Click to view the next {nextBatchSize} tests
+                            <p className="text-[#fff] text-lg sm:text-xl px-4">
+                              Click to view the next {nextBatchSize} test{nextBatchSize !== 1 ? 's' : ''}
                             </p>
 
                             <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">
@@ -285,17 +290,12 @@ function AllTest({
                         </>
                       )}
                     </div>
-                    {/* {!isLoadingMore && (
-                      <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">
-                        <ArrowRight className="w-6 h-6 cursor-pointer" />
-                      </div>
-                    )} */}
                   </button>
                 )}
               </>
             ) : (
               <div className="col-span-full text-center py-12 text-gray-500">
-                No tests found matching your filters
+                <p className="text-base sm:text-lg">No tests found matching your filters</p>
               </div>
             )}
           </div>

@@ -23,8 +23,20 @@ export function Sidebar({
     }
   };
 
-  // Check if route is active
-  const isActive = (route) => location.pathname === route;
+  // Check if route is active - now checks if current path starts with the route
+  const isActive = (route) => {
+    if (!route) return false;
+    
+    const currentPath = location.pathname;
+    
+    // Exact match
+    if (currentPath === route) return true;
+    
+    // Check if current path starts with the route (for subroutes)
+    // Add trailing slash to route to avoid partial matches like /view matching /views
+    const routeWithSlash = route.endsWith('/') ? route : route + '/';
+    return currentPath.startsWith(routeWithSlash);
+  };
 
   return (
     <>
@@ -53,7 +65,7 @@ export function Sidebar({
           </h1>
           <button
             onClick={onToggle}
-            className="p-2 rounded-lg hover:bg-purple-800/30 transition-colors cursor-pointer"
+            className="p-2 z-10 rounded-lg hover:bg-purple-800/30 transition-colors cursor-pointer"
             aria-label="Toggle Sidebar"
           >
             {isCollapsed ? (
