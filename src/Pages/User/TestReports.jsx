@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import AllTest from '../../Components/AllTest';
 import { UserTestAPI } from '../../apis/Tests/userTestData';
 import { useHttp } from '../../Hooks/useHttps';
+import Lottie from 'lottie-react';
+import handLoading from "../../Lottie/handLoading.json";
 
 function TestReports() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -158,12 +160,13 @@ function TestReports() {
 
     if (loading && allTests.length === 0) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading completed tests...</p>
-                </div>
-            </div>
+            <div className="flex justify-center items-center min-h-screen">
+        <Lottie 
+          animationData={handLoading} 
+          loop={true}
+          style={{ width: 500, height: 500 }}
+        />
+      </div>
         );
     }
 
@@ -186,6 +189,7 @@ function TestReports() {
     return (
         <div className="p-4">
             <AllTest 
+                heading="Generate & View Reports"
                 allTests={allTests} 
                 filter={false} 
                 userType='user'
@@ -196,14 +200,14 @@ function TestReports() {
             />
 
             {allTests.length === 0 && !loading && !error && (
-                <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">
-                        {searchQuery ? 
-                            `No completed tests found matching "${searchQuery}"` : 
-                            'No completed tests available yet'}
-                    </p>
-                </div>
-            )}
+    <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">
+            {searchQuery 
+                ? `No completed tests found matching "${searchQuery}"` 
+                : ''}
+        </p>
+    </div>
+)}
         </div>
     );
 }
