@@ -19,6 +19,8 @@ function TestCard({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const userData = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
+
   // Merge data and testData, prioritizing data if it exists
   const mergedData = { ...testData, ...data };
 
@@ -206,7 +208,7 @@ function TestCard({
                   <span className="text-xs sm:text-sm md:text-base font-semibold text-gray-900 truncate">
                     Institute of Engineering & Management
                   </span>
-                  <span className="text-xs sm:text-sm text-gray-500">Salt Lake</span>
+                  <span className="text-xs sm:text-sm text-gray-500">{userData.institutionName}</span>
                 </div>
               </div>
 

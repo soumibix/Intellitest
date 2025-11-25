@@ -34,7 +34,7 @@ function AllTest({
   isShowSemPopUp = false,
   setIsSemPopupOpen
 }) {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -77,21 +77,21 @@ function AllTest({
     };
   }, [searchDebounceTimer]);
 
-  const months = [
-    "All",
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  // const months = [
+  //   "All",
+  //   "January",
+  //   "February",
+  //   "March",
+  //   "April",
+  //   "May",
+  //   "June",
+  //   "July",
+  //   "August",
+  //   "September",
+  //   "October",
+  //   "November",
+  //   "December",
+  // ];
 
   // Handle search with debouncing
   const handleSearchChange = (value) => {
@@ -166,7 +166,7 @@ function AllTest({
 
             {
               isShowSemPopUp && (
-                <Button iconPosition={'right'} onClick={() => setIsSemPopupOpen(true)} variant="outline" textSize="text-md" text={`Choose Semester: ${localStorage.getItem('userSemester')? `${localStorage.getItem('userSemester')}`: "Choose your semester"}`} icon={<MousePointer /> }/>
+                <Button iconPosition={'left'} onClick={() => setIsSemPopupOpen(true)} variant="filled" textSize="text-md" text={`Choose Semester: ${localStorage.getItem('userSemester')? `${localStorage.getItem('userSemester')}`: "Choose your semester"}`} icon={<MousePointer /> }/>
               )
             }
           </div>
