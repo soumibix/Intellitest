@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ExitConfirmationModal from '../../utils/ExitConfirmationModal';
 import SubmitPdf from '../../Components/SubmitPdf';
 import { useHttp } from '../../Hooks/useHttps';
+import { UserTestAPI } from '../../apis/Tests/userTestData';
 
 const UserIndividualTest = () => {
     const [questions, setQuestions] = useState([]);
@@ -17,6 +18,7 @@ const UserIndividualTest = () => {
     const [testData, setTestData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [testSessionData, setTestSessionData] = useState(null);
+    const { postReq } = useHttp()
 
     // File upload states
     const [uploadedFile, setUploadedFile] = useState(null);
@@ -24,7 +26,7 @@ const UserIndividualTest = () => {
     const [uploadedFileName, setUploadedFileName] = useState('');
     const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-    const { getReq, postReq, patchReq } = useHttp();
+    const httpHook = useHttp();
     const token = sessionStorage.getItem('token');
 
     // Fetch test data and start test
@@ -33,15 +35,15 @@ const UserIndividualTest = () => {
             try {
                 setLoading(true);
 
-                // Fetch test details
-                const testResponse = await getReq(`student/test/getTest/${testId}`, token);
+                // Fetch test details using UserTestAPI
+                const testResponse = await UserTestAPI.fetchUserTestById(httpHook, testId, token);
                 console.log('Test Response:', testResponse);
 
-                if (testResponse?.success && testResponse?.test) {
-                    setTestData(testResponse.test);
+                if (testResponse?.success && testResponse?.data) {
+                    setTestData(testResponse.data);
 
                     // Map questions with initial status
-                    const mappedQuestions = testResponse.test.questions?.map((q, index) => ({
+                    const mappedQuestions = testResponse.data.questions?.map((q, index) => ({
                         id: q._id,
                         number: index + 1,
                         question: q.question,
@@ -54,41 +56,39 @@ const UserIndividualTest = () => {
                     setQuestions(mappedQuestions);
                 }
 
-                // Start test and get timer
-                const startTestResponse = await postReq(`student/test/startTest/${testId}`, token);
+                // Start test and get timer using UserTestAPI
+                const startTestResponse = await UserTestAPI.startTest(httpHook, testId, token);
                 console.log('Start Test Response:', startTestResponse);
+
                 try {
                     if (startTestResponse?.data || startTestResponse?.success) {
-                    setTestSessionData(startTestResponse.data);
-                    const { starttime, endtime, uploadedAnswerSheet } = startTestResponse.data;
+                        setTestSessionData(startTestResponse.data);
+                        const { starttime, endtime, uploadedAnswerSheet } = startTestResponse.data;
 
-                    // Restore uploaded file if exists
-                    if (uploadedAnswerSheet) {
-                        setUploadedFileUrl(uploadedAnswerSheet.url || uploadedAnswerSheet);
-                        setUploadedFileName(uploadedAnswerSheet.fileName || 'answer-sheet.pdf');
-                    }
+                        // Restore uploaded file if exists
+                        if (uploadedAnswerSheet) {
+                            setUploadedFileUrl(uploadedAnswerSheet.url || uploadedAnswerSheet);
+                            setUploadedFileName(uploadedAnswerSheet.fileName || 'answer-sheet.pdf');
+                        }
 
-                    // Calculate remaining time
-                    const currentTime = new Date();
-                    const endTime = new Date(endtime);
-                    const remainingSeconds = Math.max(0, Math.floor((endTime - currentTime) / 1000));
+                        // Calculate remaining time
+                        const currentTime = new Date();
+                        const endTime = new Date(endtime);
+                        const remainingSeconds = Math.max(0, Math.floor((endTime - currentTime) / 1000));
 
-                    console.log('Time Remaining (seconds):', remainingSeconds);
-                    // if(remainingSeconds <=0){
-                        // }
+                        console.log('Time Remaining (seconds):', remainingSeconds);
                         setTimeRemaining(remainingSeconds);
                     }
                 } catch (error) {
                     // alert('Test time has already expired. You will be redirected to the test reports page.');
                     navigate('/user/tests');
-                    console.log(error)
+                    console.log(error);
                 }
-                
 
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching test data:', error);
-                alert('Failed to load test. Please try again.');
+                // alert('Failed to load test. Please try again.');
                 navigate('/user/test-reports');
                 setLoading(false);
             }
@@ -103,36 +103,21 @@ const UserIndividualTest = () => {
     const handleSubmitTest = async (testId) => {
         try {
             setSubmitModal(false);
-
-            // Show loading state
             setLoading(true);
 
-            // Call end test API
-            // const endTestResponseSub = await fetch(
-            //     `https://intellitest-backend.iem.edu.in/api/v1/student/test/endTest/${testId}`,
-            //     {
-            //         method: "PATCH",
-            //         headers: {
-            //             "Content-Type": "application/json",
-            //             Authorization: `Bearer ${token}`,
-            //         }
-            //     }
-            // );
-
-            const endTestResponse = await patchReq(`student/test/endTest/${testId}`, token);
-
-
+            // Call end test API using UserTestAPI
+            const endTestResponse = await UserTestAPI.endTest(httpHook, testId, token);
             console.log('End Test Response:', endTestResponse);
 
-            if (endTestResponse?.data || endTestResponse?.message === 'Test ended successfully') {
-                alert('Test submitted successfully!');
+            if (endTestResponse?.success || endTestResponse?.message === 'Test ended successfully') {
+                // alert('Test submitted successfully!');
                 navigate('/user/test-reports');
             } else {
                 throw new Error(endTestResponse?.message || 'Failed to submit test');
             }
         } catch (error) {
             console.error('Error submitting test:', error);
-            alert('Failed to submit test. Please try again.');
+            // alert('Failed to submit test. Please try again.');
             setLoading(false);
         }
     };
@@ -145,7 +130,7 @@ const UserIndividualTest = () => {
             setTimeRemaining(prev => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    alert('Time is up! Your test will be submitted automatically.');
+                    // alert('Time is up! Your test will be submitted automatically.');
                     handleSubmitTest(testId);
                     return 0;
                 }
@@ -181,22 +166,49 @@ const UserIndividualTest = () => {
             const formData = new FormData();
             formData.append("file", file);
 
-            // Upload file to server
-            const uploadResponse = await postReq('upload/uploadFile', token, formData, true);
-            console.log('File Upload Response:', uploadResponse);
+            // Upload file directly using postReq
+            postReq("upload/uploadFile", token, formData, true)
+                .then((uploadResponse) => {
+                    console.log('File Upload Response:', uploadResponse);
 
-            if (uploadResponse?.success) {
-                setUploadedFileUrl(uploadResponse.fileUrl || uploadResponse.data?.fileUrl || uploadResponse.url);
-                setUploadedFileName(file.name);
-                alert('Answer sheet uploaded successfully!');
-            } else {
-                throw new Error(uploadResponse?.message || 'Upload failed');
-            }
+                    if (uploadResponse?.success) {
+                        const fileUrl = uploadResponse.fileUrl || uploadResponse.data?.fileUrl || uploadResponse.url;
+
+                        setUploadedFileUrl(fileUrl);
+                        setUploadedFileName(file.name);
+
+                        // Chain the submit PDF API call after successful upload
+                        return postReq(`student/test/submitpdf/${testId}`, token, {
+                            answerPdfUrl: fileUrl
+                        });
+                    } else {
+                        throw new Error(uploadResponse?.message || 'Upload failed');
+                    }
+                })
+                .then((submitResponse) => {
+                    console.log('Submit PDF Response:', submitResponse);
+
+                    if (submitResponse?.success) {
+                        // alert('Answer sheet uploaded and submitted successfully!');
+                    } else {
+                        // alert('Answer sheet uploaded but submission failed. Please try again.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error in upload/submit process:', error);
+                    // alert(error.message || 'Failed to upload or submit answer sheet. Please try again.');
+                    setUploadedFile(null);
+                    setUploadedFileUrl('');
+                    setUploadedFileName('');
+                })
+                .finally(() => {
+                    setIsUploadingFile(false);
+                });
+
         } catch (error) {
-            console.error('Error uploading file:', error);
-            alert('Failed to upload answer sheet. Please try again.');
+            console.error('Error preparing file upload:', error);
+            // alert('Failed to prepare file upload. Please try again.');
             setUploadedFile(null);
-        } finally {
             setIsUploadingFile(false);
         }
     };
@@ -204,22 +216,20 @@ const UserIndividualTest = () => {
     // Handle file deletion
     const handleFileDelete = async () => {
         try {
-            const deleteResponse = await postReq(
-                `student/test/deleteAnswerSheet/${testId}`,
-                token
-            );
+            // Delete using UserTestAPI
+            const deleteResponse = await UserTestAPI.deleteAnswerSheet(httpHook, testId, token);
 
             if (deleteResponse?.success) {
                 setUploadedFile(null);
                 setUploadedFileUrl('');
                 setUploadedFileName('');
-                alert('Answer sheet deleted successfully!');
+                // alert('Answer sheet deleted successfully!');
             } else {
                 throw new Error(deleteResponse?.message || 'Delete failed');
             }
         } catch (error) {
             console.error('Error deleting file:', error);
-            alert('Failed to delete answer sheet. Please try again.');
+            // alert('Failed to delete answer sheet. Please try again.');
         }
     };
 

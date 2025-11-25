@@ -2,7 +2,13 @@
 import { API_ENDPOINTS } from "../../Config/config";
 
 export const UserTestAPI = {
-
+  /**
+   * Fetch all user tests with optional filters
+   * @param {Object} httpHook - HTTP hook instance
+   * @param {string} token - Authentication token
+   * @param {Object} queryParams - Query parameters for filtering
+   * @returns {Promise<Object>} Response with tests data
+   */
   fetchUserTests: async (httpHook, token, queryParams = {}) => {
     try {
       // Build query string from params
@@ -21,12 +27,9 @@ export const UserTestAPI = {
         ? `${API_ENDPOINTS.USER_GET_ALL_TESTS}?${queryString}`
         : API_ENDPOINTS.USER_GET_ALL_TESTS;
 
-      console.log(endpoint)
+      console.log('Fetching tests from:', endpoint);
       
-      const response = await httpHook.getReq(
-        endpoint,
-        token
-      );
+      const response = await httpHook.getReq(endpoint, token);
       
       return {
         success: true,
@@ -59,10 +62,8 @@ export const UserTestAPI = {
   fetchUserTestById: async (httpHook, testId, token) => {
     try {
       const response = await httpHook.getReq(
-        `${API_ENDPOINTS.USER_GET_TEST_BY_ID(testId)}`,
-        'GET',
-        null,
-        { Authorization: `Bearer ${token}` }
+        API_ENDPOINTS.USER_GET_TEST_BY_ID(testId),
+        token
       );
       
       return {
@@ -111,6 +112,35 @@ export const UserTestAPI = {
   },
 
   /**
+   * End a test (complete the test)
+   * @param {Object} httpHook - HTTP hook instance
+   * @param {string} testId - Test ID
+   * @param {string} token - Authentication token
+   * @returns {Promise<Object>} Response
+   */
+  endTest: async (httpHook, testId, token) => {
+    try {
+      const response = await httpHook.patchReq(
+        API_ENDPOINTS.USER_END_TEST(testId),
+        token
+      );
+      
+      return {
+        success: true,
+        data: response.data || response,
+        message: response.message || 'Test ended successfully',
+      };
+    } catch (error) {
+      console.error('Error ending test:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to end test',
+        data: null,
+      };
+    }
+  },
+
+  /**
    * Submit test answers
    * @param {Object} httpHook - HTTP hook instance
    * @param {string} testId - Test ID
@@ -142,6 +172,68 @@ export const UserTestAPI = {
   },
 
   /**
+   * Upload answer sheet file
+   * @param {Object} httpHook - HTTP hook instance
+   * @param {File} file - File to upload
+   * @param {string} token - Authentication token
+   * @returns {Promise<Object>} Response with file URL
+   */
+  uploadAnswerSheet: async (httpHook, file, token) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await httpHook.postReq(
+        API_ENDPOINTS.UPLOAD_FILE,
+        token,
+        formData,
+        true // isFormData flag
+      );
+      
+      return {
+        success: true,
+        fileUrl: response.fileUrl || response.data?.fileUrl || response.url,
+        fileName: file.name,
+        message: response.message || 'File uploaded successfully',
+      };
+    } catch (error) {
+      console.error('Error uploading answer sheet:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to upload file',
+        fileUrl: null,
+      };
+    }
+  },
+
+  /**
+   * Delete uploaded answer sheet
+   * @param {Object} httpHook - HTTP hook instance
+   * @param {string} testId - Test ID
+   * @param {string} token - Authentication token
+   * @returns {Promise<Object>} Response
+   */
+  deleteAnswerSheet: async (httpHook, testId, token) => {
+    try {
+      const response = await httpHook.postReq(
+        API_ENDPOINTS.USER_DELETE_ANSWER_SHEET(testId),
+        token
+      );
+      
+      return {
+        success: true,
+        message: response.message || 'Answer sheet deleted successfully',
+      };
+    } catch (error) {
+      console.error('Error deleting answer sheet:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to delete answer sheet',
+      };
+    }
+  },
+
+  /**
    * Get test results/report
    * @param {Object} httpHook - HTTP hook instance
    * @param {string} testId - Test ID
@@ -152,9 +244,7 @@ export const UserTestAPI = {
     try {
       const response = await httpHook.getReq(
         API_ENDPOINTS.USER_GET_TEST_REPORT(testId),
-        'GET',
-        null,
-        { Authorization: `Bearer ${token}` }
+        token
       );
       
       return {
