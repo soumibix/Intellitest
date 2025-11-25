@@ -11,6 +11,8 @@ import { useAuth } from "../../AppRouter";
 import { useNotification } from "../../Context/NotificationContext";
 import ConfirmationModal from "../../utils/ConfirmationModal";
 import { TestAPI } from "../../apis/Tests/TestCRUD";
+import Lottie from "lottie-react";
+import formLoader from "../../Lottie/Material wave loading.json";
 
 // Helper function to check if all marks are assigned
 const checkAllMarksAssigned = (testData) => {
@@ -137,7 +139,6 @@ const FacultyTestDetails = () => {
     const storedActiveStep = parseInt(sessionStorage.getItem('activeStep'));
 
     if (storedTestId && storedActiveStep > 0) {
-      // If step 4, reset to step 3 (marks need verification)
       const safeStep = storedActiveStep === 4 ? 3 : storedActiveStep;
       
       setState(prev => ({
@@ -558,9 +559,17 @@ const handleSaveAndContinue = async (nextStep) => {
   const renderStepContent = () => {
     if (isLoadingTestData) {
       return (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-purple-600 text-lg">Loading test data...</div>
-        </div>
+        // <div className="flex items-center justify-center py-12">
+        //   <div className="text-purple-600 text-lg">Loading test data...</div>
+        // </div>
+        <div className="flex flex-col items-center justify-center py-10">
+            <Lottie
+              animationData={formLoader}
+              loop={true}
+              style={{ width: '100%', maxWidth: 150, height: '100%', maxHeight: 150, objectFit: 'contain' }}
+            />
+            <div className="text-black text-md font-bold">Wait a second !!!</div>
+          </div>
       );
     }
 

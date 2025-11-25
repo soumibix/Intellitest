@@ -1,254 +1,696 @@
-import React, { useState } from "react";
-import { UploadQuestions } from "../../Components/Admin/UploadQuestions";
-import ScheduleTest from "../../Components/Admin/ScheduleTest";
-import ReviewPublish from "../../Components/Admin/ReviewPublish";
+import React, { useState, useEffect } from "react";
+import { FacultyUploadQuestions } from "../../Components/Faculty/FacultyUploadQuestions";
+import FacultyScheduleTest from "../../Components/Faculty/FacultyScheduleTest";
+import FacultyReviewPublish from "../../Components/Faculty/FacultyReviewPublish";
 import { ProgressiveStepper } from "../../Components/Admin/ProgressiveStepper";
-import { AddTestData } from "../../Components/Admin/AddTestData";
+import { FacultyAddTestData } from "../../Components/Faculty/FacultyAddTestData";
 import AllTest from "../../Components/AllTest";
-import Button from "../../Components/common/Button";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useHttp } from "../../Hooks/useHttps";
+import { useAuth } from "../../AppRouter";
+import { useNotification } from "../../Context/NotificationContext";
+import ConfirmationModal from "../../utils/ConfirmationModal";
+import { TestAPI } from "../../apis/Tests/TestCRUD";
+import Lottie from "lottie-react";
+import formLoader from "../../Lottie/Material wave loading.json";
+
+// Helper function to check if all marks are assigned
+const checkAllMarksAssigned = (testData) => {
+  if (!testData || !testData.questions) return false;
+  return testData.questions.every(q => q.score && q.score > 0);
+};
 
 const TestDetails = () => {
+  // Only store testId and activeStep in sessionStorage (lightweight)
+  const [state, setState] = useState({
+    activeStep: parseInt(sessionStorage.getItem('admin_activeStep')) || 0,
+    testId: sessionStorage.getItem('admin_testId') || null,
+    testFormData: {
+      department: "",
+      semester: "",
+      subjectName: "",
+      subjectCode: "",
+      testCategory: "",
+      numberOfQuestions: "",
+      totalMarks: "",
+    },
+    scheduleFormData: {
+      testDate: "",
+      startTime: "",
+      endTime: "",
+      duration: "",
+    },
+    questionFileUrl: "",
+    answerFileUrl: "",
+    questionFileName: "",
+    answerFileName: "",
+  });
 
-  const [activeStep, setActiveStep] = useState(0);
-  const allTests =
-    [
-      {
-        id: 1,
-        status: "ongoing",
-        testData: {
-          timeRemaining: "58:07 mins remaining",
-          title: "Machine Learning Mid-Sem Test",
-          questions: 30,
-          marks: 60,
-          duration: "1 hour",
-          department: "CST",
-          semester: "05",
-          createdBy: "Saurabh Kumbhar",
-          createdDate: "Sept 5 04:25",
-          avatarSeed: "Saurabh",
-        },
-        month: "September",
-      },
-      {
-        id: 2,
-        status: "upcoming",
-        testData: {
-          dateTime: "Nov 15 • 2:00 PM",
-          title: "Data Structures Final Exam",
-          questions: 50,
-          marks: 100,
-          duration: "2 hours",
-          department: "CST",
-          semester: "03",
-          createdBy: "Priya Sharma",
-          createdDate: "Oct 20 10:15",
-          avatarSeed: "Priya",
-        },
-        month: "November",
-      },
-      {
-        id: 3,
-        status: "completed",
-        testData: {
-          dateTime: "Oct 10 • 10:00 AM",
-          title: "Database Management Systems Quiz",
-          questions: 20,
-          marks: 40,
-          duration: "45 mins",
-          department: "CST",
-          semester: "04",
-          createdBy: "Rahul Verma",
-          createdDate: "Sept 30 14:20",
-          avatarSeed: "Rahul",
-          marksObtained: 52,
-          totalMarks: 60,
-          timeTaken: "54 minutes",
-          accuracy: "87%",
-        },
-        month: "October",
-      },
-      {
-        id: 4,
-        status: "upcoming",
-        testData: {
-          dateTime: "Nov 20 • 11:00 AM",
-          title: "Computer Networks Test",
-          questions: 40,
-          marks: 80,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Anjali Singh",
-          createdDate: "Nov 1 09:00",
-          avatarSeed: "Anjali",
-        },
-        month: "November",
-      },
-      {
-        id: 5,
-        status: "upcoming",
-        testData: {
-          dateTime: "Nov 20 • 11:00 AM",
-          title: "Computer Networks Test",
-          questions: 40,
-          marks: 80,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Anjali Singh",
-          createdDate: "Nov 1 09:00",
-          avatarSeed: "Anjali",
-        },
-        month: "November",
-      },
-      {
-        id: 6,
-        status: "completed",
-        testData: {
-          dateTime: "Oct 25 • 3:00 PM",
-          title: "Operating Systems Mid-Term",
-          questions: 35,
-          marks: 70,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Saurabh Kumbhar",
-          createdDate: "Oct 15 11:30",
-          avatarSeed: "Saurabh",
-          marksObtained: 45,
-          totalMarks: 70,
-          timeTaken: "1 hour 20 mins",
-          accuracy: "64%",
-        },
-        month: "October",
-      },
-      {
-        id: 7,
-        status: "completed",
-        testData: {
-          dateTime: "Oct 25 • 3:00 PM",
-          title: "Operating Systems Mid-Term",
-          questions: 35,
-          marks: 70,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Saurabh Kumbhar",
-          createdDate: "Oct 15 11:30",
-          avatarSeed: "Saurabh",
-          marksObtained: 45,
-          totalMarks: 70,
-          timeTaken: "1 hour 20 mins",
-          accuracy: "64%",
-        },
-        month: "October",
-      },
-    ]
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [files, setFiles] = useState({ question: null, answer: null });
+  const [testData, setTestData] = useState(null);
+  const [isLoadingTestData, setIsLoadingTestData] = useState(false);
 
-  const handleSaveAndContinue = (nextStep) => {
-    setActiveStep(nextStep);
+  const [allTests, setAllTests] = useState([]);
+  const [testsLoading, setTestsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTests, setTotalTests] = useState(0);
+  const [currentFilter, setCurrentFilter] = useState("all");
+  const [hasMoreTests, setHasMoreTests] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const { token } = useAuth();
+  const httpHook = useHttp();
+  const { loading } = httpHook;
+  const { showError, showSuccess, showWarning } = useNotification();
+
+  const TESTS_PER_PAGE = 5;
+
+  // Check if publish should be enabled
+  const canPublish = checkAllMarksAssigned(testData);
+
+  // Fetch test data when testId exists and step changes (auto-populate from backend)
+  useEffect(() => {
+    const loadTestData = async () => {
+      if (state.testId && state.activeStep > 0 && state.activeStep < 4) {
+        setIsLoadingTestData(true);
+        try {
+          const response = await TestAPI.fetchTestById(httpHook, state.testId, token);
+          
+          if (response.success && response.data) {
+            const test = response.data;
+            
+            // Auto-populate form data from backend
+            setState(prev => ({
+              ...prev,
+              testFormData: {
+                department: test.department || prev.testFormData.department,
+                semester: test.semester || prev.testFormData.semester,
+                subjectName: test.subjectName || prev.testFormData.subjectName,
+                subjectCode: test.subjectCode || prev.testFormData.subjectCode,
+                testCategory: test.testCategory || prev.testFormData.testCategory,
+                numberOfQuestions: test.numberOfQuestions || prev.testFormData.numberOfQuestions,
+                totalMarks: test.totalMarks || prev.testFormData.totalMarks,
+              },
+              scheduleFormData: {
+                testDate: test.testDate ? new Date(test.testDate).toISOString().split('T')[0] : prev.scheduleFormData.testDate,
+                startTime: test.startTime || prev.scheduleFormData.startTime,
+                endTime: test.endTime || prev.scheduleFormData.endTime,
+                duration: test.duration || prev.scheduleFormData.duration,
+              },
+              questionFileUrl: test.questionPdfUrl || prev.questionFileUrl,
+              answerFileUrl: test.answerPdfUrl || prev.answerFileUrl,
+              questionFileName: test.questionPdfUrl ? test.questionPdfUrl.split('/').pop() : prev.questionFileName,
+              answerFileName: test.answerPdfUrl ? test.answerPdfUrl.split('/').pop() : prev.answerFileName,
+            }));
+
+            // Set testData if questions exist
+            if (test.questions && test.questions.length > 0) {
+              setTestData(test);
+            }
+          }
+        } catch (error) {
+          console.error("Error loading test data:", error);
+        } finally {
+          setIsLoadingTestData(false);
+        }
+      }
+    };
+
+    loadTestData();
+  }, [state.testId, state.activeStep]);
+
+  // Save only testId and activeStep to sessionStorage (lightweight)
+  useEffect(() => {
+    if (state.activeStep > 0) {
+      sessionStorage.setItem('admin_activeStep', state.activeStep.toString());
+      if (state.testId) {
+        sessionStorage.setItem('admin_testId', state.testId);
+      }
+    } else {
+      sessionStorage.removeItem('admin_activeStep');
+      sessionStorage.removeItem('admin_testId');
+    }
+  }, [state.activeStep, state.testId]);
+
+  // Handle page reload - fetch data from backend if testId exists
+  useEffect(() => {
+    const storedTestId = sessionStorage.getItem('admin_testId');
+    const storedActiveStep = parseInt(sessionStorage.getItem('admin_activeStep'));
+
+    if (storedTestId && storedActiveStep > 0) {
+      const safeStep = storedActiveStep === 4 ? 3 : storedActiveStep;
+      
+      setState(prev => ({
+        ...prev,
+        testId: storedTestId,
+        activeStep: safeStep,
+      }));
+    }
+  }, []);
+
+  const fetchAllTests = async (status = "all", page = 1, append = false, search = "") => {
+    setTestsLoading(true);
+    try {
+      const queryParams = { page, limit: TESTS_PER_PAGE };
+      if (status !== "all") queryParams.status = status;
+      if (search && search.trim() !== "") queryParams.search = search.trim();
+
+      const response = await TestAPI.fetchTests(httpHook, token, queryParams);
+
+      if (response.success && response.data) {
+        const newTests = response.data;
+        const total = response.pagination?.total || response.total || 0;
+        setTotalTests(total);
+
+        if (append) {
+          const updatedTests = [...allTests, ...newTests];
+          setAllTests(updatedTests);
+          setHasMoreTests(updatedTests.length < total);
+        } else {
+          setAllTests(newTests);
+          setHasMoreTests(newTests.length < total);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching tests:", error);
+      showError("Failed to fetch tests. Please try again.");
+      setAllTests(append ? allTests : []);
+      setHasMoreTests(false);
+    } finally {
+      setTestsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (state.activeStep === 0) {
+      setCurrentPage(1);
+      setCurrentFilter("all");
+      setSearchQuery("");
+      fetchAllTests("all", 1, false, "");
+    }
+  }, [state.activeStep]);
+
+  const handleFilterChange = (newFilter) => {
+    setCurrentFilter(newFilter);
+    setCurrentPage(1);
+    setAllTests([]);
+    fetchAllTests(newFilter, 1, false, searchQuery);
+  };
+
+  const handleSearchChange = (search) => {
+    setSearchQuery(search);
+    setCurrentPage(1);
+    setCurrentFilter("all");
+    setAllTests([]);
+    fetchAllTests("all", 1, false, search);
+  };
+
+  const handleViewMore = () => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchAllTests(currentFilter, nextPage, true, searchQuery);
+  };
+
+  // Handle Edit Test - Only set testId and activeStep, data fetched automatically
+  const handleEditTest = async (testId) => {
+    try {
+      // Just set testId and activeStep - useEffect will fetch the data
+      setState(prev => ({
+        ...prev,
+        testId: testId,
+        activeStep: 1,
+      }));
+      
+      showSuccess("Test loaded successfully! You can now edit it.");
+    } catch (error) {
+      console.error("Error loading test:", error);
+      showError("Failed to load test. Please try again.");
+    }
+  };
+
+  // Handle Delete Test
+  const handleDeleteTest = async (testId) => {
+    try {
+      const response = await TestAPI.deleteTest(httpHook, testId, token);
+      if (response.success) {
+        showSuccess("Test deleted successfully!");
+        fetchAllTests(currentFilter, 1, false, searchQuery);
+        setCurrentPage(1);
+      } else {
+        showError("Failed to delete test: " + (response.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error deleting test:", error);
+      showError("Failed to delete test. Please try again.");
+    }
+  };
+
+  const handleUploadToServer = async (file, type) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await TestAPI.uploadFile(httpHook, formData, token);
+
+    if (response.success) {
+      setState((prev) => ({
+        ...prev,
+        [type === "question" ? "questionFileUrl" : "answerFileUrl"]: response.fileUrl,
+        [type === "question" ? "questionFileName" : "answerFileName"]: file.name,
+      }));
+    } else {
+      showError(`Failed to upload ${type} file. Please try again.`);
+    }
+  };
+
+  useEffect(() => {
+    if (files.question) handleUploadToServer(files.question, "question");
+  }, [files.question]);
+
+  useEffect(() => {
+    if (files.answer) handleUploadToServer(files.answer, "answer");
+  }, [files.answer]);
+
+  const validateStep = (step) => {
+    if (step === 1) {
+      const { department, semester, subjectName, subjectCode, testCategory, numberOfQuestions, totalMarks } = state.testFormData;
+      return department?.trim() !== "" && semester?.trim() !== "" && subjectName?.trim() !== "" &&
+        subjectCode?.trim() !== "" && testCategory?.trim() !== "" &&
+        numberOfQuestions?.toString().trim() !== "" && parseInt(numberOfQuestions) > 0 &&
+        totalMarks?.toString().trim() !== "" && parseInt(totalMarks) > 0;
+    }
+    if (step === 2) {
+      const { testDate, startTime, endTime, duration } = state.scheduleFormData;
+      return testDate?.trim() !== "" && startTime?.trim() !== "" &&
+        endTime?.trim() !== "" && duration?.toString().trim() !== "" && parseInt(duration) > 0;
+    }
+    if (step === 3) {
+      // Check if there's either a new file uploaded OR existing questions in testData
+      const hasNewFile = state.questionFileUrl && state.questionFileUrl.trim() !== "";
+      const hasExistingQuestions = testData && testData.questions && testData.questions.length > 0;
+      return hasNewFile || hasExistingQuestions;
+    }
+    return true;
+  };
+
+  const handleSaveAndContinue = async (nextStep) => {
+    if (!validateStep(state.activeStep)) {
+      let errorMsg = "Please fill all required fields";
+      if (state.activeStep === 1) {
+        const missingFields = [];
+        const { department, semester, subjectName, subjectCode, totalMarks, testCategory, numberOfQuestions } = state.testFormData;
+        if (!department?.trim()) missingFields.push("Department");
+        if (!semester?.trim()) missingFields.push("Semester");
+        if (!subjectName?.trim()) missingFields.push("Subject Name");
+        if (!subjectCode?.trim()) missingFields.push("Subject Code");
+        if (!totalMarks || parseInt(totalMarks) <= 0) missingFields.push("Total Marks");
+        if (!testCategory?.trim()) missingFields.push("Test Category");
+        if (!numberOfQuestions || parseInt(numberOfQuestions) <= 0) missingFields.push("Number of Questions");
+        if (missingFields.length > 0) errorMsg = `Please fill the following fields: ${missingFields.join(", ")}`;
+      }
+      showError(errorMsg);
+      return;
+    }
+
+    let response;
+    const { activeStep, testId, testFormData, scheduleFormData, questionFileUrl, answerFileUrl } = state;
+
+    if (activeStep === 1) {
+      const payload = { 
+        ...testFormData, 
+        numberOfQuestions: parseInt(testFormData.numberOfQuestions), 
+        totalMarks: parseInt(testFormData.totalMarks) 
+      };
+      
+      if (!testId) {
+        // CREATE new test
+        response = await TestAPI.addTest(httpHook, payload, token);
+        if (response.success && response.data) {
+          setState((prev) => ({ 
+            ...prev, 
+            testId: response.data._id || response.data.testId, 
+            activeStep: nextStep 
+          }));
+          showSuccess("Test created successfully!");
+        } else {
+          showError("Failed to create test: " + (response.message || "Unknown error"));
+        }
+      } else {
+        // UPDATE existing test
+        response = await TestAPI.updateTest(httpHook, testId, payload, token);
+        if (response.success) {
+          setState((prev) => ({ ...prev, activeStep: nextStep }));
+          showSuccess("Test details updated successfully!");
+        } else {
+          showError("Failed to update test: " + (response.message || "Unknown error"));
+        }
+      }
+    } else if (activeStep === 2) {
+      if (!testId) { 
+        showError("Test ID is missing. Please complete step 1 first."); 
+        return; 
+      }
+      const payload = { 
+        ...scheduleFormData, 
+        duration: parseInt(scheduleFormData.duration) 
+      };
+      response = await TestAPI.scheduleTest(httpHook, testId, payload, token);
+      if (response.success) {
+        setState((prev) => ({ ...prev, activeStep: nextStep }));
+        showSuccess("Schedule updated successfully!");
+      } else {
+        showError("Failed to update schedule: " + (response.message || "Unknown error"));
+      }
+    } else if (activeStep === 3) {
+      if (!testId) { 
+        showError("Test ID is missing. Please complete previous steps first."); 
+        return; 
+      }
+
+      const hasExistingQuestions = testData && testData.questions && testData.questions.length > 0;
+      
+      // Check if NEW files were selected by user in this session
+      const questionFileNewlySelected = files.question !== null;
+      const answerFileNewlySelected = files.answer !== null;
+
+      // Check if files already exist from previous uploads or database
+      const hasQuestionFile = questionFileUrl && questionFileUrl.trim() !== "";
+      const hasAnswerFile = answerFileUrl && answerFileUrl.trim() !== "";
+
+      console.log("DEBUG - File Status Check:");
+      console.log("  questionFileNewlySelected:", questionFileNewlySelected);
+      console.log("  answerFileNewlySelected:", answerFileNewlySelected);
+      console.log("  hasQuestionFile:", hasQuestionFile);
+      console.log("  hasAnswerFile:", hasAnswerFile);
+      console.log("  hasExistingQuestions:", hasExistingQuestions);
+
+      // Validation: Must have a question file (either newly selected or existing)
+      if (!questionFileNewlySelected && !hasQuestionFile) {
+        // Check if only answer file exists without question
+        if (answerFileNewlySelected || hasAnswerFile) {
+          showError("Please upload the question file first. Answer file cannot exist without question file.");
+        } else {
+          showError("Please upload at least a question file to continue.");
+        }
+        return;
+      }
+
+      // CASE 1: Both question and answer files newly uploaded
+      if (questionFileNewlySelected && answerFileNewlySelected) {
+        response = await TestAPI.saveQA(httpHook, testId, { 
+          questionPdfUrl: questionFileUrl, 
+          answerPdfUrl: answerFileUrl 
+        }, token);
+        
+        if (response.success) {
+          setState((prev) => ({ ...prev, activeStep: nextStep }));
+          setTestData(response.updated || response.data);
+          setFiles({ question: null, answer: null }); // Reset files after upload
+          showSuccess("Question and Answer files saved successfully!");
+        } else {
+          showError("Failed to save files: " + (response.message || "Unknown error"));
+        }
+      } 
+      // CASE 2: Only question file newly uploaded (answer file may or may not exist from before)
+      else if (questionFileNewlySelected && !answerFileNewlySelected) {
+        response = await TestAPI.generateAnswer(httpHook, testId, { 
+          pdfUrl: questionFileUrl 
+        }, token);
+        
+        if (response.success) {
+          setTestData(response.updated || response.data);
+          setState((prev) => ({ ...prev, activeStep: nextStep }));
+          setFiles({ question: null, answer: null }); // Reset files after upload
+          showSuccess("Answers generated successfully!");
+        } else {
+          showError("Failed to generate answers: " + (response.message || "Unknown error"));
+        }
+      }
+      // CASE 3: Only answer file newly uploaded (question already exists from before)
+      else if (!questionFileNewlySelected && answerFileNewlySelected && hasQuestionFile) {
+        response = await TestAPI.saveQA(httpHook, testId, { 
+          questionPdfUrl: questionFileUrl,  // Use existing question file
+          answerPdfUrl: answerFileUrl 
+        }, token);
+        
+        if (response.success) {
+          setState((prev) => ({ ...prev, activeStep: nextStep }));
+          setTestData(response.updated || response.data);
+          setFiles({ question: null, answer: null }); // Reset files after upload
+          showSuccess("Answer file saved successfully!");
+        } else {
+          showError("Failed to save answer file: " + (response.message || "Unknown error"));
+        }
+      }
+      // CASE 4: No new files uploaded, but test already has questions and both files exist
+      else if (!questionFileNewlySelected && !answerFileNewlySelected && hasExistingQuestions && hasQuestionFile && hasAnswerFile) {
+        showSuccess("Using existing questions and answers. Moving to next step...");
+        setState((prev) => ({ ...prev, activeStep: nextStep }));
+      }
+      // CASE 5: No new files uploaded, test has existing questions and only question file exists
+      else if (!questionFileNewlySelected && !answerFileNewlySelected && hasExistingQuestions && hasQuestionFile && !hasAnswerFile) {
+        showSuccess("Using existing questions. Moving to next step...");
+        setState((prev) => ({ ...prev, activeStep: nextStep }));
+      }
+      // CASE 6: No new files, no URLs, but database has questions (fallback)
+      else if (!questionFileNewlySelected && !answerFileNewlySelected && hasExistingQuestions) {
+        showSuccess("Using existing questions and answers. Moving to next step...");
+        setState((prev) => ({ ...prev, activeStep: nextStep }));
+      }
+      // Fallback error
+      else {
+        showError("Please upload at least a question file to continue.");
+        return;
+      }
+    } else {
+      setState((prev) => ({ ...prev, activeStep: nextStep }));
+    }
   };
 
   const handleBack = () => {
-    if (activeStep > 0) {
-      setActiveStep(activeStep - 1);
+    if (state.activeStep > 0) {
+      setState((prev) => ({ ...prev, activeStep: prev.activeStep - 1 }));
     }
   };
 
   const handleReset = () => {
-    setActiveStep(0);
+    sessionStorage.removeItem('admin_activeStep');
+    sessionStorage.removeItem('admin_testId');
+    setState({
+      activeStep: 0,
+      testId: null,
+      testFormData: {
+        department: "",
+        semester: "",
+        subjectName: "",
+        subjectCode: "",
+        testCategory: "",
+        numberOfQuestions: "",
+        totalMarks: "",
+      },
+      scheduleFormData: {
+        testDate: "",
+        startTime: "",
+        endTime: "",
+        duration: "",
+      },
+      questionFileUrl: "",
+      answerFileUrl: "",
+      questionFileName: "",
+      answerFileName: "",
+    });
+    setFiles({ question: null, answer: null });
+    setTestData(null);
+    setCurrentPage(1);
+    setCurrentFilter("all");
+    setSearchQuery("");
+    fetchAllTests("all", 1, false, "");
   };
 
-  // Render the appropriate component based on active step
+  const handleConfirmCancel = async () => {
+    if (state.testId) {
+      const response = await TestAPI.deleteTest(httpHook, state.testId, token);
+      if (response.success) { 
+        showSuccess("Test deleted successfully!"); 
+        handleReset(); 
+      } else { 
+        showError("Failed to delete test: " + (response.message || "Unknown error")); 
+      }
+    } else { 
+      handleReset(); 
+    }
+    setShowCancelModal(false);
+  };
+
+  const handlePublish = async () => {
+    if (!state.testId) { 
+      showError("Test ID is missing. Please complete all previous steps."); 
+      return; 
+    }
+    
+    // Check if all marks are assigned before publishing
+    if (!canPublish) {
+      const questionsWithoutMarks = testData?.questions?.filter(q => !q.score || q.score <= 0).length || 0;
+      showError(`Please assign marks to all questions before publishing. ${questionsWithoutMarks} question(s) still need marks.`);
+      return;
+    }
+    
+    showSuccess("Test published successfully! 🎉");
+    handleReset();
+  };
+
+  const handleDeleteFile = (type) => {
+    if (type === "question") {
+      setState((prev) => ({ ...prev, questionFileUrl: "", questionFileName: "" }));
+      setFiles((prev) => ({ ...prev, question: null }));
+    } else {
+      setState((prev) => ({ ...prev, answerFileUrl: "", answerFileName: "" }));
+      setFiles((prev) => ({ ...prev, answer: null }));
+    }
+  };
+
   const renderStepContent = () => {
-    switch (activeStep) {
-      case 1:
-        return <AddTestData />;
-      case 2:
-        return <UploadQuestions />;
-      case 3:
-        return <ScheduleTest />;
-      case 4:
-        return <ReviewPublish />;
-      default:
+    if (isLoadingTestData) {
+      return (
+        <div className="flex flex-col items-center justify-center py-10">
+          <Lottie
+            animationData={formLoader}
+            loop={true}
+            style={{ width: '100%', maxWidth: 150, height: '100%', maxHeight: 150, objectFit: 'contain' }}
+          />
+          <div className="text-black text-md font-bold">Wait a second !!!</div>
+        </div>
+      );
+    }
+
+    switch (state.activeStep) {
+      case 1: 
+        return <FacultyAddTestData 
+          formData={state.testFormData} 
+          setFormData={(data) => setState((prev) => ({ ...prev, testFormData: data }))} 
+        />;
+      case 2: 
+        return <FacultyScheduleTest 
+          formData={state.scheduleFormData} 
+          setFormData={(data) => setState((prev) => ({ ...prev, scheduleFormData: data }))} 
+        />;
+      case 3: 
+        return <FacultyUploadQuestions 
+          questionFile={files.question} 
+          setQuestionFile={(file) => setFiles((prev) => ({ ...prev, question: file }))} 
+          answerFile={files.answer} 
+          setAnswerFile={(file) => setFiles((prev) => ({ ...prev, answer: file }))} 
+          questionFileUrl={state.questionFileUrl} 
+          answerFileUrl={state.answerFileUrl} 
+          questionFileName={state.questionFileName} 
+          answerFileName={state.answerFileName} 
+          setQuestionFileUrl={(url) => setState((prev) => ({ ...prev, questionFileUrl: url }))} 
+          setAnswerFileUrl={(url) => setState((prev) => ({ ...prev, answerFileUrl: url }))} 
+          onDeleteFile={handleDeleteFile} 
+          testId={state.testId} 
+        />;
+      case 4: 
+        return <FacultyReviewPublish 
+          testData={testData} 
+          testId={state.testId} 
+          httpHook={httpHook} 
+          token={token} 
+          setTestData={setTestData} 
+        />;
+      default: 
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-10">
-      <ProgressiveStepper
-        activeStep={activeStep}
-        onSaveAndContinue={handleSaveAndContinue}
+    <div className="min-h-screen bg-gray-50 md:py-10 md:px-10">
+      <ProgressiveStepper 
+        activeStep={state.activeStep} 
+        onSaveAndContinue={handleSaveAndContinue} 
       />
 
-      {activeStep > 0 && (
+      {state.activeStep > 0 && (
         <div className="mx-auto bg-white rounded-lg shadow-md p-8 mt-0 animate-slideIn">
-          {/* Dynamic Content Based on Active Step */}
           <div className="mb-8">{renderStepContent()}</div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-between items-center pt-6 border-t border-gray-200">
-            {activeStep > 1 && (
-              <Button
-                onClick={handleBack}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                text="Back"
-                padding="px-5 py-3"
-                icon={<ArrowLeft />}
-                color="#631891"
-                textSize="text-sm"
-                iconPosition="left"
-              />
+          <div className="flex md:flex-row flex-col gap-5 justify-between items-center pt-6 border-t border-gray-200">
+            {state.activeStep > 1 && (
+              <button 
+                onClick={handleBack} 
+                className="bg-[#631891] hover:bg-[#410964] text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2 cursor-pointer" 
+                disabled={loading || isLoadingTestData}
+              >
+                <ArrowLeft size={18} /> Back
+              </button>
             )}
-
             <div className="ml-auto flex gap-3">
-              <button
-                onClick={handleReset}
-                className="border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-6 py-2 rounded transition-all duration-300"
+              <button 
+                onClick={() => setShowCancelModal(true)} 
+                className="border border-gray-300 text-gray-700 hover:bg-red-600 hover:text-white cursor-pointer font-medium px-8 py-2 rounded transition-all duration-300" 
+                disabled={loading || isLoadingTestData}
               >
                 Cancel
               </button>
-
-              {activeStep < 4 ? (
-                <Button
-                  onClick={() => handleSaveAndContinue(activeStep + 1)}
-                  className="bg-[#6B21A8] hover:bg-[#410d6b] text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                  text="Save & Continue"
-                  padding="px-5 py-3"
-                  icon={<ArrowRight />}
-                  color="#631891"
-                  textSize="text-md"
-                  iconPosition="right"
-                />
+              {state.activeStep < 4 ? (
+                <button 
+                  onClick={() => handleSaveAndContinue(state.activeStep + 1)} 
+                  className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white font-medium px-6 py-3 rounded transition-all duration-300 flex items-center gap-2" 
+                  disabled={loading || isLoadingTestData}
+                >
+                  {loading ? "Saving..." : "Save & Continue"} {!loading && <ArrowRight size={18} />}
+                </button>
               ) : (
-                <Button
-                  onClick={handleReset}
-                  className="bg-[#6B21A8] hover:bg-[#410d6b] text-white font-medium px-6 py-2 rounded transition-all duration-300 flex items-center gap-2"
-                  text="Publish Test"
-                  padding="px-5 py-3"
-                  color="#631891"
-                  textSize="text-md"
-                />
-                // <button
-                //   onClick={handleReset}
-                //   className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded transition-all duration-300"
-                // >
-                //   Publish Test
-                // </button>
+                <button
+                  onClick={handlePublish}
+                  disabled={loading || !canPublish}
+                  className={`
+                    font-medium px-6 py-3 rounded transition-all duration-300
+                    ${canPublish 
+                      ? 'bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white' 
+                      : 'bg-gray-300 cursor-not-allowed text-gray-500'
+                    }
+                  `}
+                  title={!canPublish ? 'Please assign marks to all questions first' : 'Publish this test'}
+                >
+                  {!canPublish ? '⚠️ Assign Marks First' : 'Publish Test'}
+                </button>
               )}
             </div>
           </div>
         </div>
       )}
-
-      {/* All Tests Section */}
-      {activeStep === 0 && (
+      
+      {state.activeStep === 0 && (
         <div className="w-full mt-10 bg-white rounded-lg shadow-md p-8">
-          <AllTest userType="admin" allTests={allTests} showWrap={true} />
+          <AllTest 
+            heading="Explore All Tests" 
+            userType="admin" 
+            allTests={allTests} 
+            showWrap={true} 
+            onFilterChange={handleFilterChange} 
+            onSearchChange={handleSearchChange} 
+            onViewMore={handleViewMore} 
+            hasMoreTests={hasMoreTests} 
+            isLoadingMore={testsLoading && currentPage > 1} 
+            isLoading={testsLoading && currentPage === 1} 
+            totalTests={totalTests} 
+            displayedTestsCount={allTests.length} 
+            activeFilterProp={currentFilter}
+            onEdit={handleEditTest}
+            onDelete={handleDeleteTest}
+          />
         </div>
       )}
+
+      <ConfirmationModal 
+        isOpen={showCancelModal} 
+        onClose={() => setShowCancelModal(false)} 
+        onConfirm={handleConfirmCancel} 
+        title="Cancel Test Creation" 
+        message={state.testId ? "Are you sure you want to cancel? This will delete the test you've created." : "Are you sure you want to cancel? All progress will be lost."} 
+        confirmText="Delete Test" 
+        cancelText="Keep Editing" 
+        isLoading={loading} 
+      />
 
       <style jsx>{`
         @keyframes fadeIn {
