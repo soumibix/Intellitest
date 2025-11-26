@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, AlertCircle, ArrowRight, X, CheckCircle } from 'lucide-react';
 import { useHttp } from '../Hooks/useHttps';
+import { useAuth } from '../AppRouter';
 
 export default function TestPopup({ isOpen, _id, onClose, onStart, testData = {} }) {
   const { title = "Machine Learning Mid-Sem Test", questions = 30, marks = 60, duration = "1 hour" } = testData;
   const [countdown, setCountdown] = useState(10);
   const [testStatus, setTestStatus] = useState({ checked: false, alreadyStarted: false, timeRemaining: 0 });
   const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const { token } = useAuth();
   const { postReq } = useHttp();
 
   useEffect(() => {

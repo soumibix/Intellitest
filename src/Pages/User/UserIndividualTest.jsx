@@ -7,6 +7,7 @@ import ExitConfirmationModal from '../../utils/ExitConfirmationModal';
 import SubmitPdf from '../../Components/SubmitPdf';
 import { useHttp } from '../../Hooks/useHttps';
 import { UserTestAPI } from '../../apis/Tests/userTestData';
+import { useAuth } from '../../AppRouter';
 
 const UserIndividualTest = () => {
     const [questions, setQuestions] = useState([]);
@@ -27,7 +28,7 @@ const UserIndividualTest = () => {
     const [isUploadingFile, setIsUploadingFile] = useState(false);
 
     const httpHook = useHttp();
-    const token = sessionStorage.getItem('token');
+    const { token } = useAuth();
 
     // Fetch test data and start test
     useEffect(() => {

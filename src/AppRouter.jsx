@@ -42,6 +42,7 @@ import { NotificationProvider } from "./Context/NotificationContext";
 
 // Profile Completion Guard
 import ProfileCompletionGuard from "./Components/ProfileCompletionGuard";
+import { useHttpInterceptor } from "./Hooks/useHttpInterceptor";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production
@@ -175,13 +176,12 @@ const SmartRedirect = () => {
   return <Navigate to="/signin" replace />;
 };
 
-// *** MAIN APP ROUTER ***
-const AppRouter = () => {
+// Inside AppRouter, create a wrapper component:
+const AppWithInterceptor = () => {
+  useHttpInterceptor(); // This will handle 401/403 globally
+  
   return (
-    <NotificationProvider>
-      <Router>
-        <AuthProvider>
-          <Routes>
+    <Routes>
             {/* ==================== USER/STUDENT ROUTES ==================== */}
             
             {/* Public Routes - Sign Up & Sign In */}
@@ -451,7 +451,16 @@ const AppRouter = () => {
             {/* ==================== COMMON / FALLBACK ROUTES ==================== */}
             <Route path="/" element={<SmartRedirect />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
+    </Routes>
+  );
+};
+// Then update the main AppRouter return:
+const AppRouter = () => {
+  return (
+    <NotificationProvider>
+      <Router>
+        <AuthProvider>
+          <AppWithInterceptor />
         </AuthProvider>
       </Router>
     </NotificationProvider>

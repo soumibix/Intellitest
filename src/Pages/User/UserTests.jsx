@@ -6,11 +6,12 @@ import { useHttp } from '../../Hooks/useHttps';
 import ChooseSemPopup from '../../utils/ChooseSemPopup';
 import Lottie from 'lottie-react';
 import handLoading from "../../Lottie/handLoading.json";
+import { useAuth } from '../../AppRouter';
 
 function UserTests() {
   const navigate = useNavigate();
   const httpHook = useHttp();
-  const token = sessionStorage.getItem('token');
+  const {token } = useAuth();
   
   const [allTests, setAllTests] = useState([]);
   const [loading, setLoading] = useState(true);

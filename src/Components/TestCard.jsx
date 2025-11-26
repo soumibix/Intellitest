@@ -6,6 +6,7 @@ import TestPopup from "../utils/TestPopup";
 import userIcon from "../assets/purpleUser.png";
 import ConfirmationModal from "../utils/ConfirmationModal";
 import { useHttp } from "../Hooks/useHttps";
+import { useAuth } from "../AppRouter";
 
 function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, onDelete, onScoreGenerated }) {
   const navigate = useNavigate();
@@ -15,9 +16,9 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
   const [isGeneratingScore, setIsGeneratingScore] = useState(false);
   const [scoreGenerated, setScoreGenerated] = useState(false); // Track if score was generated in this session
   const [localScoreData, setLocalScoreData] = useState({});
+  const { token } = useAuth();
 
   const userData = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   const httpHook = useHttp();
 
   const paramTestId = useParams().testId;

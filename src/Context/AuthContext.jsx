@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -25,11 +26,32 @@ export const AuthProvider = ({ children }) => {
     return !!token;
   };
 
+  // Listen for storage changes across tabs (cross-tab sync)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      // If token is removed in another tab, logout current tab
+      if (e.key === 'token' && !e.newValue) {
+        handleLogout(false); // false = don't clear localStorage (already cleared)
+      }
+      // If token is added in another tab, prevent cross-portal login
+      if (e.key === 'token' && e.newValue && isAuthenticated) {
+        const newRole = localStorage.getItem('role');
+        if (newRole && newRole !== role) {
+          // Different role logged in - force logout
+          handleLogout(false);
+          window.location.reload();
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [isAuthenticated, role]);
+
   // Initialize authentication on mount
   useEffect(() => {
     const initializeAuth = () => {
       if (isTokenValid()) {
-        // Try sessionStorage first, then localStorage
         let storedRole =
           sessionStorage.getItem("role") || localStorage.getItem("role");
         let storedUser =
@@ -44,7 +66,6 @@ export const AuthProvider = ({ children }) => {
             setUser(parsedUser);
             setIsAuthenticated(true);
 
-            // If data was in localStorage, copy to sessionStorage for current session
             if (!sessionStorage.getItem("token") && storedToken) {
               sessionStorage.setItem("token", storedToken);
               sessionStorage.setItem("role", storedRole);
@@ -52,7 +73,6 @@ export const AuthProvider = ({ children }) => {
             }
           } catch (error) {
             console.error("Error parsing stored user data:", error);
-            // Clear invalid data
             clearAllStorage();
           }
         }
@@ -65,15 +85,29 @@ export const AuthProvider = ({ children }) => {
 
   // Clear all storage
   const clearAllStorage = () => {
+    // Clear session storage
     sessionStorage.removeItem("token");
     sessionStorage.removeItem("role");
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("userData");
+    sessionStorage.removeItem("activeStep");
+    sessionStorage.removeItem("testId");
+    
+    // Clear local storage (auth only, preserve remember me emails)
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     localStorage.removeItem("user");
     localStorage.removeItem("userData");
-    localStorage.removeItem("facultyTestProgress");
+  };
+
+  // Internal logout handler
+  const handleLogout = (clearStorage = true) => {
+    if (clearStorage) {
+      clearAllStorage();
+    }
+    setUser(null);
+    setRole(null);
+    setIsAuthenticated(false);
   };
 
   // Login function
@@ -88,6 +122,11 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", token);
       localStorage.setItem("role", userRole);
       localStorage.setItem("user", JSON.stringify(userData));
+    } else {
+      // If not remembering, clear any existing localStorage auth data
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("user");
     }
 
     setUser(userData);
@@ -95,12 +134,9 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
   };
 
-  // Logout function
+  // Public logout function
   const logout = () => {
-    clearAllStorage();
-    setUser(null);
-    setRole(null);
-    setIsAuthenticated(false);
+    handleLogout(true);
   };
 
   // Get token

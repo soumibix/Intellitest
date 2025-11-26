@@ -481,37 +481,37 @@ const handleSaveAndContinue = async (nextStep) => {
   };
 
   const handleReset = () => {
-    sessionStorage.removeItem('activeStep');
-    sessionStorage.removeItem('testId');
-    setState({
-      activeStep: 0,
-      testId: null,
-      testFormData: {
-        department: "",
-        semester: "",
-        subjectName: "",
-        subjectCode: "",
-        testCategory: "",
-        numberOfQuestions: "",
-        totalMarks: "",
-      },
-      scheduleFormData: {
-        testDate: "",
-        startTime: "",
-        endTime: "",
-        duration: "",
-      },
-      questionFileUrl: "",
-      answerFileUrl: "",
-      questionFileName: "",
-      answerFileName: "",
-    });
-    setFiles({ question: null, answer: null });
-    setTestData(null);
-    setCurrentPage(1);
-    setCurrentFilter("all");
-    setSearchQuery("");
-    fetchAllTests("all", 1, false, "");
+  sessionStorage.removeItem('activeStep');
+  sessionStorage.removeItem('testId');
+  setState({
+    activeStep: 0,
+    testId: null,
+    testFormData: {
+      department: "",
+      semester: "",
+      subjectName: "",
+      subjectCode: "",
+      testCategory: "",
+      numberOfQuestions: "",
+      totalMarks: "",
+    },
+    scheduleFormData: {
+      testDate: "",
+      startTime: "",
+      endTime: "",
+      duration: "",
+    },
+    questionFileUrl: "",
+    answerFileUrl: "",
+    questionFileName: "",
+    answerFileName: "",
+  });
+  setFiles({ question: null, answer: null });
+  setTestData(null);
+  setCurrentPage(1);
+  setCurrentFilter("all");
+  setSearchQuery("");
+  fetchAllTests("all", 1, false, "");
   };
 
   const handleConfirmCancel = async () => {

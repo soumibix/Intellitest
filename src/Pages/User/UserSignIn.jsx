@@ -29,6 +29,11 @@ const UserSignIn = () => {
       });
       
       if (response.success) {
+        if(formData.rememberMe) {
+          localStorage.setItem('rememberStudentEmail', formData.email.trim());
+        } else {
+          localStorage.removeItem('rememberStudentEmail');
+        }
           login(
             response.data.user || response.data, // userData
             response.data.role || 'user',      // userRole
@@ -96,9 +101,9 @@ const UserSignIn = () => {
       colorHeading="Back"
       fields={fields}
       initialFormData={{
-        email: localStorage.getItem('rememberFacultyEmail') || '',
+        email: localStorage.getItem('rememberStudentEmail') || '',
         password: '',
-        rememberMe: !!localStorage.getItem('rememberFacultyEmail'),
+        rememberMe: !!localStorage.getItem('rememberStudentEmail'),
       }}
       onSubmit={handleSubmit}
       submitButtonText="Sign In"

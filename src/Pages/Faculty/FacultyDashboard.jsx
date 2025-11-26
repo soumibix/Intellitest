@@ -8,13 +8,13 @@ import { departmentOptions } from "../../Config/dummyData";
 import Lottie from "lottie-react";
 import handLoading from "../../Lottie/handLoading.json"
 import { useNotification } from "../../Context/NotificationContext";
+import { useAuth } from "../../AppRouter";
 const FacultyDashboard = () => {
   const httpHook = useHttp();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const token= sessionStorage.getItem('token');
   const {showSuccess, showError} = useNotification ();
-  
+  const {token} = useAuth();
   // Get user data from sessionStorage
   const userDataStr = sessionStorage.getItem('user');
   const userData = userDataStr ? JSON.parse(userDataStr) : null;

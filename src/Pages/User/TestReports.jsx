@@ -4,6 +4,7 @@ import { useHttp } from '../../Hooks/useHttps';
 import Lottie from 'lottie-react';
 import handLoading from "../../Lottie/handLoading.json";
 import { API_ENDPOINTS } from "../../Config/config";
+import { useAuth } from '../../AppRouter';
 
 function TestReports() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -19,7 +20,7 @@ function TestReports() {
 
     const httpHook = useHttp();
     const abortControllerRef = useRef(null);
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const { token } = useAuth();
 
     // Fetch student progress (completed tests with reports)
     const fetchStudentProgress = async (page = 1, search = '') => {

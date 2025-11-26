@@ -7,13 +7,13 @@ import { useHttp } from "../../Hooks/useHttps";
 import { batchOptions, campusOptions, departmentOptions, sectionOptions } from "../../Config/dummyData";
 import handLoading from "../../Lottie/handLoading.json";
 import Lottie from "lottie-react";
+import { useAuth } from "../../AppRouter";
 
 const UserDashboard = () => {
   const httpHook = useHttp();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-
+  const {token } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",

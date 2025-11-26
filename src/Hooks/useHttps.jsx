@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useNotification } from "../Context/NotificationContext";
+import { useAuth } from "../Context/AuthContext";
 import { BASE_URL } from "../Config/config";
 
 export const useHttp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { showNotification } = useNotification();
+  const { logout, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -68,19 +70,28 @@ export const useHttp = () => {
     
     showNotification(message, "error");
 
-    // Handle unauthorized access
+    // Handle unauthorized access - Use AuthContext logout
     if ([401, 403].includes(response.status)) {
-      localStorage.clear();
-      sessionStorage.clear();
-      const path = location.pathname;
+      // Show session expired message
+      showNotification("Session expired. Please login again.", "error");
       
-      if (path.includes("admin")) {
-        navigate("/admin/signin");
-      } else if (path.includes("faculty")) {
-        navigate("/faculty/signin");
-      } else {
-        navigate("/signin");
+      // Logout using AuthContext (clears all storage properly)
+      logout();
+      
+      // Determine redirect path based on current location or role
+      const path = location.pathname;
+      let redirectPath = "/signin"; // default to student
+      
+      if (path.includes("admin") || role === "superadmin") {
+        redirectPath = "/admin/signin";
+      } else if (path.includes("faculty") || role === "faculty") {
+        redirectPath = "/faculty/signin";
       }
+      
+      // Navigate to appropriate signin page
+      setTimeout(() => {
+        navigate(redirectPath, { replace: true });
+      }, 100);
     }
 
     return { success: false, message };
@@ -215,7 +226,6 @@ export const useHttp = () => {
   };
 
   // PATCH request
-
   const patchReq = async (url, token = "", data, isFormData = false) => {
     setLoading(true);
     setError(null);
