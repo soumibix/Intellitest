@@ -67,13 +67,15 @@ function UserTests() {
   const fetchUserTests = async () => {
     setLoading(true);
     setError(null);
+
+    console.log(JSON.parse(sessionStorage.getItem('user')), 'hbdh')
     
     try {
       // Build query params
       const queryParams = {
         page: 1,
         limit: 100,
-        department: sessionStorage.getItem('user')?.department,
+        department: JSON.parse(sessionStorage.getItem('user'))?.department,
         semester: currentSemester || undefined,
       };
 
