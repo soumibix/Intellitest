@@ -18,35 +18,17 @@ function TestReports() {
 
     const httpHook = useHttp();
     const abortControllerRef = useRef(null);
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     
     // Get user data from localStorage
     const getUserData = () => {
-        try {
-            const user = JSON.parse(sessionStorage.getItem('user')) || JSON.parse(localStorage.getItem('user'));
-            return {
-                department: user?.department || '',
-                semester: user?.semester || ''
-            };
-        } catch (error) {
-            console.error('Error parsing user data:', error);
-            return { department: '', semester: '' };
-        }
+        const user = JSON.parse(sessionStorage.getItem('user')) || JSON.parse(localStorage.getItem('user'));
+        return {
+            department: user?.department || '',
+            semester: user?.semester || ''
+        };
     };
 
-    const getToken = () => {
-        try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            if (!token) {
-                console.error('❌ No token found in storage');
-            } else {
-                console.log('✅ Token found:', token.substring(0, 20) + '...');
-            }
-            return token;
-        } catch (error) {
-            console.error('Error getting token:', error);
-            return '';
-        }
-    };
 
     // Fetch completed tests with search
     const fetchCompletedTests = async (page = 1, search = '') => {
@@ -61,7 +43,6 @@ function TestReports() {
 
         try {
             const { department, semester } = getUserData();
-            const token = getToken();
 
             if (!token) {
                 setError('Authentication token not found. Please log in again.');
@@ -161,12 +142,12 @@ function TestReports() {
     if (loading && allTests.length === 0) {
         return (
             <div className="flex justify-center items-center min-h-screen">
-        <Lottie 
-          animationData={handLoading} 
-          loop={true}
-          style={{ width: 500, height: 500 }}
-        />
-      </div>
+                <Lottie 
+                    animationData={handLoading} 
+                    loop={true}
+                    style={{ width: 500, height: 500 }}
+                />
+            </div>
         );
     }
 
@@ -200,14 +181,14 @@ function TestReports() {
             />
 
             {allTests.length === 0 && !loading && !error && (
-    <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">
-            {searchQuery 
-                ? `No completed tests found matching "${searchQuery}"` 
-                : ''}
-        </p>
-    </div>
-)}
+                <div className="text-center py-12">
+                    <p className="text-gray-500 text-lg">
+                        {searchQuery 
+                            ? `No completed tests found matching "${searchQuery}"` 
+                            : ''}
+                    </p>
+                </div>
+            )}
         </div>
     );
 }
