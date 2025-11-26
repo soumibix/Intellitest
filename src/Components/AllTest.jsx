@@ -1,12 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef, memo } from "react";
 import {
   Search,
-  SlidersHorizontal,
   X,
   ArrowRight,
   Loader2,
-  TextSelect,
   MousePointer
 } from "lucide-react";
 import TestCard from "../Components/TestCard";
@@ -14,7 +11,7 @@ import handLoading from "../Lottie/handLoading.json"
 import Lottie from "lottie-react";
 import Button from "./common/Button";
 
-function AllTest({
+const AllTest = memo(function AllTest({
   heading = "All Tests",
   userType = "user",
   allTests = [],
@@ -29,26 +26,15 @@ function AllTest({
   isLoading = false,
   onSearchChange = null,
   displayedTestsCount = 0,
-  onEdit = null, // Add onEdit callback
-  onDelete = null, // Add onDelete callback
+  onEdit = null,
+  onDelete = null,
   isShowSemPopUp = false,
   setIsSemPopupOpen
 }) {
-  // const navigate = useNavigate();
-
   const [activeFilter, setActiveFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showMonthDropdown, setShowMonthDropdown] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState("All");
-  const [tests, setTests] = useState(allTests);
-  const [searchDebounceTimer, setSearchDebounceTimer] = useState(null);
-
-  const dropdownRef = useRef(null);
-
-  // Update tests when allTests prop changes
-  useEffect(() => {
-    setTests(allTests);
-  }, [allTests]);
+  const [inputValue, setInputValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef(null);
 
   // Update activeFilter when it changes from parent
   useEffect(() => {
@@ -57,59 +43,43 @@ function AllTest({
     }
   }, [activeFilterProp]);
 
-  // Close dropdown on outside click
+  // Reset searching state when loading completes
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setShowMonthDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (!isLoading) {
+      setIsSearching(false);
+    }
+  }, [isLoading]);
 
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (searchDebounceTimer) {
-        clearTimeout(searchDebounceTimer);
-      }
-    };
-  }, [searchDebounceTimer]);
+  // Handle input change (updates UI immediately)
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInputValue(value);
+    setIsSearching(true);
 
-  // const months = [
-  //   "All",
-  //   "January",
-  //   "February",
-  //   "March",
-  //   "April",
-  //   "May",
-  //   "June",
-  //   "July",
-  //   "August",
-  //   "September",
-  //   "October",
-  //   "November",
-  //   "December",
-  // ];
-
-  // Handle search with debouncing
-  const handleSearchChange = (value) => {
-    setSearchQuery(value);
-
-    // Clear existing timer
-    if (searchDebounceTimer) {
-      clearTimeout(searchDebounceTimer);
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
 
-    // Set new timer for API call
-    const timer = setTimeout(() => {
+    // Set new timeout for parent callback
+    searchTimeoutRef.current = setTimeout(() => {
       if (onSearchChange) {
+        console.log('🔤 Sending search to parent:', value);
         onSearchChange(value);
       }
-    }, 500); // 500ms debounce
+    }, 500);
+  };
 
-    setSearchDebounceTimer(timer);
+  // Clear search
+  const handleClearSearch = () => {
+    setInputValue('');
+    setIsSearching(true);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    if (onSearchChange) {
+      onSearchChange('');
+    }
   };
 
   // Handle filter change
@@ -120,39 +90,21 @@ function AllTest({
     }
   };
 
-  // Filter tests by search and month
-  // When using API search (onSearchChange exists), skip local filtering
-  const filteredTests = onSearchChange
-    ? tests // Use tests directly from API when using API search
-    : tests.filter((test) => {
-      const matchesSearch =
-        searchQuery.length === 0 ||
-        test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesMonth =
-        selectedMonth === "All" || test.month === selectedMonth;
-      return matchesSearch && matchesMonth;
-    });
-
-  // Display limited tests if showWrap is true (but show all loaded tests)
-  const displayTests = filteredTests;
-
-  // Search suggestions - only show when not using API search
-  const suggestions =
-    !onSearchChange && searchQuery.length > 0
-      ? tests
-        .filter((test) =>
-          test.subjectName?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .map((test) => test.subjectName)
-        .filter(
-          (value, index, self) => value && self.indexOf(value) === index
-        ) // Remove duplicates
-        .slice(0, 5)
-      : [];
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Calculate remaining tests to load
   const remainingTests = totalTests - displayedTestsCount;
   const nextBatchSize = Math.min(10, remainingTests);
+
+  // Show loader only during search/filter operations
+  const showLoader = isLoading && isSearching;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -164,42 +116,36 @@ function AllTest({
               {heading}
             </h1>
 
-            {
-              isShowSemPopUp && (
-                <Button iconPosition={'left'} onClick={() => setIsSemPopupOpen(true)} variant="filled" textSize="text-md" text={`Choose Semester: ${localStorage.getItem('userSemester')? `${localStorage.getItem('userSemester')}`: "Choose your semester"}`} icon={<MousePointer /> }/>
-              )
-            }
+            {isShowSemPopUp && (
+              <Button 
+                iconPosition={'left'} 
+                onClick={() => setIsSemPopupOpen(true)} 
+                variant="filled" 
+                textSize="text-md" 
+                text={`Choose Semester: ${localStorage.getItem('userSemester') ? `${localStorage.getItem('userSemester')}` : "Choose your semester"}`} 
+                icon={<MousePointer />}
+              />
+            )}
           </div>
 
           {/* Search Bar */}
           <div className="flex flex-col w-full sm:w-80 lg:w-96 gap-2">
-            {/* Search Input */}
             <div className="flex items-center gap-3 bg-white border border-[#6B21A8] rounded-3xl px-4 py-2.5 sm:py-3">
               <Search className="text-[#6B21A8] w-5 h-5 flex-shrink-0" />
-
               <input
                 type="text"
                 placeholder="Search by Test Name, Code, Department"
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                value={inputValue}
+                onChange={handleInputChange}
                 className="flex-1 focus:outline-none text-sm sm:text-base min-w-0"
               />
+              {inputValue && (
+                <X 
+                  className="text-[#6B21A8] w-5 h-5 cursor-pointer hover:text-[#4A0E78] transition-colors" 
+                  onClick={handleClearSearch}
+                />
+              )}
             </div>
-
-            {/* Suggestions */}
-            {suggestions.length > 0 && (
-              <div className="flex flex-col bg-white border border-gray-200 rounded-xl shadow-lg py-2 max-h-60 overflow-y-auto">
-                {suggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleSearchChange(suggestion)}
-                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer text-gray-700 text-sm"
-                  >
-                    {suggestion}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -211,10 +157,11 @@ function AllTest({
                 <button
                   key={filterType}
                   onClick={() => handleFilterClick(filterType)}
-                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${activeFilter === filterType
+                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${
+                    activeFilter === filterType
                       ? "bg-[#1A0B2E] text-white"
                       : "bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#d4b3f3]"
-                    }`}
+                  }`}
                 >
                   {filterType === "all"
                     ? "View All"
@@ -235,7 +182,7 @@ function AllTest({
         )}
 
         {/* Tests Grid */}
-        {isLoading ? (
+        {showLoader ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Lottie
               animationData={handLoading}
@@ -245,14 +192,14 @@ function AllTest({
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-            {displayTests.length > 0 ? (
+            {allTests.length > 0 ? (
               <>
-                {displayTests.map((test) => (
+                {allTests.map((test) => (
                   <TestCard
                     key={test._id}
                     data={test}
                     test={test}
-                    generateScore= {test.genarateScore}
+                    generateScore={test.genarateScore}
                     userType={userType}
                     status={test.status}
                     testData={test}
@@ -263,7 +210,7 @@ function AllTest({
                   />
                 ))}
 
-                {/* View More Card - Only show if there are more tests to load */}
+                {/* View More Card */}
                 {showWrap && hasMoreTests && onViewMore && (
                   <button
                     onClick={onViewMore}
@@ -283,7 +230,6 @@ function AllTest({
                             <p className="text-[#fff] text-lg sm:text-xl px-4">
                               Click to view the next {nextBatchSize} test{nextBatchSize !== 1 ? 's' : ''}
                             </p>
-
                             <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">
                               <ArrowRight className="w-6 h-6 cursor-pointer" />
                             </div>
@@ -296,7 +242,9 @@ function AllTest({
               </>
             ) : (
               <div className="col-span-full text-center py-12 text-gray-500">
-                <p className="text-base sm:text-lg">No tests found matching your filters</p>
+                <p className="text-base sm:text-lg">
+                  {inputValue ? 'No tests found matching your search' : 'No tests found matching your filters'}
+                </p>
               </div>
             )}
           </div>
@@ -304,6 +252,6 @@ function AllTest({
       </div>
     </div>
   );
-}
+});
 
 export default AllTest;

@@ -6,23 +6,18 @@ import handLoading from "../../Lottie/handLoading.json";
 import { API_ENDPOINTS } from "../../Config/config";
 
 function TestReports() {
-    const [searchQuery, setSearchQuery] = useState('');
     const [allTests, setAllTests] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        limit: 10,
-        total: 0,
-        totalPages: 0
-    });
+    const [searchQuery, setSearchQuery] = useState("");
+    const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
     const httpHook = useHttp();
     const abortControllerRef = useRef(null);
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-    // Fetch student progress (completed tests with reports)
-    const fetchStudentProgress = async (page = 1, search = '') => {
+    // Fetch student progress
+    const fetchStudentProgress = async (search = "") => {
         // Cancel previous request if exists
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -39,14 +34,11 @@ function TestReports() {
                 return;
             }
 
-            console.log('🔍 Fetching student progress with params:', { 
-                search,
-                page 
-            });
+            console.log('🔍 Fetching student progress with params:', { search });
 
             // Build query parameters
             const params = new URLSearchParams();
-            params.append('page', page);
+            params.append('page', 1);
             params.append('limit', 100);
             
             // Add search parameter only if it's not empty
@@ -89,12 +81,6 @@ function TestReports() {
                 }));
 
                 setAllTests(transformedTests);
-                setPagination({
-                    page: response.page || 1,
-                    limit: response.limit || 10,
-                    total: response.total || 0,
-                    totalPages: response.totalPages || 1
-                });
                 console.log('✅ Progress loaded successfully:', transformedTests.length, 'tests');
             } else {
                 setError(response.message || 'Failed to fetch student progress');
@@ -111,13 +97,16 @@ function TestReports() {
             setAllTests([]);
         } finally {
             setLoading(false);
+            if (!initialLoadComplete) {
+                setInitialLoadComplete(true);
+            }
         }
     };
 
     // Initial fetch on component mount ONLY
     useEffect(() => {
         console.log('🚀 Component mounted, fetching initial progress');
-        fetchStudentProgress(1, '');
+        fetchStudentProgress("");
         
         // Cleanup
         return () => {
@@ -125,23 +114,17 @@ function TestReports() {
                 abortControllerRef.current.abort();
             }
         };
-    }, []); // Empty dependency array - runs only once on mount
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Handle pagination
-    const handlePageChange = (newPage) => {
-        console.log('📄 Page changed to:', newPage);
-        fetchStudentProgress(newPage, searchQuery);
+    // Handle search query change
+    const handleSearchChange = (search) => {
+        console.log('🔤 Search query changed:', `"${search}"`);
+        setSearchQuery(search);
+        fetchStudentProgress(search);
     };
 
-    // Handle search query change from AllTest component
-    const handleSearchChange = (query) => {
-        console.log('🔤 Search received from AllTest:', `"${query}"`);
-        setSearchQuery(query);
-        // Fetch with the new search query
-        fetchStudentProgress(1, query);
-    };
-
-    if (loading && allTests.length === 0) {
+    // Show full-page loader only on initial load
+    if (!initialLoadComplete && loading) {
         return (
             <div className="flex justify-center items-center min-h-screen">
                 <Lottie 
@@ -159,7 +142,7 @@ function TestReports() {
                 <div className="text-center">
                     <p className="text-red-600 mb-4">{error}</p>
                     <button 
-                        onClick={() => fetchStudentProgress(1, searchQuery)}
+                        onClick={() => fetchStudentProgress(searchQuery)}
                         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
                         Retry
@@ -177,20 +160,8 @@ function TestReports() {
                 filter={false} 
                 userType='user'
                 onSearchChange={handleSearchChange}
-                pagination={pagination}
-                onPageChange={handlePageChange}
                 isLoading={loading}
             />
-
-            {allTests.length === 0 && !loading && !error && (
-                <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">
-                        {searchQuery 
-                            ? `No completed tests found matching "${searchQuery}"` 
-                            : 'No test reports available yet'}
-                    </p>
-                </div>
-            )}
         </div>
     );
 }
