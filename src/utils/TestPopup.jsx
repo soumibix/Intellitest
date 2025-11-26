@@ -23,7 +23,7 @@ export default function TestPopup({ isOpen, _id, onClose, onStart, testData = {}
   const checkTestStatus = async () => {
     setLoading(true);
     try {
-      const startTestResponse = await postReq(`student/test/startTest/${_id}`, token);
+      const startTestResponse = await postReq(`student/test/checktest/${_id}`, token);
       console.log('Start Test Response:', startTestResponse);
 
       if (startTestResponse?.data || startTestResponse?.success || startTestResponse?.timing) {
