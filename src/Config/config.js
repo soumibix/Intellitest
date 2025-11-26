@@ -39,6 +39,7 @@ export const API_ENDPOINTS = {
     `test/updateTestData/${testId}?action=update&questionId=${questionId}`,
   TEST_DELETE: (id) => `test/deleteTest/${id}`,
   GET_TESTS: 'test/testData',
+  VIEW_TEST_REPORT: (testId) => `faculty/studentanalysis/${testId}`,
 
   // STUDENT TEST APIs
   USER_GET_ALL_TESTS: "student/test/alltest",

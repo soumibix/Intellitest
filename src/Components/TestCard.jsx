@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SquarePen, LockKeyhole, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import logo from '../assets/iem.jpg';
 import TestPopup from "../utils/TestPopup";
 import userIcon from "../assets/purpleUser.png";
@@ -21,6 +21,11 @@ function TestCard({
 
   const userData = JSON.parse(localStorage.getItem('user')) || JSON.parse(sessionStorage.getItem('user'));
 
+  const paramTestId = useParams().testId;
+
+  console.log({testData})
+
+  // console.log({paramTestId})
   // Merge data and testData, prioritizing data if it exists
   const mergedData = { ...testData, ...data };
 
@@ -38,6 +43,7 @@ function TestCard({
     endTime,
     createdBy = "Faculty",
     createdAt,
+    totalMarks,
     questions = []
   } = mergedData;
 
@@ -74,15 +80,31 @@ function TestCard({
   };
 
   const handleViewReport = () => {
-    const testId = _id;
-    if (userType === "admin" && testId) {
-      navigate(`/admin/student-performance/viewreport/${testId}`);
-    } else if (userType === "faculty" && testId) {
-      navigate(`/faculty/student-performance/viewreport/${testId}`);
-    } else {
-      console.error('No test ID available for navigation');
-    }
-  };
+  const testId = _id;
+  if (userType === "admin" && testId) {
+    navigate(`/admin/student-performance/viewreport/${testId}`);
+  } else if (userType === "faculty" && testId) {
+    navigate(`/faculty/student-performance/viewreport/${testId}`);
+  } else {
+    console.error('No test ID available for navigation');
+  }
+};
+
+const formatDuration = (mins) => {
+  if (!mins || isNaN(mins)) return "N/A";
+
+  const hours = Math.floor(mins / 60);
+  const minutes = mins % 60;
+
+  if (hours > 0 && minutes > 0) {
+    return `${hours} hr ${minutes} min`;
+  }
+  if (hours > 0) {
+    return `${hours} hr`;
+  }
+  return `${minutes} min`;
+};
+
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -151,9 +173,10 @@ function TestCard({
           <div className="flex flex-wrap items-center gap-2 text-gray-600">
             <span className="font-medium">{numberOfQuestions || questions.length || 0} Questions</span>
             <span className="text-gray-400">•</span>
-            <span className="font-medium">{(numberOfQuestions || questions.length || 0) * 2} Marks</span>
+            {/* <span className="font-medium">{(numberOfQuestions || questions.length || 0) * 2} Marks</span> */}
+            <span className="font-medium">{totalMarks} Marks</span>
             <span className="text-gray-400">•</span>
-            <span>{duration} mins</span>
+            <span>{formatDuration(duration)}</span>
           </div>
 
           {/* Subject Code */}
@@ -171,6 +194,10 @@ function TestCard({
           {/* Category */}
           <div className="text-gray-600">
             <span className="font-medium text-gray-700">Category:</span> {testCategory}
+          </div>
+          {/* time */}
+          <div className="text-gray-600">
+            <span className="font-medium text-gray-700">Time:</span> {startTime && endTime ? ` ${startTime} - ${endTime}` : 'Not given yet'}
           </div>
         </div>
 
@@ -254,7 +281,7 @@ function TestCard({
               </div>
 
               {/* View Report Button */}
-              {status === "completed" && (
+              {status === "completed" && !paramTestId && (
                 <button 
                   onClick={handleViewReport} 
                   className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base transition-colors"
