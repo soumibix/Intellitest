@@ -251,6 +251,8 @@ function AllTest({
                   <TestCard
                     key={test._id}
                     data={test}
+                    test={test}
+                    generateScore= {test.genarateScore}
                     userType={userType}
                     status={test.status}
                     testData={test}
