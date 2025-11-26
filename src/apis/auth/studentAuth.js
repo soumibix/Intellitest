@@ -65,7 +65,7 @@ export const studentAuthAPI = {
   // If only email is provided, OTP will be sent
   // If both email and OTP are provided, verification will happen
   forgotPassword: async (httpHook, email, otp = null) => {
-    try {
+    // try {
       const payload = otp ? { email, otp } : { email };
       
       const response = await httpHook.postReq(
@@ -74,13 +74,14 @@ export const studentAuthAPI = {
         payload
       );
       return response;
-    } catch (error) {
-      console.error("Forgot password error:", error);
-      return {
-        success: false,
-        message: error.message || (otp ? "OTP verification failed" : "Failed to send OTP"),
-      };
-    }
+    
+    // } catch (error) {
+    //   console.error("Forgot password error:", error);
+    //   return {
+    //     success: false,
+    //     message: error.message || (otp ? "OTP verification failed" : "Failed to send OTP"),
+    //   };
+    // }
   },
 
   // Reset Password

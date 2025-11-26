@@ -1,32 +1,54 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.webp";
-import { useNavigate } from "react-router-dom";
+import { useHttp } from "../../Hooks/useHttps";
+import { studentAuthAPI } from "../../apis/auth/studentAuth";
 
-const UserForgotPassword = () => {
+function UserForgotPassword() {
+  const navigate = useNavigate();
+  const httpHook = useHttp();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = async (formData) => {
     setIsLoading(true);
     setErrors({});
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Email Submitted:", formData.email);
+    try {
+      const response = await studentAuthAPI.forgotPassword(
+        httpHook,
+        formData.email
+      );
+
+      // if (response.success) {
+        // Navigate to OTP verification page with email
+        navigate("/otp-verification", { 
+          state: { 
+            email: formData.email,
+            fromForgotPassword: true 
+          } 
+        });
+      // } else {
+      //   setErrors({ 
+      //     email: response.message || "Failed to send OTP. Please try again." 
+      //   });
+      // }
+    } catch (error) {
+      setErrors({ 
+        email: "An error occurred. Please try again." 
+      });
+    } finally {
       setIsLoading(false);
-      // After successful email validation, go to OTP Verification
-      navigate("/otp-verification", { state: { email: formData.email } });
-    }, 1500);
+    }
   };
 
   const fields = [
     {
       name: "email",
-      type: "text",
+      type: "email",
       label: "Email Address",
-      placeholder: "name@company.com",
+      placeholder: "Enter your registered email",
       required: true,
     },
   ];
@@ -34,18 +56,23 @@ const UserForgotPassword = () => {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle = "Recover your IntelliTest account"
-      leftDescription = "Submit your registered email address to receive a otp for resetting your password."
-      rightDescription="Enter your registered email address, and we'll send you an OTP to verify your identity."
-      heading="Reset Your Password"
+      leftTitle="Having trouble signing in?"
+      leftDescription="No worries! Reset your password and get back to your IntelliTest account to continue your exams smoothly."
+      heading="Forgot Password?"
+      rightDescription="Enter your registered email address to receive an OTP for password reset."
       fields={fields}
       initialFormData={{ email: "" }}
       onSubmit={handleSubmit}
-      submitButtonText="Proceed"
+      submitButtonText="Send OTP"
       isLoading={isLoading}
       errors={errors}
+      bottomLink={{
+        text: "Remember your password?",
+        linkText: "Sign In",
+        to: "/signin",
+      }}
     />
   );
-};
+}
 
 export default UserForgotPassword;

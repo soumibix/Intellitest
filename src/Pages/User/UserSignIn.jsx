@@ -80,7 +80,7 @@ const UserSignIn = () => {
       <button
         type="button"
         className="text-sm font-medium text-[#2B2B2B] cursor-pointer hover:underline"
-        onClick={() => navigate('/faculty/forgot-password')}
+        onClick={() => navigate('/forgot-password')}
       >
         Forgot password?
       </button>

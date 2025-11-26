@@ -3,40 +3,85 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AuthenticationComp from "../../Components/common/AuthenticationComp";
 import SignInImg from "../../assets/Authentication3.webp";
 import Button from "../../Components/common/Button";
+import { useHttp } from "../../Hooks/useHttps";
+import { studentAuthAPI } from "../../apis/auth/studentAuth";
 
 function UserOTPVerification() {
   const navigate = useNavigate();
   const location = useLocation();
+  const httpHook = useHttp();
+  
   const email = location.state?.email || "";
+  const fromForgotPassword = location.state?.fromForgotPassword || false;
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [timer, setTimer] = useState(30);
 
   useEffect(() => {
+    // Redirect if no email is provided
+    if (!email) {
+      navigate("/forgot-password");
+      return;
+    }
+
     if (timer > 0) {
       const countdown = setTimeout(() => setTimer((t) => t - 1), 1000);
       return () => clearTimeout(countdown);
     }
-  }, [timer]);
+  }, [timer, email, navigate]);
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = async (formData) => {
     setIsLoading(true);
     setErrors({});
 
-    setTimeout(() => {
-      if (formData.otp === "123456") {
-        navigate("/reset-new-password", { state: { email } });
+    try {
+      const response = await studentAuthAPI.forgotPassword(
+        httpHook,
+        email,
+        formData.otp
+      );
+
+      if (response.success && response.isVerified) {
+        // Navigate to reset password page with email and verification flag
+        navigate("/reset-new-password", { 
+          state: { 
+            email,
+            isVerified: true 
+          } 
+        });
       } else {
-        setErrors({ otp: "Invalid OTP. Please try again." });
+        setErrors({ 
+          otp: response.message || "Invalid OTP. Please try again." 
+        });
       }
+    } catch (error) {
+      setErrors({ 
+        otp: "Verification failed. Please try again." 
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleResend = () => {
-    setTimer(30);
-    console.log("OTP resent to:", email);
+  const handleResend = async () => {
+    try {
+      const response = await studentAuthAPI.forgotPassword(httpHook, email);
+      
+      if (response.success) {
+        setTimer(30);
+        setErrors({});
+        console.log("OTP resent to:", email);
+      } else {
+        setErrors({ 
+          otp: response.message || "Failed to resend OTP" 
+        });
+      }
+    } catch (error) {
+      setErrors({ 
+        otp: "Failed to resend OTP. Please try again." 
+      });
+    }
   };
 
   const fields = [
@@ -72,8 +117,8 @@ function UserOTPVerification() {
   return (
     <AuthenticationComp
       image={SignInImg}
-      leftTitle = "Verify your account"
-      leftDescription = "Enter the OTP sent to your email to confirm your identity and secure your IntelliTest account."
+      leftTitle="Verify your account"
+      leftDescription="Enter the OTP sent to your email to confirm your identity and secure your IntelliTest account."
       heading="Verify OTP to proceed"
       rightDescription="Please enter the 6-digit code below to verify your identity."
       fields={fields}
