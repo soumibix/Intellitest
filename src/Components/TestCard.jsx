@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SquarePen, LockKeyhole, Trash2, Sparkles, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import logo from '../assets/iem.jpg';
 import TestPopup from "../utils/TestPopup";
 import userIcon from "../assets/purpleUser.png";
@@ -20,6 +20,11 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   const httpHook = useHttp();
 
+  const paramTestId = useParams().testId;
+
+  console.log({testData})
+
+  // console.log({paramTestId})
   const mergedData = { ...testData, ...data };
   const {
     _id,
@@ -28,13 +33,14 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
     testCategory = mergedData.testcategory || "Test",
     department = "N/A",
     semester = "N/A",
-    numberOfQuestions = mergedData.numberofQuestions || 0,
+    numberOfQuestions = mergedData.numberQuestions || 0,
     duration = "N/A",
     testDate,
     startTime,
     endTime,
     createdBy = "Faculty",
     createdAt,
+    totalMarks,
     questions = [],
     obtainedScore = mergedData.obtainedScore,
     maxScore = mergedData.maxScore,
@@ -59,7 +65,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
   const percentage = (displayMaxScore > 0 && displayObtainedScore !== undefined && displayObtainedScore !== null) 
     ? Math.round((displayObtainedScore / displayMaxScore) * 100) 
     : null;
-  const totalMarks = displayMaxScore || (numberOfQuestions || questions.length || 0) * 2;
+  // const totalMarks = displayMaxScore || (numberOfQuestions || questions.length || 0) * 2;
 
   const formatDateTime = () => {
     if (!testDate || !startTime) return "Not scheduled";
@@ -117,11 +123,31 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
   };
 
   const handleViewReport = () => {
-    if (!_id) return console.error('No test ID available');
-    const routes = { admin: 'admin', faculty: 'faculty', user: 'user' };
-    const paths = { admin: 'student-performance/viewreport', faculty: 'student-performance/viewreport', user: 'test-report' };
-    navigate(`/${routes[userType]}/${paths[userType]}/${_id}`);
-  };
+  const testId = _id;
+  if (userType === "admin" && testId) {
+    navigate(`/admin/student-performance/viewreport/${testId}`);
+  } else if (userType === "faculty" && testId) {
+    navigate(`/faculty/student-performance/viewreport/${testId}`);
+  } else {
+    console.error('No test ID available for navigation');
+  }
+};
+
+const formatDuration = (mins) => {
+  if (!mins || isNaN(mins)) return "N/A";
+
+  const hours = Math.floor(mins / 60);
+  const minutes = mins % 60;
+
+  if (hours > 0 && minutes > 0) {
+    return `${hours} hr ${minutes} min`;
+  }
+  if (hours > 0) {
+    return `${hours} hr`;
+  }
+  return `${minutes} min`;
+};
+
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -173,9 +199,10 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
           <div className="flex flex-wrap items-center gap-2 text-gray-600">
             <span className="font-medium">{numberOfQuestions || questions.length || 0} Questions</span>
             <span className="text-gray-400">•</span>
+            {/* <span className="font-medium">{(numberOfQuestions || questions.length || 0) * 2} Marks</span> */}
             <span className="font-medium">{totalMarks} Marks</span>
             <span className="text-gray-400">•</span>
-            <span>{duration} mins</span>
+            <span>{formatDuration(duration)}</span>
           </div>
           <div className="text-gray-600"><span className="font-medium text-gray-700">Code:</span> {subjectCode}</div>
           <div className="flex flex-wrap items-center gap-2 text-gray-600">
@@ -183,7 +210,15 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
             <span className="text-gray-400 hidden sm:inline">•</span>
             <span><span className="font-medium text-gray-700">Sem:</span> {semester}</span>
           </div>
-          <div className="text-gray-600"><span className="font-medium text-gray-700">Category:</span> {testCategory}</div>
+
+          {/* Category */}
+          <div className="text-gray-600">
+            <span className="font-medium text-gray-700">Category:</span> {testCategory}
+          </div>
+          {/* time */}
+          <div className="text-gray-600">
+            <span className="font-medium text-gray-700">Time:</span> {startTime && endTime ? ` ${startTime} - ${endTime}` : 'Not given yet'}
+          </div>
         </div>
 
         {/* Score Section for Completed Tests (User Only) */}
@@ -292,8 +327,13 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
                   <span className="text-xs sm:text-sm text-gray-500 font-semibold truncate">{createdBy?.designation || 'Educator'}</span>
                 </div>
               </div>
-              {actualStatus === "completed" && (
-                <button onClick={handleViewReport} className="bg-[#6B21A8] hover:bg-[#410d6b] text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base transition-colors">
+
+              {/* View Report Button */}
+              {status === "completed" && !paramTestId && (
+                <button 
+                  onClick={handleViewReport} 
+                  className="bg-[#6B21A8] hover:bg-[#410d6b] cursor-pointer text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium w-full sm:w-auto text-sm sm:text-base transition-colors"
+                >
                   View Report
                 </button>
               )}

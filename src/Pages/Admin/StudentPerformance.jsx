@@ -1,148 +1,104 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import AllTest from '../../Components/AllTest';
+import { useHttp } from "../../Hooks/useHttps";
+import { useAuth } from "../../AppRouter";
+import { TestAPI } from "../../apis/Tests/TestCRUD";
 
 const StudentPerformance = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const allTests =
-    [
-      {
-        id: 1,
-        status: "ongoing",
-        testData: {
-          timeRemaining: "58:07 mins remaining",
-          title: "Machine Learning Mid-Sem Test",
-          questions: 30,
-          marks: 60,
-          duration: "1 hour",
-          department: "CST",
-          semester: "05",
-          createdBy: "Saurabh Kumbhar",
-          createdDate: "Sept 5 04:25",
-          avatarSeed: "Saurabh",
-        },
-        month: "September",
-      },
-      {
-        id: 2,
-        status: "upcoming",
-        testData: {
-          dateTime: "Nov 15 • 2:00 PM",
-          title: "Data Structures Final Exam",
-          questions: 50,
-          marks: 100,
-          duration: "2 hours",
-          department: "CST",
-          semester: "03",
-          createdBy: "Priya Sharma",
-          createdDate: "Oct 20 10:15",
-          avatarSeed: "Priya",
-        },
-        month: "November",
-      },
-      {
-        id: 3,
-        status: "completed",
-        testData: {
-          dateTime: "Oct 10 • 10:00 AM",
-          title: "Database Management Systems Quiz",
-          questions: 20,
-          marks: 40,
-          duration: "45 mins",
-          department: "CST",
-          semester: "04",
-          createdBy: "Rahul Verma",
-          createdDate: "Sept 30 14:20",
-          avatarSeed: "Rahul",
-          marksObtained: 52,
-          totalMarks: 60,
-          timeTaken: "54 minutes",
-          accuracy: "87%",
-        },
-        month: "October",
-      },
-      {
-        id: 4,
-        status: "upcoming",
-        testData: {
-          dateTime: "Nov 20 • 11:00 AM",
-          title: "Computer Networks Test",
-          questions: 40,
-          marks: 80,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Anjali Singh",
-          createdDate: "Nov 1 09:00",
-          avatarSeed: "Anjali",
-        },
-        month: "November",
-      },
-      {
-        id: 5,
-        status: "upcoming",
-        testData: {
-          dateTime: "Nov 20 • 11:00 AM",
-          title: "Computer Networks Test",
-          questions: 40,
-          marks: 80,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Anjali Singh",
-          createdDate: "Nov 1 09:00",
-          avatarSeed: "Anjali",
-        },
-        month: "November",
-      },
-      {
-        id: 6,
-        status: "completed",
-        testData: {
-          dateTime: "Oct 25 • 3:00 PM",
-          title: "Operating Systems Mid-Term",
-          questions: 35,
-          marks: 70,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Saurabh Kumbhar",
-          createdDate: "Oct 15 11:30",
-          avatarSeed: "Saurabh",
-          marksObtained: 45,
-          totalMarks: 70,
-          timeTaken: "1 hour 20 mins",
-          accuracy: "64%",
-        },
-        month: "October",
-      },
-      {
-        id: 7,
-        status: "completed",
-        testData: {
-          dateTime: "Oct 25 • 3:00 PM",
-          title: "Operating Systems Mid-Term",
-          questions: 35,
-          marks: 70,
-          duration: "1.5 hours",
-          department: "CST",
-          semester: "05",
-          createdBy: "Saurabh Kumbhar",
-          createdDate: "Oct 15 11:30",
-          avatarSeed: "Saurabh",
-          marksObtained: 45,
-          totalMarks: 70,
-          timeTaken: "1 hour 20 mins",
-          accuracy: "64%",
-        },
-        month: "October",
-      },
-    ]
+  const [allTests, setAllTests] = useState([]);
+  const [testsLoading, setTestsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalTests, setTotalTests] = useState(0);
+  const [hasMoreTests, setHasMoreTests] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const currentTests = allTests.filter(test => test.status === 'completed');
+  const { token } = useAuth();
+  const httpHook = useHttp();
+
+  const TESTS_PER_PAGE = 10;
+
+  // Fetch only completed tests
+  const fetchCompletedTests = async (page = 1, append = false, search = "") => {
+    setTestsLoading(true);
+
+    try {
+      const queryParams = {
+        page: page,
+        limit: TESTS_PER_PAGE,
+        status: "completed",
+      };
+
+      if (search.trim() !== "") {
+        queryParams.search = search.trim();
+      }
+
+      const response = await TestAPI.fetchTests(httpHook, token, queryParams);
+
+      if (response.success && response.data) {
+        const newTests = response.data;
+        const total = response.pagination?.total || 0;
+        setTotalTests(total);
+
+        if (append) {
+          const updated = [...allTests, ...newTests];
+          setAllTests(updated);
+          setHasMoreTests(updated.length < total);
+        } else {
+          setAllTests(newTests);
+          setHasMoreTests(newTests.length < total);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching completed tests:", error);
+      setAllTests(append ? allTests : []);
+      setHasMoreTests(false);
+    } finally {
+      setTestsLoading(false);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    setCurrentPage(1);
+    setSearchQuery("");
+    fetchCompletedTests(1, false, "");
+  }, []);
+
+  // When search text changes
+  const handleSearchChange = (search) => {
+    setSearchQuery(search);
+    setCurrentPage(1);
+    setAllTests([]);
+    fetchCompletedTests(1, false, search);
+  };
+
+  // Load more
+  const handleViewMore = () => {
+    const next = currentPage + 1;
+    setCurrentPage(next);
+    fetchCompletedTests(next, true, searchQuery);
+  };
 
   return (
-    <AllTest heading='Student Performance Details' filter={false} userType='admin' allTests={currentTests}  />
+    <div className="min-h-screen">
+      <div className="w-full">
+        <AllTest
+          heading="Student Performance Details"
+          filter={false}
+          userType="admin"
+          allTests={allTests}
+          showWrap={true}
+          onSearchChange={handleSearchChange}
+          onViewMore={handleViewMore}
+          hasMoreTests={hasMoreTests}
+          isLoadingMore={testsLoading && currentPage > 1}
+          isLoading={testsLoading && currentPage === 1}
+          totalTests={totalTests}
+          displayedTestsCount={allTests.length}
+        />
+      </div>
+    </div>
   );
-}
+};
 
-export default StudentPerformance
+export default StudentPerformance;

@@ -231,4 +231,48 @@ export const TestAPI = {
       return { success: false, message: err.message };
     }
   },
+// };
+
+// 11. View Test Report - Get student performance for a specific test
+viewTestReport: async (httpHook, testId, token, queryParams = {}) => {
+  try {
+    // Build query string from params
+    const params = new URLSearchParams();
+    
+    if (queryParams.page) params.append('page', queryParams.page);
+    if (queryParams.limit) params.append('limit', queryParams.limit);
+    
+    const queryString = params.toString();
+    const endpoint = queryString 
+      ? `${API_ENDPOINTS.VIEW_TEST_REPORT(testId)}?${queryString}`
+      : API_ENDPOINTS.VIEW_TEST_REPORT(testId);
+    
+    const response = await httpHook.getReq(
+      endpoint,
+      'GET',
+      null,
+      { Authorization: `Bearer ${token}` }
+    );
+    
+    return {
+      success: response.success !== false,
+      data: response.data || {},
+      page: response.page || 1,
+      limit: response.limit || 10,
+      totalStudents: response.totalStudents || 0,
+    };
+  } catch (error) {
+    console.error('Error fetching test report:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to fetch test report',
+      data: {},
+      page: 1,
+      limit: 10,
+      totalStudents: 0,
+    };
+  }
+},
+
+
 };

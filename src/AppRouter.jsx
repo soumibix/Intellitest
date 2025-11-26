@@ -348,7 +348,7 @@ const AppRouter = () => {
               }
             />
             <Route
-              path="/admin/student-performance/viewreport/:id"
+              path="/admin/student-performance/viewreport/:testId"
               element={
                 <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
@@ -438,7 +438,7 @@ const AppRouter = () => {
               }
             />
             <Route
-              path="/faculty/student-performance/viewreport/:id"
+              path="/faculty/student-performance/viewreport/:testId"
               element={
                 <ProtectedRoute allowedRoles={["faculty"]}>
                   <FacultyLayout>
