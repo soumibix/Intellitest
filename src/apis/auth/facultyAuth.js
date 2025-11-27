@@ -42,7 +42,7 @@ export const facultyAuthAPI = {
   verifyOTP: async (httpHook, email, otp) => {
     try {
       const response = await httpHook.postReq(
-        API_ENDPOINTS.FACULTY_VERIFY_OTP,
+        API_ENDPOINTS.FACULTY_FORGOT_PASSWORD,
         "",
         { email, otp }
       );

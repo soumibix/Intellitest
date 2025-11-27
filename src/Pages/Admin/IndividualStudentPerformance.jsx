@@ -1,3 +1,4 @@
+// src/pages/Admin/IndividualStudentPerformance.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PerformanceAnalytics from '../../Components/common/PerformanceAnalytics';
@@ -19,74 +20,81 @@ function IndividualStudentPerformance() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // console.log("🚀 IndividualStudentPerformance testId:", testId);
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalStudents, setTotalStudents] = useState(0);
+    const [limit] = useState(10);
+
+    const fetchTestReport = async (page = 1) => {
+        if (!testId) {
+            setError("No test ID provided");
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await TestAPI.viewTestReport(
+                httpHook, 
+                testId, 
+                token, 
+                { page, limit }
+            );
+
+            if (response.success && response.data) {
+                const { data } = response;
+
+                // Save full test data (for TestCard + analytics)
+                setTestData(data);
+
+                // Compute total marks (fallback if needed)
+                const totalMarks = data.totalMarks || (data.numberQuestions * 2);
+
+                // Format student table data
+                if (data.students && Array.isArray(data.students)) {
+                    const formattedStudents = data.students.map((s) => ({
+                        id: s.studentId,
+                        name: s.name,
+                        rollNo: s.rollNo,
+                        marksObtained: s.markObtained,
+                        totalMarks,
+                        timeTaken: s.timeTaken,
+                        status: "Done",
+                        answerPdfUrl: s.answerPdfUrl,
+                    }));
+                    setStudents(formattedStudents);
+                } else {
+                    setStudents([]);
+                }
+
+                // Pagination meta
+                const total = response.totalStudents || 0;
+                setCurrentPage(response.page || page || 1);
+                setTotalStudents(total);
+                setTotalPages(Math.ceil(total / limit) || 1);
+            } else {
+                setError(response.message || "Failed to fetch test report");
+            }
+        } catch (err) {
+            console.error("Admin Test Report Error:", err);
+            setError("Unable to load test report");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchTestReport = async () => {
-            if (!testId) {
-                setError("No test ID provided");
-                setIsLoading(false);
-                return;
-            }
+        fetchTestReport(currentPage);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [testId, token, currentPage]);
 
-            setIsLoading(true);
-            setError(null);
-
-            try {
-                const response = await TestAPI.viewTestReport(
-                    httpHook, 
-                    testId, 
-                    token, 
-                    { page: 1, limit: 20 }
-                );
-
-                if (response.success && response.data) {
-                    const { data } = response;
-
-                    // Format test data for TestCard
-                    const formatted = {
-                        _id: data.testId,
-                        subjectName: data.subjectName,
-                        subjectCode: data.subjectCode,
-                        department: data.department,
-                        semester: data.semester,
-                        numberOfQuestions: data.numberQuestions,
-                        duration: data.duration,
-                        testDate: data.testDate,
-                        startTime: data.startTime,
-                        endTime: data.endTime,
-                        status: data.status,
-                        totalMarks: data.totalMarks || (data.numberQuestions * 2),
-                    };
-                    setTestData(response.data);
-
-                    // Format student table data
-                    if (data.students && Array.isArray(data.students)) {
-                        const formattedStudents = data.students.map((s) => ({
-                            id: s.studentId,
-                            name: s.name,
-                            rollNo: s.rollNo,
-                            marksObtained: s.markObtained,
-                            totalMarks: formatted.totalMarks,
-                            timeTaken: s.timeTaken,
-                            status: "Done",
-                            answerPdfUrl: s.answerPdfUrl,
-                        }));
-                        setStudents(formattedStudents);
-                    }
-                } else {
-                    setError(response.message || "Failed to fetch test report");
-                }
-            } catch (err) {
-                console.error("Admin Test Report Error:", err);
-                setError("Unable to load test report");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchTestReport();
-    }, [testId, token]);
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     // Loading State
     if (isLoading) {
@@ -131,14 +139,20 @@ function IndividualStudentPerformance() {
                 <div className="lg:col-span-2">
                     <PerformanceAnalytics 
                         students={students}
-                        totalMarks={testData.totalMarks}
+                        totalMarks={testData.totalMarks || (testData.numberQuestions * 2)}
                     />
                 </div>
             </div>
 
             {/* STUDENTS TABLE */}
             <div className="bg-white rounded-lg shadow p-6">
-                <StudentPerformanceTable students={students} />
+                <StudentPerformanceTable 
+                    students={students}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalStudents={totalStudents}
+                    onPageChange={handlePageChange}
+                />
             </div>
         </div>
     );
