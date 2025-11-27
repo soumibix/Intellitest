@@ -1,4 +1,4 @@
-import { ChartPie, FileText, GraduationCap, Settings, UserRoundPlus } from "lucide-react";
+import { ChartPie, FileText, GraduationCap, Settings, UserRound, UserRoundPlus } from "lucide-react";
 
 export const portalNavItems = [
   {
@@ -29,6 +29,13 @@ export const portalNavItems = [
     hasDropdown: false,
     route: "/admin/student-performance",
   },
+  // {
+  //   id: "profile",
+  //   label: "Your Profile",
+  //   icon: UserRound,
+  //   hasDropdown: false,
+  //   route: "/admin/admin-profile",
+  // },
   // {
   //   id: "settings",
   //   label: "Settings",

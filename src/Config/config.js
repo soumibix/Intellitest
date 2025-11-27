@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   FACULTY_SIGNIN: "faculty/signin",
   FACULTY_FORGOT_PASSWORD: "faculty/forgotPassword",
   FACULTY_RESET_PASSWORD: "faculty/resetPassword",
+  FACULTY_CHANGE_PASSWORD: "faculty/changePassword",
   FACULTY_GET_PROFILE: "faculty/getProfileData",
   FACULTY_UPDATE_PROFILE: "faculty/updateProfile",
 

@@ -73,6 +73,24 @@ export const facultyAuthAPI = {
       };
     }
   },
+  
+  // Change Password
+  changePassword: async (httpHook, email, newPassword) => {
+    try {
+      const response = await httpHook.postReq(
+        API_ENDPOINTS.FACULTY_CHANGE_PASSWORD,
+        "",
+        { email, newPassword }
+      );
+      return response;
+    } catch (error) {
+      console.error("Faculty reset password error:", error);
+      return {
+        success: false,
+        message: error.message || "Password reset failed",
+      };
+    }
+  },
 
   // Get Profile Data
   getProfile: async (httpHook, token, facultyId) => {

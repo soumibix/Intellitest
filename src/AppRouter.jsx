@@ -43,6 +43,7 @@ import { NotificationProvider } from "./Context/NotificationContext";
 // Profile Completion Guard
 import ProfileCompletionGuard from "./Components/ProfileCompletionGuard";
 import { useHttpInterceptor } from "./Hooks/useHttpInterceptor";
+import AdminProfilePage from "./Pages/Admin/AdminProfilePage";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production
@@ -313,6 +314,16 @@ const AppWithInterceptor = () => {
                 <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <AdminDashboard />
+                  </AdminLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/admin-profile"
+              element={
+                <ProtectedRoute allowedRoles={["superadmin"]}>
+                  <AdminLayout>
+                    <AdminProfilePage />
                   </AdminLayout>
                 </ProtectedRoute>
               }

@@ -43,7 +43,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         onChange={handleChange}
         options={semesterOptions}
       />
-        <BorderLabelInput
+        {/* <BorderLabelInput
           label="Total Marks"
           name="totalMarks"
           type="number"
@@ -51,7 +51,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
           value={formData.totalMarks || ""}
           onChange={handleChange}
           placeholder="Enter total marks"
-        />
+        /> */}
       <BorderLabelInput
         label="Subject Name"
         name="subjectName"
@@ -71,7 +71,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         onChange={handleChange}
         placeholder="Enter Subject Code"
       />
-      <BorderLabelInput
+      {/* <BorderLabelInput
         label="Number of Questions"
         name="numberOfQuestions"
         type="number"
@@ -79,7 +79,7 @@ export const FacultyAddTestData = ({ formData, setFormData }) => {
         value={formData.numberOfQuestions || ""}
         onChange={handleChange}
         placeholder="Enter number of questions"
-      />
+      /> */}
     </div>
   );
 };
