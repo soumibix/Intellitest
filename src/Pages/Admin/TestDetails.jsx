@@ -331,7 +331,7 @@ const TestDetails = () => {
             testId: response.data._id || response.data.testId, 
             activeStep: nextStep 
           }));
-          showSuccess("Test created successfully!");
+          showSuccess(response.message || "Test details created successfully!");
         } else {
           showError("Failed to create test: " + (response.message || "Unknown error"));
         }
@@ -357,7 +357,7 @@ const TestDetails = () => {
       response = await TestAPI.scheduleTest(httpHook, testId, payload, token);
       if (response.success) {
         setState((prev) => ({ ...prev, activeStep: nextStep }));
-        showSuccess("Schedule updated successfully!");
+        showSuccess(response.message || "Schedule updated successfully!");
       } else {
         showError("Failed to update schedule: " + (response.message || "Unknown error"));
       }
