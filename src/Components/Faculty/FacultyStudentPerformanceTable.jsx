@@ -1,5 +1,7 @@
 
+import Lottie from 'lottie-react';
 import React, { useState } from 'react';
+import noData from '../../Lottie/nodata.json';
 
 const FacultyStudentPerformanceTable = ({ students = [] }) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -39,7 +41,7 @@ const FacultyStudentPerformanceTable = ({ students = [] }) => {
             {/* Header Row */}
             <div className="grid grid-cols-5 gap-4 px-6 py-4 bg-[#F9F9F9] border-b border-[#E4E4E4] rounded-t-lg">
                 <div className="text-base font-medium text-gray-600">Student Name</div>
-                <div className="text-base font-medium text-gray-600">Roll No</div>
+                <div className="text-base font-medium text-gray-600">Enrollment No</div>
                 <div className="text-base font-medium text-gray-600">Marks Obtained</div>
                 <div className="text-base font-medium text-gray-600">Time Taken</div>
                 <div className="text-base font-medium text-gray-600">Actions</div>
@@ -78,7 +80,8 @@ const FacultyStudentPerformanceTable = ({ students = [] }) => {
                         </div>
                     ))
                 ) : (
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="flex flex-col items-center justify-center text-center py-12 text-gray-500">
+                        <Lottie animationData={noData} loop={true} style={{ width: '100%', maxWidth: 300, height: 'auto' }}/>
                         <p className="text-base">No student data available</p>
                     </div>
                 )}
