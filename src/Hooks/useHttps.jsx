@@ -71,28 +71,24 @@ export const useHttp = () => {
     showNotification(message, "error");
 
     // Handle unauthorized access - Use AuthContext logout
-    if ([401, 403].includes(response.status)) {
-      // Show session expired message
-      showNotification("Session expired. Please login again.", "error");
+    // if ([401, 403].includes(response.status)) {
+    //   showNotification("Session expired. Please login again.", "error");
       
-      // Logout using AuthContext (clears all storage properly)
-      logout();
+    //   logout();
       
-      // Determine redirect path based on current location or role
-      const path = location.pathname;
-      let redirectPath = "/signin"; // default to student
+    //   const path = location.pathname;
+    //   let redirectPath = "/signin"; 
       
-      if (path.includes("admin") || role === "superadmin") {
-        redirectPath = "/admin/signin";
-      } else if (path.includes("faculty") || role === "faculty") {
-        redirectPath = "/faculty/signin";
-      }
+    //   if (path.includes("admin") || role === "superadmin") {
+    //     redirectPath = "/admin/signin";
+    //   } else if (path.includes("faculty") || role === "faculty") {
+    //     redirectPath = "/faculty/signin";
+    //   }
       
-      // Navigate to appropriate signin page
-      setTimeout(() => {
-        navigate(redirectPath, { replace: true });
-      }, 100);
-    }
+    //   setTimeout(() => {
+    //     navigate(redirectPath, { replace: true });
+    //   }, 100);
+    // }
 
     return { success: false, message };
   };
@@ -125,6 +121,8 @@ export const useHttp = () => {
       
       const headers = { 'Accept': 'application/json' };
       if (token) headers.Authorization = `Bearer ${token}`;
+
+      console.log('usehttp token', token)
       
       const response = await fetch(fullUrl, {
         method: 'GET',

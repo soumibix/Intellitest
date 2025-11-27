@@ -66,6 +66,8 @@ const FacultyTestDetails = () => {
 
   const TESTS_PER_PAGE = 5;
 
+  console.log('token check', token)
+
   // Check if publish should be enabled
   const canPublish = checkAllMarksAssigned(testData);
 

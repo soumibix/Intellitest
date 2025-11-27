@@ -5,6 +5,7 @@ export const TestAPI = {
 
   fetchTests: async (httpHook, token, queryParams = {}) => {
     try {
+      console.log('fetchtest token', token)
       // Build query string from params
       const params = new URLSearchParams();
       
@@ -19,12 +20,8 @@ export const TestAPI = {
         ? `${API_ENDPOINTS.GET_TESTS}?${queryString}`
         : API_ENDPOINTS.GET_TESTS;
       
-      const response = await httpHook.getReq(
-        endpoint,
-        'GET',
-        null,
-        { Authorization: `Bearer ${token}` }
-      );
+      // ✅ FIXED: Pass only url and token
+      const response = await httpHook.getReq(endpoint, token);
       
       // Handle both response structures
       // Response structure: { success: true, pagination: {...}, data: [...] }
@@ -64,11 +61,10 @@ export const TestAPI = {
   // Fetch single test by ID
   fetchTestById: async (httpHook, testId, token) => {
     try {
+      // ✅ FIXED: Pass only url and token
       const response = await httpHook.getReq(
         `${API_ENDPOINTS.GET_TESTS}?id=${testId}`,
-        'GET',
-        null,
-        { Authorization: `Bearer ${token}` }
+        token
       );
       
       return {
@@ -161,21 +157,6 @@ export const TestAPI = {
     }
   },
 
-  // 6️⃣ Get Tests (Pagination + Filters)
-  getTests: async (httpHook, token, queryParams = "") => {
-    try {
-      const url = queryParams
-        ? `${API_ENDPOINTS.TEST_GET}?${queryParams}`
-        : API_ENDPOINTS.TEST_GET;
-
-      const res = await httpHook.getReq(url, token);
-      return res;
-    } catch (err) {
-      console.log("Get tests error:", err);
-      return { success: false, message: err.message };
-    }
-  },
-
   // 7️⃣ Get Test by ID
   getTestById: async (httpHook, id, token) => {
     try {
@@ -231,48 +212,41 @@ export const TestAPI = {
       return { success: false, message: err.message };
     }
   },
-// };
 
-// 11. View Test Report - Get student performance for a specific test
-viewTestReport: async (httpHook, testId, token, queryParams = {}) => {
-  try {
-    // Build query string from params
-    const params = new URLSearchParams();
-    
-    if (queryParams.page) params.append('page', queryParams.page);
-    if (queryParams.limit) params.append('limit', queryParams.limit);
-    
-    const queryString = params.toString();
-    const endpoint = queryString 
-      ? `${API_ENDPOINTS.VIEW_TEST_REPORT(testId)}?${queryString}`
-      : API_ENDPOINTS.VIEW_TEST_REPORT(testId);
-    
-    const response = await httpHook.getReq(
-      endpoint,
-      'GET',
-      null,
-      { Authorization: `Bearer ${token}` }
-    );
-    
-    return {
-      success: response.success !== false,
-      data: response.data || {},
-      page: response.page || 1,
-      limit: response.limit || 10,
-      totalStudents: response.totalStudents || 0,
-    };
-  } catch (error) {
-    console.error('Error fetching test report:', error);
-    return {
-      success: false,
-      message: error.message || 'Failed to fetch test report',
-      data: {},
-      page: 1,
-      limit: 10,
-      totalStudents: 0,
-    };
-  }
-},
-
-
+  // 11. View Test Report - Get student performance for a specific test
+  viewTestReport: async (httpHook, testId, token, queryParams = {}) => {
+    try {
+      // Build query string from params
+      const params = new URLSearchParams();
+      
+      if (queryParams.page) params.append('page', queryParams.page);
+      if (queryParams.limit) params.append('limit', queryParams.limit);
+      
+      const queryString = params.toString();
+      const endpoint = queryString 
+        ? `${API_ENDPOINTS.VIEW_TEST_REPORT(testId)}?${queryString}`
+        : API_ENDPOINTS.VIEW_TEST_REPORT(testId);
+      
+      // ✅ FIXED: Pass only url and token
+      const response = await httpHook.getReq(endpoint, token);
+      
+      return {
+        success: response.success !== false,
+        data: response.data || {},
+        page: response.page || 1,
+        limit: response.limit || 10,
+        totalStudents: response.totalStudents || 0,
+      };
+    } catch (error) {
+      console.error('Error fetching test report:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to fetch test report',
+        data: {},
+        page: 1,
+        limit: 10,
+        totalStudents: 0,
+      };
+    }
+  },
 };

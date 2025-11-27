@@ -1,18 +1,60 @@
 import React from 'react';
 
-export default function PerformanceAnalytics() {
-  const data = [
-    { label: '> 90', students: 12, color: '#3b82f6' },
-    { label: '75-90', students: 70, color: '#fbbf24' },
-    { label: '50-75', students: 20, color: '#fb923c' },
-    { label: '< 50', students: 18, color: '#ef4444' }
-  ];
+export default function PerformanceAnalytics({ students = [], totalMarks = 100, analysis = [] }) {
+  // Use analysis data from props if available, otherwise calculate from students
+  const getAnalysisData = () => {
+    if (analysis && analysis.length > 0) {
+      return analysis.map(item => {
+        let color = '#3b82f6';
+        let label = item.label;
+        
+        if (label.includes('> 90')) color = '#3b82f6';
+        else if (label.includes('75')) color = '#fbbf24';
+        else if (label.includes('50')) color = '#fb923c';
+        else if (label.includes('< 50')) color = '#ef4444';
+        
+        return {
+          label: label,
+          students: item.students,
+          color: color
+        };
+      });
+    }
+    
+    // Fallback calculation if no analysis provided
+    const ranges = [
+      { label: '> 90%', min: 90, color: '#3b82f6' },
+      { label: '75–90%', min: 75, max: 90, color: '#fbbf24' },
+      { label: '50–75%', min: 50, max: 75, color: '#fb923c' },
+      { label: '< 50%', max: 50, color: '#ef4444' }
+    ];
+    
+    return ranges.map(range => {
+      const count = students.filter(student => {
+        const percentage = (student.marksObtained / totalMarks) * 100;
+        if (range.min && range.max) {
+          return percentage >= range.min && percentage < range.max;
+        } else if (range.min) {
+          return percentage >= range.min;
+        } else {
+          return percentage < range.max;
+        }
+      }).length;
+      
+      return {
+        label: range.label,
+        students: count,
+        color: range.color
+      };
+    });
+  };
 
+  const data = getAnalysisData();
   const total = data.reduce((sum, item) => sum + item.students, 0);
   
   let currentAngle = -90;
   const segments = data.map(item => {
-    const percentage = (item.students / total) * 100;
+    const percentage = total > 0 ? (item.students / total) * 100 : 0;
     const angle = (percentage / 100) * 360;
     const startAngle = currentAngle;
     const endAngle = currentAngle + angle;
@@ -58,52 +100,79 @@ export default function PerformanceAnalytics() {
   });
 
   return (
-    <div className="">
-      <div className="bg-white rounded-lg p-10 shadow">
-        <h2 className="text-2xl font-bold text-[#3D3D3D] ">Performance Analytics</h2>
-        
-        <div className="flex items-center justify-between gap-12">
-          <div className="space-y-5">
-            <div className="flex items-center justify-around gap-24 text-sm font-medium text-[#475569] mb-3 px-4">
-              <span>Score</span>
-              <span>No. of Students</span>
-            </div>
-            
+    <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-10 shadow">
+      <h2 className="text-xl sm:text-2xl font-bold text-[#3D3D3D] mb-4 sm:mb-6">
+        Performance Analytics
+      </h2>
+      
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-12">
+        {/* Legend */}
+        <div className="w-full lg:w-auto">
+          <div className="flex items-center justify-between sm:justify-around gap-4 sm:gap-24 text-xs sm:text-sm font-medium text-[#475569] mb-3 px-2 sm:px-4">
+            <span>Score</span>
+            <span>No. of Students</span>
+          </div>
+          
+          <div className="space-y-3 sm:space-y-5">
             {data.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-8">
-                <div className="flex items-center gap-2 min-w-[80px]">
+              <div key={idx} className="flex items-center justify-between gap-4 sm:gap-8">
+                <div className="flex items-center gap-2 min-w-[70px] sm:min-w-[80px]">
                   <div 
-                    className="w-2.5 h-2.5 rounded-full" 
+                    className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0" 
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="text-gray-700 font-medium text-center">{item.label}</span>
+                  <span className="text-sm sm:text-base text-gray-700 font-medium">
+                    {item.label}
+                  </span>
                 </div>
-                <span className="text-gray-700 font-semibold text-center w-full">{item.students}</span>
+                <span className="text-sm sm:text-base text-gray-700 font-semibold text-right min-w-[40px]">
+                  {item.students}
+                </span>
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="">
-            <svg width="240" height="240" viewBox="0 0 240 240">
-              {segments.map((segment, idx) => (
+        {/* Chart */}
+        <div className="flex-shrink-0">
+          <svg 
+            width="100%" 
+            height="100%" 
+            viewBox="0 0 240 240"
+            className="w-48 h-48 sm:w-56 sm:h-56 lg:w-60 lg:h-60"
+          >
+            {total > 0 ? (
+              segments.map((segment, idx) => (
                 <g key={idx}>
                   <path
                     d={segment.pathData}
                     fill={segment.color}
                   />
-                  <text
-                    x={segment.textX}
-                    y={segment.textY}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    className="text-xs font-bold fill-white"
-                  >
-                    {segment.percentage}%
-                  </text>
+                  {segment.percentage > 5 && (
+                    <text
+                      x={segment.textX}
+                      y={segment.textY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="text-[10px] sm:text-xs font-bold fill-white"
+                    >
+                      {segment.percentage}%
+                    </text>
+                  )}
                 </g>
-              ))}
-            </svg>
-          </div>
+              ))
+            ) : (
+              <text
+                x="120"
+                y="120"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className="text-sm fill-gray-400"
+              >
+                No Data
+              </text>
+            )}
+          </svg>
         </div>
       </div>
     </div>
