@@ -24,6 +24,7 @@ import FacultyTestDetails from "./Pages/Faculty/FacultyTestDetails";
 import { ForgotPassword as FacultyForgotPassword } from "./Pages/Faculty/ForgotPassword";
 import FacultyOTPVerification from "./Pages/Faculty/OTPVerification";
 import FacultyResetNewPassword from "./Pages/Faculty/ResetNewPassword";
+import FacultyChangePassword from "./Pages/Faculty/ChangePassword";
 
 // User/Student Pages
 import UserDashboard from "./Pages/User/UserDashboard";
@@ -403,6 +404,14 @@ const AppWithInterceptor = () => {
               element={
                 <GuestOnlyRoute>
                   <FacultyResetNewPassword />
+                </GuestOnlyRoute>
+              }
+            />
+            <Route
+              path="/faculty/change-password"
+              element={
+                <GuestOnlyRoute>
+                  <FacultyChangePassword />
                 </GuestOnlyRoute>
               }
             />

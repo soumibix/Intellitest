@@ -103,8 +103,8 @@ export const FacultySignIn = () => {
           navigate(`/${role.toLowerCase()}/dashboard`);
           
         } else {
-          // User is not verified, redirect to reset password
-          navigate('/faculty/reset-new-password', { 
+          // User is not verified, redirect to change password
+          navigate('/faculty/change-password', { 
             state: { email: formData.email.trim() } 
           });
         }
