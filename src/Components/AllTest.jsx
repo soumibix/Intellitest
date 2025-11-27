@@ -31,7 +31,8 @@ const AllTest = memo(function AllTest({
   onDelete = null,
   isShowSemPopUp = false,
   setIsSemPopupOpen,
-  placeholderProps = 'Search by Test Name, Code, Department...'
+  placeholderProps = 'Search by Test Name, Code, Department...',
+  showCompletedTestsFilter = true,
 }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [inputValue, setInputValue] = useState("");
@@ -155,30 +156,43 @@ const AllTest = memo(function AllTest({
         {filter && (
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 scrollbar-hide">
-              {["ongoing", "completed", "upcoming", "all"].map((filterType) => (
-                <button
-                  key={filterType}
-                  onClick={() => handleFilterClick(filterType)}
-                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${activeFilter === filterType
-                    ? "bg-[#1A0B2E] text-white"
-                    : "bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#d4b3f3]"
-                    }`}
-                >
-                  {filterType === "all"
+              {["ongoing", "completed", "upcoming", "all"].map((filterType) => {
+                const label =
+                  filterType === "all"
                     ? "View All"
-                    : filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-                  {activeFilter === filterType && filterType !== "all" && (
-                    <X
-                      className="inline-block w-3 h-3 sm:w-4 sm:h-4 ml-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleFilterClick("all");
-                      }}
-                    />
-                  )}
-                </button>
-              ))}
+                    : filterType === "completed"
+                      ? showCompletedTestsFilter
+                        ? "Completed"
+                        : "" // hide if false
+                      : filterType.charAt(0).toUpperCase() + filterType.slice(1);
+
+                if (label === "") return null;
+
+                return (
+                  <button
+                    key={filterType}
+                    onClick={() => handleFilterClick(filterType)}
+                    className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${activeFilter === filterType
+                      ? "bg-[#1A0B2E] text-white"
+                      : "bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#d4b3f3]"
+                      }`}
+                  >
+                    {label}
+
+                    {activeFilter === filterType && filterType !== "all" && (
+                      <X
+                        className="inline-block w-3 h-3 sm:w-4 sm:h-4 ml-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFilterClick("all");
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
+
           </div>
         )}
 

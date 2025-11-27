@@ -21,6 +21,7 @@ export const UserTestAPI = {
       if (queryParams.search) params.append('search', queryParams.search);
       if (queryParams.status) params.append('status', queryParams.status);
       if (queryParams.testCategory) params.append('testCategory', queryParams.testCategory);
+      if (queryParams.excludeStatus) params.append('excludeStatus', queryParams.excludeStatus);
       
       const queryString = params.toString();
       const endpoint = queryString 
@@ -37,6 +38,7 @@ export const UserTestAPI = {
         total: response.total || 0,
         page: response.page || 1,
         limit: response.limit || 10,
+        // excludeStatus: response.excludeStatus || 10,
         message: response.message || 'Tests fetched successfully',
       };
     } catch (error) {
@@ -48,6 +50,7 @@ export const UserTestAPI = {
         total: 0,
         page: 1,
         limit: 10,
+        // excludeStatus: 10,
       };
     }
   },
