@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import TestCard from "../Components/TestCard";
 import handLoading from "../Lottie/handLoading.json"
-import noData from "../Lottie/noData.json"
+import noData from "../Lottie/nodata.json"
 import Lottie from "lottie-react";
 import Button from "./common/Button";
 
