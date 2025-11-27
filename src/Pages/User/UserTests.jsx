@@ -78,6 +78,7 @@ function UserTests() {
         limit: 100,
         department: JSON.parse(sessionStorage.getItem('user'))?.department,
         semester: currentSemester || undefined,
+        excludeStatus: 'completed',
       };
 
       // Add search query if exists
@@ -165,6 +166,7 @@ function UserTests() {
         isLoading={loading}
         setIsSemPopupOpen={setIsSemPopupOpen}
         isShowSemPopUp={true}
+        showCompletedTestsFilter={false}
       />
       
       {isSemPopupOpen && 
