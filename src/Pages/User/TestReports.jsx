@@ -162,6 +162,7 @@ function TestReports() {
                 userType='user'
                 onSearchChange={handleSearchChange}
                 isLoading={loading}
+                placeholderProps="Search by Subject Name, Code..."
             />
         </div>
     );

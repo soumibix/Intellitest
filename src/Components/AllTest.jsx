@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import TestCard from "../Components/TestCard";
 import handLoading from "../Lottie/handLoading.json"
+import noData from "../Lottie/noData.json"
 import Lottie from "lottie-react";
 import Button from "./common/Button";
 
@@ -29,7 +30,8 @@ const AllTest = memo(function AllTest({
   onEdit = null,
   onDelete = null,
   isShowSemPopUp = false,
-  setIsSemPopupOpen
+  setIsSemPopupOpen,
+  placeholderProps = 'Search by Test Name, Code, Department...'
 }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [inputValue, setInputValue] = useState("");
@@ -117,12 +119,12 @@ const AllTest = memo(function AllTest({
             </h1>
 
             {isShowSemPopUp && (
-              <Button 
-                iconPosition={'left'} 
-                onClick={() => setIsSemPopupOpen(true)} 
-                variant="filled" 
-                textSize="text-md" 
-                text={`Choose Semester: ${localStorage.getItem('userSemester') ? `${localStorage.getItem('userSemester')}` : "Choose your semester"}`} 
+              <Button
+                iconPosition={'left'}
+                onClick={() => setIsSemPopupOpen(true)}
+                variant="filled"
+                textSize="text-md"
+                text={`Choose Semester: ${localStorage.getItem('userSemester') ? `${localStorage.getItem('userSemester')}` : "Choose your semester"}`}
                 icon={<MousePointer />}
               />
             )}
@@ -134,14 +136,14 @@ const AllTest = memo(function AllTest({
               <Search className="text-[#6B21A8] w-5 h-5 flex-shrink-0" />
               <input
                 type="text"
-                placeholder="Search by Test Name, Code, Department"
+                placeholder={placeholderProps}
                 value={inputValue}
                 onChange={handleInputChange}
                 className="flex-1 focus:outline-none text-sm sm:text-base min-w-0"
               />
               {inputValue && (
-                <X 
-                  className="text-[#6B21A8] w-5 h-5 cursor-pointer hover:text-[#4A0E78] transition-colors" 
+                <X
+                  className="text-[#6B21A8] w-5 h-5 cursor-pointer hover:text-[#4A0E78] transition-colors"
                   onClick={handleClearSearch}
                 />
               )}
@@ -157,11 +159,10 @@ const AllTest = memo(function AllTest({
                 <button
                   key={filterType}
                   onClick={() => handleFilterClick(filterType)}
-                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${
-                    activeFilter === filterType
-                      ? "bg-[#1A0B2E] text-white"
-                      : "bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#d4b3f3]"
-                  }`}
+                  className={`px-4 cursor-pointer sm:px-5 py-2 rounded-full font-medium text-xs sm:text-sm transition-all whitespace-nowrap flex-shrink-0 ${activeFilter === filterType
+                    ? "bg-[#1A0B2E] text-white"
+                    : "bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#d4b3f3]"
+                    }`}
                 >
                   {filterType === "all"
                     ? "View All"
@@ -243,7 +244,16 @@ const AllTest = memo(function AllTest({
             ) : (
               <div className="col-span-full text-center py-12 text-gray-500">
                 <p className="text-base sm:text-lg">
-                  {inputValue ? 'No tests found matching your search' : 'No tests found matching your filters'}
+                  {!showLoader && (
+                    <div className="flex flex-col justify-center items-center gap-10">
+                      <Lottie
+                        animationData={noData}
+                        loop
+                        style={{ height: 200 }}
+                      />
+                      <div className="font-bold">No Data Found!!!</div>
+                    </div>
+                  )}
                 </p>
               </div>
             )}
