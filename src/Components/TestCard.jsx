@@ -201,7 +201,7 @@ const formatDuration = (mins) => {
             <span className="font-medium">{numberOfQuestions || questions.length || 0} Questions</span>
             <span className="text-gray-400">•</span>
             {/* <span className="font-medium">{(numberOfQuestions || questions.length || 0) * 2} Marks</span> */}
-            <span className="font-medium">{totalMarks} Marks</span>
+            <span className="font-medium">{totalMarks || maxScore} Marks</span>
             <span className="text-gray-400">•</span>
             <span>{formatDuration(duration)}</span>
           </div>
@@ -231,13 +231,13 @@ const formatDuration = (mins) => {
                   <div className="text-purple-700 font-medium mb-1 text-xs sm:text-sm">Marks Obtained</div>
                   <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-purple-800">
                     {displayObtainedScore !== undefined && displayObtainedScore !== null ? displayObtainedScore : '--'}
-                    <span className="text-base sm:text-lg md:text-xl text-gray-500"> / {totalMarks}</span>
+                    <span className="text-base sm:text-lg md:text-xl text-gray-500"> / {totalMarks || maxScore}</span>
                   </div>
-                  {percentage !== null && (
+                  {/* {percentage !== null && (
                     <div className={`text-sm sm:text-base font-semibold mt-1 ${percentage >= 60 ? 'text-green-600' : percentage >= 40 ? 'text-yellow-600' : 'text-red-600'}`}>
                       {percentage}%
                     </div>
-                  )}
+                  )} */}
                 </div>
                 <div className="text-xs sm:text-sm text-gray-800 space-y-1">
                   <div>
