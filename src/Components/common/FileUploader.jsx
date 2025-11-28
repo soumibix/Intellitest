@@ -8,9 +8,6 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef(null);
-
-    // console.log({uploadedFileUrl});
-    // console.log({fileName});
     
     // Effect to restore file from S3 URL when component mounts or uploadedFileUrl changes
     useEffect(() => {
@@ -77,11 +74,11 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
     };
 
     const processFile = (selectedFile) => {
-        const validTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'application/zip', 'application/pdf'];
+        const validTypes = ['application/pdf'];
         const maxSize = 25 * 1024 * 1024;
 
-        if (!validTypes.includes(selectedFile.type) && !selectedFile.name.endsWith('.svg')) {
-            alert('Only .jpg, .png, .svg, .zip and .pdf files are supported');
+        if (!validTypes.includes(selectedFile.type)) {
+            alert('Only PDF files are supported');
             return;
         }
 
@@ -143,14 +140,14 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
     };
 
     return (
-        <div className="">
-            <div className="w-full cursor-grab">
+        <div className="w-full">
+            <div className="w-full">
                 {!file && !isUploading && (
                     <div
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
-                        className={`relative border-2 border-dashed rounded-lg p-16 text-center transition-colors ${isDragging
+                        className={`relative border-2 border-dashed rounded-lg p-6 sm:p-10 md:p-16 text-center transition-colors ${isDragging
                                 ? 'border-purple-500 bg-purple-50'
                                 : 'border-[#631891] bg-[#fff]'
                             }`}
@@ -160,29 +157,29 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
                             type="file"
                             onChange={handleFileSelect}
                             className="hidden"
-                            accept=".jpg,.jpeg,.png,.svg,.zip,.pdf"
+                            accept=".pdf"
                         />
 
-                        <div className="flex flex-col items-center gap-4">
-                            <div className={`relative cursor-pointer ${isDragging ? 'bg-[#4e884c]' : 'bg-[#631891]'} p-4 rounded-lg`}
+                        <div className="flex flex-col items-center gap-3 sm:gap-4">
+                            <div className={`relative cursor-pointer ${isDragging ? 'bg-[#4e884c]' : 'bg-[#631891]'} p-3 sm:p-4 rounded-lg`}
                                 onClick={() => fileInputRef.current?.click()}
                             >
-                                <Upload className="w-8 h-8 text-white" strokeWidth={2.5} />
-                                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
+                                <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-white" strokeWidth={2.5} />
+                                <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 sm:p-1">
                                     <div className="bg-[#631891] rounded-full p-0.5">
-                                        <Upload className="w-3 h-3 text-white" strokeWidth={3} />
+                                        <Upload className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" strokeWidth={3} />
                                     </div>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <p className="text-gray-700 font-medium">
+                                <p className="text-gray-700 font-medium text-sm sm:text-base px-2">
                                     {isDragging ? 'Drop your file here' : 'Drag your file(s) to start uploading'}
                                 </p>
-                                <p className="text-gray-500 text-md font-[600] ">OR</p>
+                                <p className="text-gray-500 text-sm sm:text-md font-[600]">OR</p>
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="px-6 py-2 border-2 border-[#631891] text-[#631891] rounded-xl bg-purple-50 transition-colors font-medium cursor-pointer"
+                                    className="px-4 sm:px-6 py-2 border-2 border-[#631891] text-[#631891] rounded-xl bg-purple-50 transition-colors font-medium cursor-pointer text-sm sm:text-base"
                                 >
                                     Browse files
                                 </button>
@@ -192,17 +189,38 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
                 )}
 
                 {isUploading && (
-                    <div className="relative border-2 border-dashed border-gray-300 bg-white rounded-lg p-16 text-center">
+                    <div className="relative border-2 border-dashed border-gray-300 bg-white rounded-lg p-8 sm:p-12 md:p-16 text-center">
                         <button
                             onClick={handleCancel}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                            className="absolute top-3 right-3 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600"
                         >
                             <X className="w-5 h-5" />
                         </button>
 
-                        <div className="flex flex-col items-center gap-6">
-                            <div className="relative w-24 h-24">
-                                <svg className="w-24 h-24 transform -rotate-90">
+                        <div className="flex flex-col items-center gap-4 sm:gap-6">
+                            <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+                                <svg className="w-20 h-20 sm:w-24 sm:h-24 transform -rotate-90">
+                                    <circle
+                                        cx="40"
+                                        cy="40"
+                                        r="32"
+                                        stroke="#e5e7eb"
+                                        strokeWidth="8"
+                                        fill="none"
+                                        className="sm:hidden"
+                                    />
+                                    <circle
+                                        cx="40"
+                                        cy="40"
+                                        r="32"
+                                        stroke="#7c3aed"
+                                        strokeWidth="8"
+                                        fill="none"
+                                        strokeDasharray={`${2 * Math.PI * 32}`}
+                                        strokeDashoffset={`${2 * Math.PI * 32 * (1 - uploadProgress / 100)}`}
+                                        strokeLinecap="round"
+                                        className="transition-all duration-300 sm:hidden"
+                                    />
                                     <circle
                                         cx="48"
                                         cy="48"
@@ -210,6 +228,7 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
                                         stroke="#e5e7eb"
                                         strokeWidth="8"
                                         fill="none"
+                                        className="hidden sm:block"
                                     />
                                     <circle
                                         cx="48"
@@ -221,32 +240,30 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
                                         strokeDasharray={`${2 * Math.PI * 40}`}
                                         strokeDashoffset={`${2 * Math.PI * 40 * (1 - uploadProgress / 100)}`}
                                         strokeLinecap="round"
-                                        className="transition-all duration-300"
+                                        className="transition-all duration-300 hidden sm:block"
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-xl font-semibold text-gray-700">{uploadProgress}%</span>
+                                    <span className="text-lg sm:text-xl font-semibold text-gray-700">{uploadProgress}%</span>
                                 </div>
                             </div>
 
-                            <p className="text-gray-700 font-medium">Uploading...</p>
+                            <p className="text-gray-700 font-medium text-sm sm:text-base">Uploading...</p>
                         </div>
                     </div>
                 )}
 
                 {file && !isUploading && (
-                    <div className="border-2 border-dashed border-green-300 bg-green-50 rounded-lg p-8">
-                        <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
-                            <div className="flex items-center gap-4">
-                                <div className="bg-red-500 rounded-lg p-3 flex items-center justify-center min-w-[48px]">
-                                    <span className="text-white text-xs font-bold">
-                                        {file.type.includes('pdf') ? 'PDF' : file.type.includes('zip') ? 'ZIP' : 'IMG'}
-                                    </span>
+                    <div className="border-2 border-dashed border-green-300 bg-green-50 rounded-lg p-4 sm:p-6 md:p-8">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-white rounded-lg p-3 sm:p-4 shadow-sm gap-3 sm:gap-4">
+                            <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto min-w-0">
+                                <div className="bg-red-500 rounded-lg p-2 sm:p-3 flex items-center justify-center min-w-[40px] sm:min-w-[48px] flex-shrink-0">
+                                    <span className="text-white text-xs font-bold">PDF</span>
                                 </div>
 
-                                <div className="text-left">
-                                    <p className="text-gray-800 font-medium">{file.name}</p>
-                                    <p className="text-sm text-gray-500">
+                                <div className="text-left min-w-0 flex-1">
+                                    <p className="text-gray-800 font-medium text-sm sm:text-base truncate">{file.name}</p>
+                                    <p className="text-xs sm:text-sm text-gray-500">
                                         {file.isVirtual 
                                             ? 'Previously uploaded' 
                                             : file.size === 0 
@@ -260,33 +277,35 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3 ml-auto sm:ml-0 flex-shrink-0">
                                 <div className="bg-green-500 rounded-full p-1">
-                                    <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" strokeWidth={3} />
                                 </div>
-                                {removeDelete &&
+                                {removeDelete && (
                                     <button
-                                    onClick={handleDelete}
-                                    className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                                >
-                                    <Trash2 className="w-5 h-5" />
-                                </button>}
-                                {redirectOnClick &&
+                                        onClick={handleDelete}
+                                        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                                    >
+                                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </button>
+                                )}
+                                {redirectOnClick && (
                                     <button
-                                    onClick={() => window.open(uploadedFileUrl, '_blank')}
-                                    className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                                >
-                                    <SquareArrowOutUpRight className="w-5 h-5" />
-                                </button>}
+                                        onClick={() => window.open(uploadedFileUrl, '_blank')}
+                                        className="text-gray-400 hover:text-purple-500 transition-colors cursor-pointer"
+                                    >
+                                        <SquareArrowOutUpRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
                 )}
 
             </div>
-            <p className="text-sm text-gray-500 pt-2">
-                Only support .pdf files. (Upto 25mb)
+            <p className="text-xs sm:text-sm text-gray-500 pt-2">
+                Only support .pdf files. (Up to 25mb)
             </p>
         </div>
     );
-};
+}
