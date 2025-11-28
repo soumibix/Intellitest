@@ -4,7 +4,7 @@ import Input from "../../Components/common/Input";
 import Button from "../../Components/common/Button";
 import { facultyAuthAPI } from "../../apis/auth/facultyAuth";
 import { useHttp } from "../../Hooks/useHttps";
-import { departmentOptions } from "../../Config/dummyData";
+import { campusOptions, departmentOptions, designationOptions } from "../../Config/dummyData";
 import Lottie from "lottie-react";
 import handLoading from "../../Lottie/handLoading.json"
 import { useNotification } from "../../Context/NotificationContext";
@@ -33,22 +33,22 @@ const FacultyDashboard = () => {
   const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   // Campus options
-  const campusOptions = [
-    { value: "", label: "Select Campus" },
-    { value: "IEM Salt Lake", label: "IEM SaltLake" },
-    { value: "IEM Newtown", label: "IEM Newtown" },
-    { value: "UEM Jaipur", label: "UEM Jaipur" },
-  ];
+  // const campusOptions = [
+  //   { value: "", label: "Select Campus" },
+  //   { value: "IEM Salt Lake", label: "IEM SaltLake" },
+  //   { value: "IEM Newtown", label: "IEM Newtown" },
+  //   { value: "UEM Jaipur", label: "UEM Jaipur" },
+  // ];
 
   // Designation options - updated to match backend values
-  const designationOptions = [
-    { value: "", label: "Select Designation" },
-    { value: "Professor", label: "Professor" },
-    { value: "Associate Professor", label: "Associate Professor" },
-    { value: "Assistant Professor", label: "Assistant Professor" },
-    { value: "Lecturer", label: "Lecturer" },
-    { value: "Teaching Assistant", label: "Teaching Assistant" },
-  ];
+  // const designationOptions = [
+  //   { value: "", label: "Select Designation" },
+  //   { value: "Professor", label: "Professor" },
+  //   { value: "Associate Professor", label: "Associate Professor" },
+  //   { value: "Assistant Professor", label: "Assistant Professor" },
+  //   { value: "Lecturer", label: "Lecturer" },
+  //   { value: "Teaching Assistant", label: "Teaching Assistant" },
+  // ];
 
   // Fetch profile data on component mount
   useEffect(() => {
