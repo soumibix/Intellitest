@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, act } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AllTest from '../../Components/AllTest';
 import { UserTestAPI } from '../../apis/Tests/userTestData';
@@ -78,7 +78,7 @@ function UserTests() {
         limit: 100,
         department: JSON.parse(sessionStorage.getItem('user'))?.department,
         semester: currentSemester || undefined,
-        excludeStatus: 'completed',
+        // excludeStatus: 'completed',
       };
 
       // Add search query if exists
@@ -89,6 +89,9 @@ function UserTests() {
       // Add status filter if not 'all'
       if (activeFilter && activeFilter !== 'all') {
         queryParams.status = activeFilter;
+      }
+      if(activeFilter === 'all'){
+        queryParams.excludeStatus = 'completed';
       }
 
       console.log('Fetching tests with params:', queryParams);
@@ -167,6 +170,7 @@ function UserTests() {
         setIsSemPopupOpen={setIsSemPopupOpen}
         isShowSemPopUp={true}
         showCompletedTestsFilter={false}
+        placeholderProps={"Search by Test Name, Code..."}
       />
       
       {isSemPopupOpen && 
