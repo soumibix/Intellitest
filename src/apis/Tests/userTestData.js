@@ -216,22 +216,41 @@ export const UserTestAPI = {
    * @param {string} token - Authentication token
    * @returns {Promise<Object>} Response
    */
-  deleteAnswerSheet: async (httpHook, testId, token) => {
+  // deleteAnswerSheet: async (httpHook, testId, token) => {
+  //   try {
+  //     const response = await httpHook.postReq(
+  //       API_ENDPOINTS.USER_DELETE_ANSWER_SHEET(testId),
+  //       token
+  //     );
+      
+  //     return {
+  //       success: true,
+  //       message: response.message || 'Answer sheet deleted successfully',
+  //     };
+  //   } catch (error) {
+  //     console.error('Error deleting answer sheet:', error);
+  //     return {
+  //       success: false,
+  //       message: error.message || 'Failed to delete answer sheet',
+  //     };
+  //   }
+  // },
+
+  deleteAnswerSheet: async (httpHook, testId, answerPdfUrl='', token) => {
     try {
       const response = await httpHook.postReq(
-        API_ENDPOINTS.USER_DELETE_ANSWER_SHEET(testId),
-        token
+        API_ENDPOINTS.USER_SUBMIT_TEST(testId),
+        token,
+        answerPdfUrl
       );
       
-      return {
-        success: true,
-        message: response.message || 'Answer sheet deleted successfully',
-      };
+      return response;
     } catch (error) {
-      console.error('Error deleting answer sheet:', error);
+      console.error('Error submitting test:', error);
       return {
         success: false,
-        message: error.message || 'Failed to delete answer sheet',
+        message: error.message || 'Failed to submit test',
+        data: null,
       };
     }
   },

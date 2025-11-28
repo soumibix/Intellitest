@@ -218,7 +218,9 @@ const UserIndividualTest = () => {
     const handleFileDelete = async () => {
         try {
             // Delete using UserTestAPI
-            const deleteResponse = await UserTestAPI.deleteAnswerSheet(httpHook, testId, token);
+            const deleteResponse = await postReq(`student/test/submitpdf/${testId}`, token, {
+                answerPdfUrl: ''
+            })
 
             if (deleteResponse?.success) {
                 setUploadedFile(null);
