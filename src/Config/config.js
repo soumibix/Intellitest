@@ -18,6 +18,9 @@ export const API_ENDPOINTS = {
   GET_ALL_FACULTIES: "superAdmin/faculty",
   UPDATE_FACULTY: (id) => `superAdmin/faculty/${id}`,
   DELETE_FACULTY: (id) => `superAdmin/faculty/${id}`,
+  ADMIN_TEST_COUNTS: `superAdmin/testCounts`,
+  ADMIN_STUDENT_SCORE_CHART: `superAdmin/studentScoreChartData`,
+  ADMIN_EXAM_DATEWISE: `superAdmin/examDateWise`,
 
   // FACULTY ENDPOINTS
   FACULTY_SIGNIN: "faculty/signin",

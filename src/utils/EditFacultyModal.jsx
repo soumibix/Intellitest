@@ -1,31 +1,8 @@
-// src/utils/EditFacultyModal.jsx
 import { Edit2, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import Button from "../Components/common/Button";
 import Input from "../Components/common/Input";
 import { campusOptions, departmentOptions } from "../Config/dummyData";
-
-// Institution options
-// const INSTITUTIONS = [
-//   { value: "IEM Saltlake", label: "IEM, Salt Lake" },
-//   { value: "IEM Newtown", label: "IEM, Newtown" },
-//   { value: "UEM Jaipur", label: "IEM, Jaipur" },
-// ];
-
-// Department options
-// const DEPARTMENTS = [
-//   { value: "computer_science", label: "Computer Science & Engineering" },
-//   { value: "electronics", label: "Electronics & Communication Engineering" },
-//   { value: "electrical", label: "Electrical Engineering" },
-//   { value: "mechanical", label: "Mechanical Engineering" },
-//   { value: "civil", label: "Civil Engineering" },
-//   { value: "information_technology", label: "Information Technology" },
-//   { value: "mathematics", label: "Mathematics" },
-//   { value: "physics", label: "Physics" },
-//   { value: "chemistry", label: "Chemistry" },
-//   { value: "management", label: "Management Studies" },
-//   { value: "other", label: "Other" },
-// ];
 
 export const EditFacultyModal = ({
   isOpen,
@@ -43,9 +20,9 @@ export const EditFacultyModal = ({
   });
   const [errors, setErrors] = useState({});
 
-  // Populate form when faculty changes
+  // Populate form when faculty changes or modal opens
   useEffect(() => {
-    if (faculty) {
+    if (isOpen && faculty) {
       setFormData({
         name: faculty.name || "",
         email: faculty.email || "",
@@ -53,8 +30,22 @@ export const EditFacultyModal = ({
         department: faculty.department || "",
         campus: faculty.campus || "",
       });
+    } else if (isOpen && !faculty) {
+      // If no faculty is passed, get campus from session storage
+      const user = sessionStorage.getItem("user");
+      if (user) {
+        try {
+          const userData = JSON.parse(user);
+          setFormData((prev) => ({
+            ...prev,
+            campus: userData.campus || "",
+          }));
+        } catch (error) {
+          console.error("Error parsing user from session storage:", error);
+        }
+      }
     }
-  }, [faculty]);
+  }, [isOpen, faculty]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -88,7 +79,6 @@ export const EditFacultyModal = ({
   const handleSubmit = () => {
     if (validateForm() && !isSubmitting) {
       onUpdateFaculty(formData);
-      // Don't close modal or reset form here - parent will handle it after API success
     }
   };
 
@@ -156,7 +146,7 @@ export const EditFacultyModal = ({
           </div>
 
           <div className="mb-4">
-            <Input
+            {/* <Input
               type="email"
               name="email"
               label="Email Address"
@@ -166,7 +156,15 @@ export const EditFacultyModal = ({
               onKeyPress={handleKeyPress}
               error={errors.email}
               disabled={isSubmitting}
-            />
+            /> */}
+            <div className="mb-6">
+            <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
+              Email
+            </label>
+            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700">
+              {formData.email}
+            </div>
+          </div>
           </div>
 
           <div className="mb-4">
@@ -201,20 +199,14 @@ export const EditFacultyModal = ({
             />
           </div>
 
+          {/* Display Institution as read-only text */}
           <div className="mb-6">
-            <Input
-              type="dropdown"
-              name="campus"
-              label="Institution"
-              placeholder="Select Institution"
-              value={formData.campus}
-              onChange={(e) =>
-                handleChange({ target: { name: "campus", value: e.target.value } })
-              }
-              options={campusOptions}
-              error={errors.campus}
-              disabled={isSubmitting}
-            />
+            <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
+              Institution
+            </label>
+            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700">
+              {campusOptions.find((opt) => opt.value === formData.campus)?.label || "Not assigned"}
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3">
