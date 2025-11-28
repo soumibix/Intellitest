@@ -120,7 +120,7 @@ export const PerformanceChart = ({
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900">
             Student Performance Distribution
           </h2>
           <p className="text-sm text-gray-500 mt-1">
@@ -141,7 +141,7 @@ export const PerformanceChart = ({
 
       <div className="relative">
         {/* Display info for highest bar */}
-        {highestBar && highestBar.students > 0 && (
+        {/* {highestBar && highestBar.students > 0 && (
           <div className="absolute top-0 left-12 bg-purple-50 px-3 py-1 rounded-md z-10">
             <p className="text-xs text-purple-600 font-medium">
               {highestBar.range}
@@ -151,7 +151,7 @@ export const PerformanceChart = ({
             </p>
             <p className="text-xs text-purple-500">{highestBar.percentage}</p>
           </div>
-        )}
+        )} */}
 
         <ResponsiveContainer width="100%" height={350}>
           <BarChart

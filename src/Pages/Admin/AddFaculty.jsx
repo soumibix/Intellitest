@@ -232,7 +232,7 @@ const AddFaculty = () => {
   const hasActiveFilters = searchTerm || selectedDepartment || selectedCampus;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen p-3 sm:p-4 md:p-6">
       <div className="mx-auto">
         <div className="bg-white rounded-lg shadow-md">
           {/* Header Section */}
@@ -242,7 +242,7 @@ const AddFaculty = () => {
                 Faculty Management
               </h1>
               <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                Manage your faculty members • {totalCount} total
+                Manage your faculty members {"  "}<b>• {totalCount} total </b>
               </p>
             </div>
             <div className="w-full sm:w-auto">
@@ -250,9 +250,9 @@ const AddFaculty = () => {
                 onClick={() => setIsAddModalOpen(true)}
                 text="Add Faculty"
                 icon={<UserPlus size={18} />}
-                textSize="text-sm sm:text-md"
+                textSize="text-md sm:text-md"
                 color="#631891"
-                padding="w-full sm:w-auto px-4 py-2"
+                padding="w-full sm:w-auto px-5 py-3"
               />
             </div>
           </div>

@@ -196,7 +196,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen  p-8">
       <div className="max-w-[100rem] mx-auto space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -226,18 +226,18 @@ const AdminDashboard = () => {
           {/* Left Section */}
           <div className="w-full lg:w-2/3 flex flex-col gap-6">
             {/* Create New Test Banner */}
-            <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-1">
                     Create New Test — Begin with Basic Details
                   </h2>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600 text-md">
                     Fill in the necessary information to start building your test.
                   </p>
                 </div>
                 <button 
-                  className="bg-[#6B21A8] hover:bg-[#3e056d] text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors cursor-pointer" 
+                  className="bg-[#6B21A8] hover:bg-[#3e056d] text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-all duration-300 ease-out transform hover:scale-105 group cursor-pointer" 
                   onClick={() => navigate('/admin/test-details')}
                 >
                   Create New Test
