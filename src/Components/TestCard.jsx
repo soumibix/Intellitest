@@ -324,8 +324,8 @@ const formatDuration = (mins) => {
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <img src={userIcon} alt="Creator" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-gray-300 flex-shrink-0" />
                 <div className="flex flex-col min-w-0">
-                  <span className="text-xs sm:text-sm md:text-base font-medium text-gray-900 truncate">{createdBy?.name || 'Faculty'}</span>
-                  <span className="text-xs sm:text-sm text-gray-500 font-semibold truncate">{createdBy?.designation || 'Educator'}</span>
+                  <span className="text-xs sm:text-sm md:text-base font-medium text-gray-900 truncate">{createdBy?.name || createdBy?.role ||'Faculty'}</span>
+                  <span className="text-xs sm:text-sm text-gray-500 font-semibold truncate">{createdBy?.designation || 'Head'}</span>
                 </div>
               </div>
 

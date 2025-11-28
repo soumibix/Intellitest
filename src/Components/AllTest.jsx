@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import TestCard from "../Components/TestCard";
 import handLoading from "../Lottie/handLoading.json"
-import noData from "../Lottie/noData.json"
+import noData from "../Lottie/nodata.json"
 import Lottie from "lottie-react";
 import Button from "./common/Button";
 
@@ -107,7 +107,7 @@ const AllTest = memo(function AllTest({
   const nextBatchSize = Math.min(10, remainingTests);
 
   // Show loader only during search/filter operations
-  const showLoader = isLoading && isSearching;
+  const showLoader = isLoading || isSearching;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -259,13 +259,13 @@ const AllTest = memo(function AllTest({
               <div className="col-span-full text-center py-12 text-gray-500">
                 <p className="text-base sm:text-lg">
                   {!showLoader && (
-                    <div className="flex flex-col justify-center items-center gap-10">
+                    <div className="flex flex-col justify-center items-center gap-10 bg-white rounded-3xl py-22">
                       <Lottie
                         animationData={noData}
                         loop
                         style={{ height: 200 }}
                       />
-                      <div className="font-bold">No Data Found!!!</div>
+                      <div className="text-base font-semibold">No Test Data Found !!</div>
                     </div>
                   )}
                 </p>

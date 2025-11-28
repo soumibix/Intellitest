@@ -24,6 +24,7 @@ import FacultyTestDetails from "./Pages/Faculty/FacultyTestDetails";
 import { ForgotPassword as FacultyForgotPassword } from "./Pages/Faculty/ForgotPassword";
 import FacultyOTPVerification from "./Pages/Faculty/OTPVerification";
 import FacultyResetNewPassword from "./Pages/Faculty/ResetNewPassword";
+import FacultyChangePassword from "./Pages/Faculty/ChangePassword";
 
 // User/Student Pages
 import UserDashboard from "./Pages/User/UserDashboard";
@@ -43,6 +44,7 @@ import { NotificationProvider } from "./Context/NotificationContext";
 // Profile Completion Guard
 import ProfileCompletionGuard from "./Components/ProfileCompletionGuard";
 import { useHttpInterceptor } from "./Hooks/useHttpInterceptor";
+import AdminProfilePage from "./Pages/Admin/AdminProfilePage";
 import FacultyTestDetailsView from "./Pages/Faculty/FacultyTestDetailsView";
 
 // *** CONFIGURATION ***
@@ -319,6 +321,16 @@ const AppWithInterceptor = () => {
               }
             />
             <Route
+              path="/admin/admin-profile"
+              element={
+                <ProtectedRoute allowedRoles={["superadmin"]}>
+                  <AdminLayout>
+                    <AdminProfilePage />
+                  </AdminLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/add-faculties"
               element={
                 <ProtectedRoute allowedRoles={["superadmin"]}>
@@ -393,6 +405,14 @@ const AppWithInterceptor = () => {
               element={
                 <GuestOnlyRoute>
                   <FacultyResetNewPassword />
+                </GuestOnlyRoute>
+              }
+            />
+            <Route
+              path="/faculty/change-password"
+              element={
+                <GuestOnlyRoute>
+                  <FacultyChangePassword />
                 </GuestOnlyRoute>
               }
             />

@@ -263,7 +263,7 @@ const FacultyTestDetails = () => {
         [type === "question" ? "questionFileName" : "answerFileName"]: file.name,
       }));
     } else {
-      showError(`Failed to upload ${type} file. Please try again.`);
+      showError(response?.message||`Failed to upload ${type} file. Please try again.`);
     }
   };
 
@@ -279,9 +279,7 @@ const FacultyTestDetails = () => {
     if (step === 1) {
       const { department, semester, subjectName, subjectCode, testCategory, numberOfQuestions, totalMarks } = state.testFormData;
       return department?.trim() !== "" && semester?.trim() !== "" && subjectName?.trim() !== "" &&
-        subjectCode?.trim() !== "" && testCategory?.trim() !== "" &&
-        numberOfQuestions?.toString().trim() !== "" && parseInt(numberOfQuestions) > 0 &&
-        totalMarks?.toString().trim() !== "" && parseInt(totalMarks) > 0;
+        subjectCode?.trim() !== "" && testCategory?.trim() !== "" 
     }
     if (step === 2) {
       const { testDate, startTime, endTime, duration } = state.scheduleFormData;
@@ -304,14 +302,15 @@ const handleSaveAndContinue = async (nextStep) => {
     let errorMsg = "Please fill all required fields";
     if (state.activeStep === 1) {
       const missingFields = [];
-      const { department, semester, subjectName, subjectCode, totalMarks, testCategory, numberOfQuestions } = state.testFormData;
+      // const { department, semester, subjectName, subjectCode, totalMarks, testCategory, numberOfQuestions } = state.testFormData;
+      const { department, semester, subjectName, subjectCode, testCategory } = state.testFormData;
       if (!department?.trim()) missingFields.push("Department");
       if (!semester?.trim()) missingFields.push("Semester");
       if (!subjectName?.trim()) missingFields.push("Subject Name");
       if (!subjectCode?.trim()) missingFields.push("Subject Code");
-      if (!totalMarks || parseInt(totalMarks) <= 0) missingFields.push("Total Marks");
+      // if (!totalMarks || parseInt(totalMarks) <= 0) missingFields.push("Total Marks");
       if (!testCategory?.trim()) missingFields.push("Test Category");
-      if (!numberOfQuestions || parseInt(numberOfQuestions) <= 0) missingFields.push("Number of Questions");
+      // if (!numberOfQuestions || parseInt(numberOfQuestions) <= 0) missingFields.push("Number of Questions");
       if (missingFields.length > 0) errorMsg = `Please fill the following fields: ${missingFields.join(", ")}`;
     }
     showError(errorMsg);

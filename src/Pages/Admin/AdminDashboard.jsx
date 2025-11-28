@@ -36,22 +36,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const institutionOptions =  [
-    { value: "", label: "College Campus" },
-    { value: "college1", label: "IEM, Salt Lake" },
-    { value: "college2", label: "IEM, Newtown" },
-    { value: "college3", label: "IEM, Jaipur" },
-  ];
-
-
-  const designationOptions = [
-    { value: "", label: "Your Designation" },
-    { value: "professor", label: "Professor" },
-    { value: "associateProfessor", label: "Associate Professor" },
-    { value: "assistantProfessor", label: "Assistant Professor" },
-    { value: "lecturer", label: "Lecturer" },
-    { value: "instructor", label: "Instructor" }
-  ];
 
 
 

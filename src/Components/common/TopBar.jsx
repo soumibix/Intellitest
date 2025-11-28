@@ -19,7 +19,7 @@ export const TopBar = ({
   const handleProfileClick = () => {
     setDropdownOpen(false);
     if (role === "superadmin") {
-      navigate("/admin/dashboard");
+      navigate("/admin/admin-profile");
     } else if (role === "faculty") {
       navigate("/faculty/dashboard");
     } else {

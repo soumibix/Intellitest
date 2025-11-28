@@ -42,7 +42,7 @@ export const facultyAuthAPI = {
   verifyOTP: async (httpHook, email, otp) => {
     try {
       const response = await httpHook.postReq(
-        API_ENDPOINTS.FACULTY_VERIFY_OTP,
+        API_ENDPOINTS.FACULTY_FORGOT_PASSWORD,
         "",
         { email, otp }
       );
@@ -61,6 +61,24 @@ export const facultyAuthAPI = {
     try {
       const response = await httpHook.postReq(
         API_ENDPOINTS.FACULTY_RESET_PASSWORD,
+        "",
+        { email, newPassword }
+      );
+      return response;
+    } catch (error) {
+      console.error("Faculty reset password error:", error);
+      return {
+        success: false,
+        message: error.message || "Password reset failed",
+      };
+    }
+  },
+  
+  // Change Password
+  changePassword: async (httpHook, email, newPassword) => {
+    try {
+      const response = await httpHook.postReq(
+        API_ENDPOINTS.FACULTY_CHANGE_PASSWORD,
         "",
         { email, newPassword }
       );

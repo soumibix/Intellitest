@@ -89,7 +89,7 @@ export const AdminSignIn = () => {
         login(userData, userData.role, token, formData.rememberMe || false);
 
         // Show success message with correct variant
-        showNotification("Sign in successful! Redirecting...", "success");
+        showNotification(response?.message, "success");
 
         // Redirect to admin dashboard
         setTimeout(() => {
