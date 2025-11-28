@@ -1,5 +1,5 @@
 export const departmentOptions = [
-  // { value: "", label: "Select Department" },
+  { value: "", label: "Select Department" },
   { value: "CSE", label: "CSE" },
   {
     value: "Computer Science & Engineering",

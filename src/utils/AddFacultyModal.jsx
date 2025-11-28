@@ -2,7 +2,7 @@ import { UserPlus, X } from "lucide-react";
 import React, { useState } from "react";
 import Button from "../Components/common/Button";
 import Input from "../Components/common/Input";
-import { campusOptions, departmentOptions } from "../Config/dummyData";
+import { campusOptions, departmentOptions, designationOptions } from "../Config/dummyData";
 
 // Institution options
 // const INSTITUTIONS = [
@@ -112,9 +112,9 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
 
   return (
     <div className="fixed inset-0 backdrop-blur shadow-top bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+          <h2 className="md:text-2xl text-xl font-bold text-[#631891]">
             Add New Faculty
           </h2>
           <button
@@ -159,13 +159,16 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
 
           <div className="mb-4">
             <Input
-              type="text"
+              type="dropdown"
               name="designation"
               label="Designation"
-              placeholder="Enter Designation (e.g., Professor, Assistant Professor)"
+              // placeholder="Enter Designation (e.g., Professor, Assistant Professor)"
               value={formData.designation}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
+              onChange={(e) =>
+                handleChange({ target: { name: "designation", value: e.target.value } })
+              }
+              // onKeyPress={handleKeyPress}
+              options={designationOptions}
               error={errors.designation}
               disabled={isSubmitting}
             />

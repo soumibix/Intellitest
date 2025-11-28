@@ -1,31 +1,8 @@
-// src/utils/EditFacultyModal.jsx
 import { Edit2, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import Button from "../Components/common/Button";
 import Input from "../Components/common/Input";
-import { campusOptions, departmentOptions } from "../Config/dummyData";
-
-// Institution options
-// const INSTITUTIONS = [
-//   { value: "IEM Saltlake", label: "IEM, Salt Lake" },
-//   { value: "IEM Newtown", label: "IEM, Newtown" },
-//   { value: "UEM Jaipur", label: "IEM, Jaipur" },
-// ];
-
-// Department options
-// const DEPARTMENTS = [
-//   { value: "computer_science", label: "Computer Science & Engineering" },
-//   { value: "electronics", label: "Electronics & Communication Engineering" },
-//   { value: "electrical", label: "Electrical Engineering" },
-//   { value: "mechanical", label: "Mechanical Engineering" },
-//   { value: "civil", label: "Civil Engineering" },
-//   { value: "information_technology", label: "Information Technology" },
-//   { value: "mathematics", label: "Mathematics" },
-//   { value: "physics", label: "Physics" },
-//   { value: "chemistry", label: "Chemistry" },
-//   { value: "management", label: "Management Studies" },
-//   { value: "other", label: "Other" },
-// ];
+import { campusOptions, departmentOptions, designationOptions } from "../Config/dummyData";
 
 export const EditFacultyModal = ({
   isOpen,
@@ -43,9 +20,9 @@ export const EditFacultyModal = ({
   });
   const [errors, setErrors] = useState({});
 
-  // Populate form when faculty changes
+  // Populate form when faculty changes or modal opens
   useEffect(() => {
-    if (faculty) {
+    if (isOpen && faculty) {
       setFormData({
         name: faculty.name || "",
         email: faculty.email || "",
@@ -53,8 +30,22 @@ export const EditFacultyModal = ({
         department: faculty.department || "",
         campus: faculty.campus || "",
       });
+    } else if (isOpen && !faculty) {
+      // If no faculty is passed, get campus from session storage
+      const user = sessionStorage.getItem("user");
+      if (user) {
+        try {
+          const userData = JSON.parse(user);
+          setFormData((prev) => ({
+            ...prev,
+            campus: userData.campus || "",
+          }));
+        } catch (error) {
+          console.error("Error parsing user from session storage:", error);
+        }
+      }
     }
-  }, [faculty]);
+  }, [isOpen, faculty]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -63,14 +54,8 @@ export const EditFacultyModal = ({
       newErrors.name = "Full name is required";
     }
 
-    if (!formData.designation.trim()) {
+    if (!formData.designation) {
       newErrors.designation = "Designation is required";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
     }
 
     if (!formData.department) {
@@ -88,7 +73,6 @@ export const EditFacultyModal = ({
   const handleSubmit = () => {
     if (validateForm() && !isSubmitting) {
       onUpdateFaculty(formData);
-      // Don't close modal or reset form here - parent will handle it after API success
     }
   };
 
@@ -124,8 +108,8 @@ export const EditFacultyModal = ({
 
   return (
     <div className="fixed inset-0 backdrop-blur bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
             Edit Faculty
           </h2>
@@ -155,29 +139,28 @@ export const EditFacultyModal = ({
             />
           </div>
 
+          {/* Email - Read Only */}
           <div className="mb-4">
-            <Input
-              type="email"
-              name="email"
-              label="Email Address"
-              placeholder="Enter Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
-              error={errors.email}
-              disabled={isSubmitting}
-            />
+            <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
+              Email Address
+            </label>
+            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700 cursor-not-allowed">
+              {formData.email}
+            </div>
           </div>
 
           <div className="mb-4">
             <Input
-              type="text"
+              type="dropdown"
               name="designation"
               label="Designation"
-              placeholder="Enter Designation"
               value={formData.designation}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
+              onChange={(e) =>
+                handleChange({
+                  target: { name: "designation", value: e.target.value },
+                })
+              }
+              options={designationOptions}
               error={errors.designation}
               disabled={isSubmitting}
             />
@@ -201,20 +184,14 @@ export const EditFacultyModal = ({
             />
           </div>
 
+          {/* Institution - Read Only */}
           <div className="mb-6">
-            <Input
-              type="dropdown"
-              name="campus"
-              label="Institution"
-              placeholder="Select Institution"
-              value={formData.campus}
-              onChange={(e) =>
-                handleChange({ target: { name: "campus", value: e.target.value } })
-              }
-              options={campusOptions}
-              error={errors.campus}
-              disabled={isSubmitting}
-            />
+            <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
+              Institution
+            </label>
+            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700 cursor-not-allowed">
+              {campusOptions.find((opt) => opt.value === formData.campus)?.label || "Not assigned"}
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3">

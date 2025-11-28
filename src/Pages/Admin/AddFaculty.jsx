@@ -232,17 +232,20 @@ const AddFaculty = () => {
   const hasActiveFilters = searchTerm || selectedDepartment || selectedCampus;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
+    <div className="min-h-screen p-3 sm:p-4 md:p-6">
       <div className="mx-auto">
         <div className="bg-white rounded-lg shadow-md">
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 border-b border-gray-200 gap-4">
             <div className="w-full sm:w-auto">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+              {/* <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
                 Faculty Management
-              </h1>
-              <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                Manage your faculty members • {totalCount} total
+              </h1> */}
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6B21A8] border-l-4 border-[#6B21A8] pl-2">
+              Faculty Management
+            </h2>
+              <p className="text-gray-600 mt-2 text-sm sm:text-base">
+                Manage your faculty members {"  "}<b>• {totalCount} total </b>
               </p>
             </div>
             <div className="w-full sm:w-auto">
@@ -250,9 +253,9 @@ const AddFaculty = () => {
                 onClick={() => setIsAddModalOpen(true)}
                 text="Add Faculty"
                 icon={<UserPlus size={18} />}
-                textSize="text-sm sm:text-md"
+                textSize="text-md sm:text-md"
                 color="#631891"
-                padding="w-full sm:w-auto px-4 py-2"
+                padding="w-full sm:w-auto px-5 py-3"
               />
             </div>
           </div>
