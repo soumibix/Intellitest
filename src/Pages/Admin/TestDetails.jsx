@@ -535,7 +535,7 @@ const TestDetails = () => {
       return;
     }
     
-    showSuccess("Test published successfully! 🎉");
+    showSuccess("Test published successfully!");
     handleReset();
   };
 
