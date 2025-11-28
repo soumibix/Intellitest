@@ -46,6 +46,7 @@ import ProfileCompletionGuard from "./Components/ProfileCompletionGuard";
 import { useHttpInterceptor } from "./Hooks/useHttpInterceptor";
 import AdminProfilePage from "./Pages/Admin/AdminProfilePage";
 import FacultyTestDetailsView from "./Pages/Faculty/FacultyTestDetailsView";
+import AdminViewTestDetails from "./Pages/Admin/AdminViewTestDetails";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production
@@ -346,6 +347,16 @@ const AppWithInterceptor = () => {
                 <ProtectedRoute allowedRoles={["superadmin"]}>
                   <AdminLayout>
                     <AdminTestDetails />
+                  </AdminLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/test-details/:testId"
+              element={
+                <ProtectedRoute allowedRoles={["superadmin"]}>
+                  <AdminLayout>
+                    <AdminViewTestDetails />
                   </AdminLayout>
                 </ProtectedRoute>
               }
