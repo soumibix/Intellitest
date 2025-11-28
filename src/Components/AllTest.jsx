@@ -242,7 +242,7 @@ const AllTest = memo(function AllTest({
                       ) : (
                         <>
                           <div className="flex flex-col items-center gap-4">
-                            <p className="text-[#fff] text-lg sm:text-xl px-4">
+                            <p className="text-lg sm:text-xl px-4">
                               Click to view the next {nextBatchSize} test{nextBatchSize !== 1 ? 's' : ''}
                             </p>
                             <div className="relative z-10 bg-white/20 rounded-full p-3 group-hover:bg-white/30 transition-colors">

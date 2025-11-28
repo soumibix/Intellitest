@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SquarePen, LockKeyhole, Trash2, Sparkles, Loader2 } from "lucide-react";
+import { SquarePen, LockKeyhole, Trash2, Sparkles, Loader2, Eye } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import logo from '../assets/iem.jpg';
 import TestPopup from "../utils/TestPopup";
@@ -187,6 +187,13 @@ const formatDuration = (mins) => {
                 </button>
                 <button onClick={() => setShowDeleteModal(true)} className="p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete Test">
                   <Trash2 className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+                </button>
+              </div>
+            )}
+            {(userType === "admin" || userType === "faculty") && (
+              <div className="flex items-center gap-2 flex-shrink-0 cursor-pointer">
+                <button onClick={()=>{navigate(`/faculty/test-details/${_id}`)}} className="p-2 hover:bg-purple-50 rounded-lg transition-colors cursor-pointer" title="Edit Test">
+                  <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                 </button>
               </div>
             )}

@@ -85,10 +85,10 @@ export default function FacultyTestDetailsView() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="mx-auto bg-white rounded-lg p-8">
+    <div className=" min-h-screen ">
+      <div className="mx-auto  rounded-lg p-8 bg-white">
         {/* Header */}
-        <div className="flex justify-between items-start mb-6 bg-[#F7F3F9] p-6 rounded-lg">
+        <div className="flex justify-between items-start m b-6 bg-[#F7F3F9] p-6 rounded-lg">
           <div>
             <h1 className="text-2xl font-bold text-purple-700 mb-2">
               {testData.subjectName} - {testData.testCategory}
@@ -102,7 +102,7 @@ export default function FacultyTestDetailsView() {
               <p>Semester: {testData.semester}</p>
               <p>Subject Code: {testData.subjectCode}</p>
               <p className="mt-2">
-                <span className={`inline-block py-1 rounded-full text-xs font-medium ${
+                <span className={`inline-block py-1 rounded-lg text-xs px-5 font-medium ${
                   testData.status === 'ongoing' ? 'bg-green-100 text-green-700' :
                   testData.status === 'completed' ? 'bg-blue-100 text-blue-700' :
                   'bg-gray-100 text-gray-700'
