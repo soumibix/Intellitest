@@ -29,6 +29,7 @@ export function FacultyUploadQuestions({
           setFileUrl={setQuestionFileUrl}
           fileName={questionFileName}
           onDelete={() => onDeleteFile("question")}
+          redirectOnClick={true}
         />
       </div>
 
@@ -63,6 +64,7 @@ export function FacultyUploadQuestions({
             setFileUrl={setAnswerFileUrl}
             fileName={answerFileName}
             onDelete={() => onDeleteFile("answer")}
+            redirectOnClick={true}
           />
         </div>
       </div>

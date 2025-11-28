@@ -43,6 +43,7 @@ import { NotificationProvider } from "./Context/NotificationContext";
 // Profile Completion Guard
 import ProfileCompletionGuard from "./Components/ProfileCompletionGuard";
 import { useHttpInterceptor } from "./Hooks/useHttpInterceptor";
+import FacultyTestDetailsView from "./Pages/Faculty/FacultyTestDetailsView";
 
 // *** CONFIGURATION ***
 const ENFORCE_ROUTE_PROTECTION = true; // Set to false for development, true for production
@@ -443,6 +444,17 @@ const AppWithInterceptor = () => {
                 <ProtectedRoute allowedRoles={["faculty"]}>
                   <FacultyLayout>
                     <FacultyIndividualStudentPerformance />
+                  </FacultyLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/faculty/test-details/:testId"
+              element={
+                <ProtectedRoute allowedRoles={["faculty"]}>
+                  <FacultyLayout>
+                    <FacultyTestDetailsView />
                   </FacultyLayout>
                 </ProtectedRoute>
               }

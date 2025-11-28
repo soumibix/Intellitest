@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, X, Check, Trash2 } from 'lucide-react';
+import { Upload, X, Check, Trash2, SquareArrowOutUpRight } from 'lucide-react';
 
 // FileUploader Component
-export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl, fileName, onDelete }) {
+export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl, fileName, onDelete, removeDelete = true, redirectOnClick = false }) {
     const [file, setFile] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -264,12 +264,20 @@ export default function FileUploader({ onFileSelect, uploadedFileUrl, setFileUrl
                                 <div className="bg-green-500 rounded-full p-1">
                                     <Check className="w-4 h-4 text-white" strokeWidth={3} />
                                 </div>
-                                <button
+                                {removeDelete &&
+                                    <button
                                     onClick={handleDelete}
                                     className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                                 >
                                     <Trash2 className="w-5 h-5" />
-                                </button>
+                                </button>}
+                                {redirectOnClick &&
+                                    <button
+                                    onClick={() => window.open(uploadedFileUrl, '_blank')}
+                                    className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                                >
+                                    <SquareArrowOutUpRight className="w-5 h-5" />
+                                </button>}
                             </div>
                         </div>
                     </div>
