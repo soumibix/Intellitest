@@ -1,8 +1,30 @@
 import { UserPlus, X } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "../Components/common/Button";
 import Input from "../Components/common/Input";
-import { campusOptions, departmentOptions } from "../Config/dummyData";
+import { campusOptions, departmentOptions, designationOptions } from "../Config/dummyData";
+
+// Institution options
+// const INSTITUTIONS = [
+//   { value: "IEM Saltlake", label: "IEM, Salt Lake" },
+//   { value: "IEM Newtown", label: "IEM, Newtown" },
+//   { value: "UEM Jaipur", label: "IEM, Jaipur" },
+// ];
+
+// Department options
+// const DEPARTMENTS = [
+//   { value: "computer_science", label: "Computer Science & Engineering" },
+//   { value: "electronics", label: "Electronics & Communication Engineering" },
+//   { value: "electrical", label: "Electrical Engineering" },
+//   { value: "mechanical", label: "Mechanical Engineering" },
+//   { value: "civil", label: "Civil Engineering" },
+//   { value: "information_technology", label: "Information Technology" },
+//   { value: "mathematics", label: "Mathematics" },
+//   { value: "physics", label: "Physics" },
+//   { value: "chemistry", label: "Chemistry" },
+//   { value: "management", label: "Management Studies" },
+//   { value: "other", label: "Other" },
+// ];
 
 export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = false }) => {
   const [formData, setFormData] = useState({
@@ -13,24 +35,6 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
     campus: "",
   });
   const [errors, setErrors] = useState({});
-
-  // Get campus from session storage on component mount or when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      const user = sessionStorage.getItem("user");
-      if (user) {
-        try {
-          const userData = JSON.parse(user);
-          setFormData((prev) => ({
-            ...prev,
-            campus: userData.campus || "",
-          }));
-        } catch (error) {
-          console.error("Error parsing user from session storage:", error);
-        }
-      }
-    }
-  }, [isOpen]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -64,6 +68,8 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
   const handleSubmit = () => {
     if (validateForm() && !isSubmitting) {
       onAddFaculty(formData);
+      // Don't reset form or close modal here - parent will handle closing
+      // after successful API call
     }
   };
 
@@ -106,9 +112,9 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
 
   return (
     <div className="fixed inset-0 backdrop-blur shadow-top bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+          <h2 className="md:text-2xl text-xl font-bold text-[#631891]">
             Add New Faculty
           </h2>
           <button
@@ -153,13 +159,16 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
 
           <div className="mb-4">
             <Input
-              type="text"
+              type="dropdown"
               name="designation"
               label="Designation"
-              placeholder="Enter Designation (e.g., Professor, Assistant Professor)"
+              // placeholder="Enter Designation (e.g., Professor, Assistant Professor)"
               value={formData.designation}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
+              onChange={(e) =>
+                handleChange({ target: { name: "designation", value: e.target.value } })
+              }
+              // onKeyPress={handleKeyPress}
+              options={designationOptions}
               error={errors.designation}
               disabled={isSubmitting}
             />
@@ -170,6 +179,7 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
               type="dropdown"
               name="department"
               label="Department"
+              // placeholder="Select Department"
               value={formData.department}
               onChange={(e) =>
                 handleChange({ target: { name: "department", value: e.target.value } })
@@ -180,14 +190,20 @@ export const AddFacultyModal = ({ isOpen, onClose, onAddFaculty, isSubmitting = 
             />
           </div>
 
-          {/* Display Institution as read-only text */}
           <div className="mb-6">
-            <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
-              Institution
-            </label>
-            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700">
-              {campusOptions.find((opt) => opt.value === formData.campus)?.label || "Not assigned"}
-            </div>
+            <Input
+              type="dropdown"
+              name="campus"
+              label="Institution"
+              placeholder="Select Institution"
+              value={formData.campus}
+              onChange={(e) =>
+                handleChange({ target: { name: "campus", value: e.target.value } })
+              }
+              options={campusOptions}
+              error={errors.campus}
+              disabled={isSubmitting}
+            />
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end gap-3">

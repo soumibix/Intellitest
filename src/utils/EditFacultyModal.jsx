@@ -2,7 +2,7 @@ import { Edit2, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import Button from "../Components/common/Button";
 import Input from "../Components/common/Input";
-import { campusOptions, departmentOptions } from "../Config/dummyData";
+import { campusOptions, departmentOptions, designationOptions } from "../Config/dummyData";
 
 export const EditFacultyModal = ({
   isOpen,
@@ -54,14 +54,8 @@ export const EditFacultyModal = ({
       newErrors.name = "Full name is required";
     }
 
-    if (!formData.designation.trim()) {
+    if (!formData.designation) {
       newErrors.designation = "Designation is required";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
     }
 
     if (!formData.department) {
@@ -114,8 +108,8 @@ export const EditFacultyModal = ({
 
   return (
     <div className="fixed inset-0 backdrop-blur bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b sticky top-0 bg-white z-10">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
             Edit Faculty
           </h2>
@@ -145,37 +139,28 @@ export const EditFacultyModal = ({
             />
           </div>
 
+          {/* Email - Read Only */}
           <div className="mb-4">
-            {/* <Input
-              type="email"
-              name="email"
-              label="Email Address"
-              placeholder="Enter Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
-              error={errors.email}
-              disabled={isSubmitting}
-            /> */}
-            <div className="mb-6">
             <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
-              Email
+              Email Address
             </label>
-            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700">
+            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700 cursor-not-allowed">
               {formData.email}
             </div>
-          </div>
           </div>
 
           <div className="mb-4">
             <Input
-              type="text"
+              type="dropdown"
               name="designation"
               label="Designation"
-              placeholder="Enter Designation"
               value={formData.designation}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
+              onChange={(e) =>
+                handleChange({
+                  target: { name: "designation", value: e.target.value },
+                })
+              }
+              options={designationOptions}
               error={errors.designation}
               disabled={isSubmitting}
             />
@@ -199,12 +184,12 @@ export const EditFacultyModal = ({
             />
           </div>
 
-          {/* Display Institution as read-only text */}
+          {/* Institution - Read Only */}
           <div className="mb-6">
             <label className="block text-md font-medium text-[#2B2B2B] mb-2 text-left">
               Institution
             </label>
-            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700">
+            <div className="px-4 py-2 bg-gray-100 rounded-lg border border-gray-300 text-gray-700 cursor-not-allowed">
               {campusOptions.find((opt) => opt.value === formData.campus)?.label || "Not assigned"}
             </div>
           </div>

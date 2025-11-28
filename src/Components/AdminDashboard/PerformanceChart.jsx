@@ -40,32 +40,32 @@ export const PerformanceChart = ({
       // Transform backend data structure to chart format
       const transformedData = [
         { 
-          range: "Below 50", 
+          range: "Below 50%", 
           students: apiData.below50 || 0,
           percentage: total > 0 ? `${((apiData.below50 / total) * 100).toFixed(1)}%` : "0%"
         },
         { 
-          range: "50-60", 
+          range: "50-60%", 
           students: apiData.fiftyToSixty || 0,
           percentage: total > 0 ? `${((apiData.fiftyToSixty / total) * 100).toFixed(1)}%` : "0%"
         },
         { 
-          range: "60-70", 
+          range: "60-70%", 
           students: apiData.sixtyToSeventy || 0,
           percentage: total > 0 ? `${((apiData.sixtyToSeventy / total) * 100).toFixed(1)}%` : "0%"
         },
         { 
-          range: "70-80", 
+          range: "70-80%", 
           students: apiData.seventyToEighty || 0,
           percentage: total > 0 ? `${((apiData.seventyToEighty / total) * 100).toFixed(1)}%` : "0%"
         },
         { 
-          range: "80-90", 
+          range: "80-90%", 
           students: apiData.eightyToNinety || 0,
           percentage: total > 0 ? `${((apiData.eightyToNinety / total) * 100).toFixed(1)}%` : "0%"
         },
         { 
-          range: "Above 90", 
+          range: "Above 90%", 
           students: apiData.above90 || 0,
           percentage: total > 0 ? `${((apiData.above90 / total) * 100).toFixed(1)}%` : "0%"
         },

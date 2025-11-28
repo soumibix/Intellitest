@@ -603,7 +603,7 @@ const TestDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 md:py-10 md:px-10">
+    <div className="min-h-screen md:py-10 md:px-10">
       <ProgressiveStepper 
         activeStep={state.activeStep} 
         onSaveAndContinue={handleSaveAndContinue} 
