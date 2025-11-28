@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SquarePen, LockKeyhole, Trash2, Sparkles, Loader2, Eye } from "lucide-react";
+import { SquarePen, LockKeyhole, Trash2, Sparkles, Loader2, Eye, Info, BadgeInfo } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import logo from '../assets/iem.jpg';
 import TestPopup from "../utils/TestPopup";
@@ -190,10 +190,10 @@ const formatDuration = (mins) => {
                 </button>
               </div>
             )}
-            {(userType === "admin" || userType === "faculty") && (
+            {(userType === "admin" || userType === "faculty") && !paramTestId && (
               <div className="flex items-center gap-2 flex-shrink-0 cursor-pointer">
-                <button onClick={()=>{navigate(`/${userType}/test-details/${_id}`)}} className="p-2 hover:bg-purple-50 rounded-lg transition-colors cursor-pointer" title="Edit Test">
-                  <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                <button onClick={()=>{navigate(`/${userType}/test-details/${_id}`)}} className="p-2 hover:bg-purple-100 bg-purple-50 rounded-lg transition-colors cursor-pointer" title="Edit Test">
+                  <BadgeInfo className="md:w-6 md:h-6 w-5 h-5 text-[#6B21A8]" />
                 </button>
               </div>
             )}
@@ -331,7 +331,7 @@ const formatDuration = (mins) => {
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <img src={userIcon} alt="Creator" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-gray-300 flex-shrink-0" />
                 <div className="flex flex-col min-w-0">
-                  <span className="text-xs sm:text-sm md:text-base font-medium text-gray-900 truncate">{createdBy?.name || createdBy?.role ||'Faculty'}</span>
+                  <span className="text-xs sm:text-sm md:text-base font-medium text-gray-900 truncate capitalize">{createdBy?.name || createdBy?.role ||'Faculty'}</span>
                   <span className="text-xs sm:text-sm text-gray-500 font-semibold truncate">{createdBy?.designation || 'Head'}</span>
                 </div>
               </div>

@@ -203,13 +203,14 @@ const FacultyDashboard = () => {
             />
 
             <Input
-              type="dropdown"
+              type="text"
               label="Campus"
               placeholder="Select Campus"
               value={formData.campus}
               onChange={handleChange("campus")}
               options={campusOptions}
               size="md"
+              disabled={true}
             />
             <Input
               type="dropdown"
