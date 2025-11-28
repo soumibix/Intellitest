@@ -19,7 +19,7 @@ export const FacultyProgressiveStepper = ({ activeStep, onSaveAndContinue }) => 
     {
       id: 3,
       icon: Upload,
-      title: 'Upload Questions & Publish',
+      title: 'Upload Questions & Answers',
       description: 'Import questions from your files & generate answers.',
     },
     {
@@ -154,7 +154,7 @@ export const FacultyProgressiveStepper = ({ activeStep, onSaveAndContinue }) => 
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

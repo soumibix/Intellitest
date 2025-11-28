@@ -19,7 +19,7 @@ export const ProgressiveStepper = ({ activeStep, onSaveAndContinue }) => {
     {
       id: 3,
       icon: Upload,
-      title: 'Upload Questions & Publish',
+      title: 'Upload Questions & Answers',
       description: 'Import questions from your files.',
     },
     {

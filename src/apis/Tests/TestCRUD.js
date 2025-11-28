@@ -233,6 +233,7 @@ export const TestAPI = {
       return {
         success: response.success !== false,
         data: response.data || {},
+        analysis: response.analysis || [],
         page: response.page || 1,
         limit: response.limit || 10,
         totalStudents: response.totalStudents || 0,

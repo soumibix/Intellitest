@@ -23,7 +23,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
 
   const paramTestId = useParams().testId;
 
-  console.log({testData})
+  console.log({testData}, "lo");
 
   // console.log({paramTestId})
   const mergedData = { ...testData, ...data };
@@ -34,7 +34,9 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
     testCategory = mergedData.testcategory || "Test",
     department = "N/A",
     semester = "N/A",
-    numberOfQuestions = mergedData.numberQuestions || 0,
+    // numberOfQuestions = mergedData.numberQuestions || "N/A",
+    numberQuestions = mergedData.numberQuestions || 0,
+    questionCount = mergedData.questionCount || 0 ,
     duration = "N/A",
     testDate,
     startTime,
@@ -82,7 +84,7 @@ function TestCard({ userType, status = "upcoming", testData = {}, onEdit, data, 
       if (response.success) {
         // Use obtainedScore from response, fallback to totalScore if not available
         const obtainedScoreValue = response.obtainedScore ?? response.totalScore ?? 0;
-        const totalQuestions = response.answers?.length || numberOfQuestions || questions.length || 0;
+        const totalQuestions = questionCount || 0;
         const correctAnswers = response.answers?.filter(ans => ans.score > 0).length || 0;
         const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
 
@@ -205,10 +207,10 @@ const formatDuration = (mins) => {
         {/* Test Details */}
         <div className="space-y-2 mb-4 sm:mb-6 text-sm sm:text-base">
           <div className="flex flex-wrap items-center gap-2 text-gray-600">
-            <span className="font-medium">{numberOfQuestions || questions.length || 0} Questions</span>
+            <span className="font-medium">{ questionCount || numberQuestions || questions.length || 0} Questions</span>
             <span className="text-gray-400">•</span>
             {/* <span className="font-medium">{(numberOfQuestions || questions.length || 0) * 2} Marks</span> */}
-            <span className="font-medium">{totalMarks || maxScore} Marks</span>
+            <span className="font-medium">{totalMarks || maxScore || 'N/A'} Marks</span>
             <span className="text-gray-400">•</span>
             <span>{formatDuration(duration)}</span>
           </div>
@@ -354,7 +356,7 @@ const formatDuration = (mins) => {
         isOpen={showPopup} 
         onClose={() => setShowPopup(false)} 
         onStart={handlePopupStart} 
-        testData={{ title: subjectName, questions: numberOfQuestions || questions.length, marks: totalMarks, duration: `${duration} minutes` }} 
+        testData={{ title: subjectName, questions: questionCount || questions.length, marks: totalMarks, duration: `${duration} minutes` }} 
         _id={_id}
       />
 

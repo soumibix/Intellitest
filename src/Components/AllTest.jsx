@@ -39,6 +39,8 @@ const AllTest = memo(function AllTest({
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef(null);
 
+  console.log(allTests, "pe")
+
   // Update activeFilter when it changes from parent
   useEffect(() => {
     if (activeFilterProp !== null) {
@@ -233,7 +235,7 @@ const AllTest = memo(function AllTest({
                     className="bg-[#000000d8] text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center justify-center gap-4 min-h-[280px] group relative overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     <div className="absolute inset-0 bg-black"></div>
-                    <div className="relative z-10 text-center backdrop-blur-2xl">
+                    <div className="relative z-10 text-center ">
                       {isLoadingMore ? (
                         <>
                           <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" />
@@ -257,7 +259,7 @@ const AllTest = memo(function AllTest({
               </>
             ) : (
               <div className="col-span-full text-center py-12 text-gray-500">
-                <p className="text-base sm:text-lg">
+                <div className="text-base sm:text-lg">
                   {!showLoader && (
                     <div className="flex flex-col justify-center items-center gap-10 bg-white rounded-3xl py-22">
                       <Lottie
@@ -268,7 +270,7 @@ const AllTest = memo(function AllTest({
                       <div className="text-base font-semibold">No Test Data Found !!</div>
                     </div>
                   )}
-                </p>
+                </div>
               </div>
             )}
           </div>
