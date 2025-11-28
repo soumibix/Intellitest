@@ -192,7 +192,7 @@ const formatDuration = (mins) => {
             )}
             {(userType === "admin" || userType === "faculty") && (
               <div className="flex items-center gap-2 flex-shrink-0 cursor-pointer">
-                <button onClick={()=>{navigate(`/faculty/test-details/${_id}`)}} className="p-2 hover:bg-purple-50 rounded-lg transition-colors cursor-pointer" title="Edit Test">
+                <button onClick={()=>{navigate(`/${userType}/test-details/${_id}`)}} className="p-2 hover:bg-purple-50 rounded-lg transition-colors cursor-pointer" title="Edit Test">
                   <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                 </button>
               </div>
