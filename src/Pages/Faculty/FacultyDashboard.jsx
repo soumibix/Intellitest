@@ -9,12 +9,14 @@ import Lottie from "lottie-react";
 import handLoading from "../../Lottie/handLoading.json"
 import { useNotification } from "../../Context/NotificationContext";
 import { useAuth } from "../../AppRouter";
+
 const FacultyDashboard = () => {
   const httpHook = useHttp();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const {showSuccess, showError} = useNotification ();
+  const {showSuccess, showError} = useNotification();
   const {token} = useAuth();
+  
   // Get user data from sessionStorage
   const userDataStr = sessionStorage.getItem('user');
   const userData = userDataStr ? JSON.parse(userDataStr) : null;
@@ -29,6 +31,24 @@ const FacultyDashboard = () => {
   });
 
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+
+  // Campus options
+  const campusOptions = [
+    { value: "", label: "Select Campus" },
+    { value: "IEM Salt Lake", label: "IEM SaltLake" },
+    { value: "IEM Newtown", label: "IEM Newtown" },
+    { value: "UEM Jaipur", label: "UEM Jaipur" },
+  ];
+
+  // Designation options - updated to match backend values
+  const designationOptions = [
+    { value: "", label: "Select Designation" },
+    { value: "Professor", label: "Professor" },
+    { value: "Associate Professor", label: "Associate Professor" },
+    { value: "Assistant Professor", label: "Assistant Professor" },
+    { value: "Lecturer", label: "Lecturer" },
+    { value: "Teaching Assistant", label: "Teaching Assistant" },
+  ];
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -45,13 +65,16 @@ const FacultyDashboard = () => {
       if (response.success && response.data) {
         const profileData = response.data;
 
-        // Update form data with fetched profile
+        // Update form data with fetched profile - with proper value normalization
         setFormData({
-          name: profileData.name || "",
-          email: profileData.email || "",
-          campus: profileData.campus || "",
-          department: profileData.department || "",
-          designation: profileData.designation || "",
+          name: profileData.name?.trim() || "",
+          email: profileData.email?.trim() || "",
+          campus: profileData.campus?.trim() || "",
+          department: profileData.department?.trim() || "",
+          // Capitalize first letter to match options
+          designation: profileData.designation 
+            ? profileData.designation.charAt(0).toUpperCase() + profileData.designation.slice(1).toLowerCase()
+            : "",
         });
 
         // Check if profile is complete
@@ -63,11 +86,18 @@ const FacultyDashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
-      alert("Failed to load profile data");
+      showError("Failed to load profile data");
     } finally {
       setLoading(false);
     }
   };
+
+  // Debug useEffect to check formData
+  useEffect(() => {
+    console.log('Current formData:', formData);
+    console.log('Designation value:', formData.designation);
+    console.log('Designation match:', designationOptions.find(opt => opt.value === formData.designation));
+  }, [formData]);
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({
@@ -80,11 +110,11 @@ const FacultyDashboard = () => {
     // Validate if required fields are filled
     const requiredFields = ['campus', 'department', 'designation'];
     const allFieldsFilled = requiredFields.every(
-      (field) => formData[field].trim() !== ""
+      (field) => formData[field]?.trim() !== ""
     );
 
     if (!allFieldsFilled) {
-      alert("Please fill all required fields");
+      showError("Please fill all required fields");
       return;
     }
 
@@ -105,7 +135,6 @@ const FacultyDashboard = () => {
       );
 
       if (response.success) {
-        // alert("Profile updated successfully!");
         showSuccess(response.message || "Profile updated successfully!");
         
         // Update profile completion status
@@ -117,49 +146,23 @@ const FacultyDashboard = () => {
         }
       } else {
         showError(response.message || "Failed to update profile");
-        // alert(response.message || "Failed to update profile");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("An error occurred while updating profile");
+      showError("An error occurred while updating profile");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const campusOptions = [
-    { value: "", label: "Select Campus" },
-    { value: "IEM Salt Lake", label: "IEM SaltLake" },
-    { value: "IEM Newtown", label: "IEM Newtown" },
-    { value: "UEM Jaipur", label: "UEM Jaipur" },
-  ];
-
-  // const departmentOptions = [
-  //   { value: "", label: "Select Department" },
-  //   { value: "Civil Engineering", label: "Civil Engineering" },
-  //   { value: "Mechanical Engineering", label: "Mechanical Engineering" },
-  //   { value: "Electrical Engineering", label: "Electrical Engineering" },
-  //   { value: "Computer Science", label: "Computer Science" },
-  //   { value: "CSE", label: "CSE" },
-  // ];
-
-  const designationOptions = [
-    { value: "", label: "Select Designation" },
-    { value: "Professor", label: "Professor" },
-    { value: "Associate Professor", label: "Associate Professor" },
-    { value: "Assistant Professor", label: "Assistant Professor" },
-    { value: "Lecturer", label: "Lecturer" },
-    { value: "Teaching Assistant", label: "Teaching Assistant" },
-  ];
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Lottie 
-            animationData={handLoading} 
-            loop={true}
-            style={{ width: 500, height: 500 }}
-          />
+          animationData={handLoading} 
+          loop={true}
+          style={{ width: 500, height: 500 }}
+        />
       </div>
     );
   }
