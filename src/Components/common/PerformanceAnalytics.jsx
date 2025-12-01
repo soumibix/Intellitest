@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function PerformanceAnalytics({ students = [], totalMarks = 100, analysis = [] }) {
+  const [hoveredSegment, setHoveredSegment] = useState(null);
+
   // Use analysis data from props if available, otherwise calculate from students
   const getAnalysisData = () => {
     if (analysis && analysis.length > 0) {
@@ -13,14 +15,25 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
         else if (label.includes('50')) color = '#fb923c';
         else if (label.includes('< 50')) color = '#ef4444';
         
+        // Get students in this range
+        const studentsInRange = students.filter(student => {
+          const percentage = (student.marksObtained / totalMarks) * 100;
+          if (label.includes('> 90')) return percentage >= 90;
+          else if (label.includes('75')) return percentage >= 75 && percentage < 90;
+          else if (label.includes('50')) return percentage >= 50 && percentage < 75;
+          else if (label.includes('< 50')) return percentage < 50;
+          return false;
+        });
+        
         return {
           label: label,
           students: item.students,
-          color: color
+          color: color,
+          studentList: studentsInRange
         };
       });
     }
-    
+
     // Fallback calculation if no analysis provided
     const ranges = [
       { label: '> 90%', min: 90, color: '#3b82f6' },
@@ -30,7 +43,7 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
     ];
     
     return ranges.map(range => {
-      const count = students.filter(student => {
+      const studentsInRange = students.filter(student => {
         const percentage = (student.marksObtained / totalMarks) * 100;
         if (range.min && range.max) {
           return percentage >= range.min && percentage < range.max;
@@ -39,18 +52,23 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
         } else {
           return percentage < range.max;
         }
-      }).length;
+      });
       
       return {
         label: range.label,
-        students: count,
-        color: range.color
+        students: studentsInRange.length,
+        color: range.color,
+        studentList: studentsInRange
       };
     });
   };
 
   const data = getAnalysisData();
   const total = data.reduce((sum, item) => sum + item.students, 0);
+
+  useEffect(() => {
+    console.log('dghhvbhv', students, total)
+  }, [students])
   
   let currentAngle = -90;
   const segments = data.map(item => {
@@ -60,30 +78,45 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
     const endAngle = currentAngle + angle;
     currentAngle = endAngle;
 
-    const startRad = (startAngle * Math.PI) / 180;
-    const endRad = (endAngle * Math.PI) / 180;
-    
     const innerRadius = 60;
     const outerRadius = 110;
     
-    const x1 = 120 + outerRadius * Math.cos(startRad);
-    const y1 = 120 + outerRadius * Math.sin(startRad);
-    const x2 = 120 + outerRadius * Math.cos(endRad);
-    const y2 = 120 + outerRadius * Math.sin(endRad);
-    const x3 = 120 + innerRadius * Math.cos(endRad);
-    const y3 = 120 + innerRadius * Math.sin(endRad);
-    const x4 = 120 + innerRadius * Math.cos(startRad);
-    const y4 = 120 + innerRadius * Math.sin(startRad);
-    
-    const largeArc = angle > 180 ? 1 : 0;
-    
-    const pathData = [
-      `M ${x1} ${y1}`,
-      `A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${x2} ${y2}`,
-      `L ${x3} ${y3}`,
-      `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x4} ${y4}`,
-      'Z'
-    ].join(' ');
+    // Handle full circle case (100% or very close to it)
+    let pathData;
+    if (angle >= 359.99) {
+      // Draw two semicircles to create a full donut
+      pathData = [
+        `M 120 ${120 - outerRadius}`,
+        `A ${outerRadius} ${outerRadius} 0 0 1 120 ${120 + outerRadius}`,
+        `A ${outerRadius} ${outerRadius} 0 0 1 120 ${120 - outerRadius}`,
+        `M 120 ${120 - innerRadius}`,
+        `A ${innerRadius} ${innerRadius} 0 0 0 120 ${120 + innerRadius}`,
+        `A ${innerRadius} ${innerRadius} 0 0 0 120 ${120 - innerRadius}`,
+        'Z'
+      ].join(' ');
+    } else {
+      const startRad = (startAngle * Math.PI) / 180;
+      const endRad = (endAngle * Math.PI) / 180;
+      
+      const x1 = 120 + outerRadius * Math.cos(startRad);
+      const y1 = 120 + outerRadius * Math.sin(startRad);
+      const x2 = 120 + outerRadius * Math.cos(endRad);
+      const y2 = 120 + outerRadius * Math.sin(endRad);
+      const x3 = 120 + innerRadius * Math.cos(endRad);
+      const y3 = 120 + innerRadius * Math.sin(endRad);
+      const x4 = 120 + innerRadius * Math.cos(startRad);
+      const y4 = 120 + innerRadius * Math.sin(startRad);
+      
+      const largeArc = angle > 180 ? 1 : 0;
+      
+      pathData = [
+        `M ${x1} ${y1}`,
+        `A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${x2} ${y2}`,
+        `L ${x3} ${y3}`,
+        `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${x4} ${y4}`,
+        'Z'
+      ].join(' ');
+    }
 
     const midAngle = (startAngle + endAngle) / 2;
     const textRadius = 85;
@@ -95,7 +128,10 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
       percentage: percentage.toFixed(2),
       textX,
       textY,
-      color: item.color
+      color: item.color,
+      studentList: item.studentList || [],
+      label: item.label,
+      studentCount: item.students
     };
   });
 
@@ -134,7 +170,7 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
         </div>
 
         {/* Chart */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 relative">
           <svg 
             width="100%" 
             height="100%" 
@@ -147,6 +183,10 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
                   <path
                     d={segment.pathData}
                     fill={segment.color}
+                    className="transition-opacity cursor-pointer"
+                    style={{ opacity: hoveredSegment === idx ? 0.8 : 1 }}
+                    onMouseEnter={() => setHoveredSegment(idx)}
+                    onMouseLeave={() => setHoveredSegment(null)}
                   />
                   {segment.percentage > 5 && (
                     <text
@@ -154,7 +194,7 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
                       y={segment.textY}
                       textAnchor="middle"
                       dominantBaseline="middle"
-                      className="text-[10px] sm:text-xs font-bold fill-white"
+                      className="text-[10px] sm:text-xs font-bold fill-white pointer-events-none"
                     >
                       {segment.percentage}%
                     </text>
@@ -162,17 +202,53 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
                 </g>
               ))
             ) : (
-              <text
-                x="120"
-                y="120"
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="text-sm fill-gray-400"
-              >
-                No Data
-              </text>
+              <>
+                {/* Empty state - gray donut ring */}
+                <path
+                  d={[
+                    `M 120 ${120 - 110}`,
+                    `A 110 110 0 0 1 120 ${120 + 110}`,
+                    `A 110 110 0 0 1 120 ${120 - 110}`,
+                    `M 120 ${120 - 60}`,
+                    `A 60 60 0 0 0 120 ${120 + 60}`,
+                    `A 60 60 0 0 0 120 ${120 - 60}`,
+                    'Z'
+                  ].join(' ')}
+                  fill="#E5E7EB"
+                />
+                <text
+                  x="120"
+                  y="120"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  className="text-sm font-medium fill-gray-400"
+                >
+                  No Data
+                </text>
+              </>
             )}
           </svg>
+          
+          {/* Tooltip */}
+          {hoveredSegment !== null && (
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg border border-gray-200 p-3 pointer-events-none z-10 max-w-xs w-64">
+              <div className="text-sm font-semibold text-gray-800">
+                {segments[hoveredSegment].label} - {segments[hoveredSegment].studentCount} Student{segments[hoveredSegment].studentCount !== 1 ? 's' : ''}
+              </div>
+              <div className="max-h-32 overflow-y-auto space-y-1">
+                {/* {segments[hoveredSegment].studentList.length > 0 ? (
+                  segments[hoveredSegment].studentList.map((student, idx) => (
+                    <div key={idx} className="text-xs text-gray-600 flex justify-between gap-2">
+                      <span className="truncate">{student.name}</span>
+                      <span className="font-medium whitespace-nowrap">{student.marksObtained}/{totalMarks}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-xs text-gray-400 italic">No students in this range</div>
+                )} */}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
