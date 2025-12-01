@@ -66,9 +66,6 @@ export default function PerformanceAnalytics({ students = [], totalMarks = 100, 
   const data = getAnalysisData();
   const total = data.reduce((sum, item) => sum + item.students, 0);
 
-  useEffect(() => {
-    console.log('dghhvbhv', students, total)
-  }, [students])
   
   let currentAngle = -90;
   const segments = data.map(item => {
